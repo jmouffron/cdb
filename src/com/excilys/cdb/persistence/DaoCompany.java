@@ -1,5 +1,6 @@
 package com.excilys.cdb.persistence;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -7,6 +8,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.excilys.cdb.exceptions.ConnectionException;
 import com.excilys.cdb.mappers.CompanyMapper;
 import com.excilys.cdb.model.Company;
 
@@ -14,22 +16,22 @@ import com.excilys.cdb.model.Company;
  * @author excilys
  *
  */
-public class DaoCompany extends DaoInstance<Company> {
+public class DaoCompany implements DaoInstance<Company> {
 	private final String INSERT = "INSERT INTO company VALUES(?);";
-	private final String SELECT_ALL = "Select "
-			+ "pc.name, pc.introduced, pc.discontinued, c.id c.name as manu_name pc " + "from company pc "
-			+ "inner join " + "company c " + "on pc.company_id=c.id;";
+	private final String SELECT_ALL = "Select * from company;";
 	private final String SELECT_ID = "Select * from company where id=?;";
 	private final String UPDATE = "UPDATE company SET name=? WHERE id=?;";
 	private final String DELETE_ID = "DELETE FROM company WHERE id=? ;";
 	private final String DELETE_NAME = "DELETE FROM company WHERE name=? ;";
+	
+	private Connection conn;
 
-	DaoCompany() {
-		super();
+	DaoCompany(){
+		this.conn = Datasource.getConnection();
 	}
 
 	@Override
-	List<Company> getAll() {
+	public List<Company> getAll() {
 		List<Company> result = new ArrayList<>();
 		try (Statement stmt = this.conn.createStatement(); ResultSet rs = stmt.executeQuery(SELECT_ALL);) {
 			while (rs.next()) {
@@ -43,7 +45,7 @@ public class DaoCompany extends DaoInstance<Company> {
 	}
 
 	@Override
-	Company getOneById(Long id) {
+	public Company getOneById(Long id) {
 		Company result = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -66,7 +68,7 @@ public class DaoCompany extends DaoInstance<Company> {
 	}
 
 	@Override
-	boolean create(Company newEntity) {
+	public boolean create(Company newEntity) {
 		PreparedStatement stmt = null;
 		int lineAffected = 0;
 		try {
@@ -85,7 +87,7 @@ public class DaoCompany extends DaoInstance<Company> {
 	}
 
 	@Override
-	boolean updateById(Long id, Company newEntity) {
+	public boolean updateById(Long id, Company newEntity) {
 		PreparedStatement stmt = null;
 		int lineAffected = 0;
 		try {
@@ -106,7 +108,7 @@ public class DaoCompany extends DaoInstance<Company> {
 	}
 
 	@Override
-	boolean deleteById(Long id) {
+	public boolean deleteById(Long id) {
 		PreparedStatement stmt = null;
 		int lineAffected = 0;
 		try {
@@ -125,7 +127,7 @@ public class DaoCompany extends DaoInstance<Company> {
 	}
 
 	@Override
-	boolean deleteByName(String name) {
+	public boolean deleteByName(String name) {
 		PreparedStatement stmt = null;
 		int lineAffected = 0;
 		try {

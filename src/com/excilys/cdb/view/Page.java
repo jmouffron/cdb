@@ -4,8 +4,12 @@ import java.util.Scanner;
 
 import org.slf4j.Logger;
 
-public abstract class Page {
+import com.excilys.cdb.model.Entity;
+import com.excilys.cdb.service.IService;
+
+public abstract class Page<T extends Entity> {
 	protected Logger logger;
 	protected Scanner input;
+	protected IService<T> service;
 	public abstract String show();
 }

@@ -1,5 +1,6 @@
 package com.excilys.cdb.persistence;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -12,22 +13,23 @@ import com.excilys.cdb.mappers.ComputerMapper;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 
-public class DaoComputer extends DaoInstance<Computer> {
+public class DaoComputer implements DaoInstance<Computer> {
 	private final String INSERT = "INSERT INTO computer VALUES(?,?,?,?);";
-	private final String SELECT_ALL = "Select "
-			+ "pc.name, pc.introduced, pc.discontinued, c.id, c.name as manu_name pc " + "from company pc "
-			+ "inner join " + "company c " + "on pc.company_id=c.id";
+	private final String SELECT_ALL = "Select pc.*, c.id, c.name from computer pc "
+			+ "INNER JOIN company c ON pc.company_id=c.id";
 	private final String SELECT_ID = SELECT_ALL + " where pc.id=? ;";
 	private final String UPDATE = "UPDATE computer SET name=?,introduced=?,discontinued=?,company_id=? WHERE id=? ;";
 	private final String DELETE_ID = "DELETE FROM computer WHERE id=? ;";
 	private final String DELETE_NAME = "DELETE FROM computer WHERE name=? ;";
-
+	
+	private Connection conn;
+	
 	DaoComputer() {
-		super();
+		this.conn = Datasource.getConnection();
 	}
 
 	@Override
-	List<Computer> getAll() {
+	public List<Computer> getAll() {
 		List<Computer> result = new ArrayList<>();
 		try (Statement stmt = this.conn.createStatement(); ResultSet rs = stmt.executeQuery(SELECT_ALL);) {
 			while (rs.next()) {
@@ -41,7 +43,7 @@ public class DaoComputer extends DaoInstance<Computer> {
 	}
 
 	@Override
-	Computer getOneById(Long id) {
+	public Computer getOneById(Long id) {
 		Computer result = null;
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
@@ -64,7 +66,7 @@ public class DaoComputer extends DaoInstance<Computer> {
 	}
 
 	@Override
-	boolean create(Computer newEntity) {
+	public boolean create(Computer newEntity) {
 		PreparedStatement stmt = null;
 		ResultSet rs = null;
 		int linesAffected = 0;
@@ -88,7 +90,7 @@ public class DaoComputer extends DaoInstance<Computer> {
 	}
 
 	@Override
-	boolean updateById(Long id, Computer newEntity) {
+	public boolean updateById(Long id, Computer newEntity) {
 		PreparedStatement stmt = null;
 		int lineAffected = 0;
 		try {
@@ -111,7 +113,7 @@ public class DaoComputer extends DaoInstance<Computer> {
 	}
 
 	@Override
-	boolean deleteById(Long id) {
+	public boolean deleteById(Long id) {
 		PreparedStatement stmt = null;
 		int lineAffected = 0;
 		try {
@@ -130,11 +132,11 @@ public class DaoComputer extends DaoInstance<Computer> {
 	}
 
 	@Override
-	boolean deleteByName(String name) {
+	public boolean deleteByName(String name) {
 		PreparedStatement stmt = null;
 		int lineAffected = 0;
 		try {
-			stmt = this.conn.prepareStatement(DELETE_ID);
+			stmt = this.conn.prepareStatement(DELETE_NAME);
 			stmt.setString(1, name);
 			lineAffected = stmt.executeUpdate();
 		} catch (SQLException sqlex) {

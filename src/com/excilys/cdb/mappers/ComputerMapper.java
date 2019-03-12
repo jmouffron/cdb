@@ -16,9 +16,9 @@ public class ComputerMapper {
 		Timestamp introduced = rs.getTimestamp("introduced");
 		Timestamp discontinued = rs.getTimestamp("discontinued");
 		
-		Long manuId = rs.getLong("company_id");
-		String manuName = rs.getString("manu_name");
-		Company company = new Company(manuId, manuName);
+		Long companyId = rs.getLong("company_id");
+		String companyName = rs.getString("c.name");
+		Company company = new Company(companyId, companyName);
 		
 		Computer computer = new Computer(id, name, introduced, discontinued, company);		
 		return computer;

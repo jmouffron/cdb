@@ -3,11 +3,11 @@ package com.excilys.cdb.persistence;
 import com.excilys.cdb.model.Company;
 
 public class DaoCompanyFactory implements IDaoFactory<Company> {
-	private DaoInstance<Company> instance;
-	
-	public DaoInstance<Company> getInstance() {
+	private volatile DaoCompany instance = null;
+
+	public DaoInstance<Company> getDao() {
 		if(instance == null) {
-			synchronized(DaoComputerFactory.class) {
+			synchronized(DaoCompanyFactory.class) {
 				if(instance == null) {
 					instance = new DaoCompany();
 				}

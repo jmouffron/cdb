@@ -1,7 +1,5 @@
 package com.excilys.cdb.exceptions;
 
-package com.excilys.cdb.exceptions;
-
 public class ServiceException extends Exception {
 
 	/**

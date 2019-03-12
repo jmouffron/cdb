@@ -52,7 +52,7 @@ public class Computer extends Entity {
 
 	@Override
 	public String toString() {
-		return "Computer of id "+ this.id + ", of name" + this.name +" ,introduced in "+ this.introduced.toString()+ " ,discontinued in"+ this.discontinued.toString() + " " + this.company.toString();
+		return "Computer of id "+ this.id + ", of name " + this.name +" ,introduced in "+ this.introduced+ " ,discontinued in "+ this.discontinued + " " + this.company.toString();
 	}
 
 }

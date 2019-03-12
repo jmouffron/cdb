@@ -2,15 +2,20 @@ package com.excilys.cdb.view;
 
 import org.slf4j.LoggerFactory;
 
-public class ComputerUpdatePage extends Page {
+import com.excilys.cdb.exceptions.ServiceException;
+import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.service.ServiceFactory;
+
+public class ComputerUpdatePage extends Page<Computer> {
 	
-	public ComputerUpdatePage() {
-		this.logger = LoggerFactory.getLogger(MenuPage.class);
+	public ComputerUpdatePage() throws ServiceException {
+		this.service = ServiceFactory.getService(ServiceFactory.COMPANY_SERVICE);
+		this.logger = LoggerFactory.getLogger(ComputerUpdatePage.class);
 	}
 	
 	@Override
 	public String show() {
-		// TODO Auto-generated method stub
+	
 		return null;
 	}
 

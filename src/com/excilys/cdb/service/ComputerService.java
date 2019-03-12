@@ -1,46 +1,62 @@
 package com.excilys.cdb.service;
 
-import java.math.BigInteger;
 import java.util.List;
 
-import com.excilys.cdb.model.Entity;
+import com.excilys.cdb.exceptions.BadInputException;
+import com.excilys.cdb.exceptions.CreationException;
+import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.persistence.DaoComputerFactory;
+import com.excilys.cdb.persistence.DaoInstance;
 
-public class ComputerService extends AbstractService {
-
-	@Override
-	List<Entity> getAll() {
-		// TODO Auto-generated method stub
-		return null;
+public class ComputerService implements IService<Computer> {
+	private DaoInstance<Computer> dao;
+	
+	public ComputerService(){
+		this.dao = new DaoComputerFactory().getDao();
 	}
 
 	@Override
-	Entity getOneById(BigInteger id) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<Computer> getAll() {
+		return this.dao.getAll();
 	}
 
 	@Override
-	Entity create(Entity newEntity) {
-		// TODO Auto-generated method stub
-		return null;
+	public Computer getOneById(Long id) throws BadInputException {
+		if(id<0) {
+			throw new BadInputException();
+		}
+		return this.dao.getOneById(id);
 	}
 
 	@Override
-	Entity updateById(BigInteger id) {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean create(Computer newEntity) throws BadInputException {
+		if(newEntity == null || newEntity.getName() == null || newEntity.getName().equals("")) {
+			throw new BadInputException();
+		}
+		return this.dao.create(newEntity);
 	}
 
 	@Override
-	Entity deleteById(BigInteger id) {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean updateById(Long id, Computer newEntity) throws BadInputException {
+		if(id<0) {
+			throw new BadInputException();
+		}
+		return this.dao.updateById(id, newEntity);
 	}
 
 	@Override
-	Entity deleteByName(String name) {
-		// TODO Auto-generated method stub
-		return null;
+	public boolean deleteById(Long id) throws BadInputException {
+		if(id<0) {
+			throw new BadInputException();
+		}
+		return this.dao.deleteById(id);
 	}
 
+	@Override
+	public boolean deleteByName(String name) throws BadInputException {
+		if(name == null || name.equals("")) {
+			throw new BadInputException();
+		}
+		return this.dao.deleteByName(name);
+	}
 }
