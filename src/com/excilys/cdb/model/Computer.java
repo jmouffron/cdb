@@ -1,36 +1,26 @@
 package com.excilys.cdb.model;
 
-import java.math.BigInteger;
-import java.util.Date;
+import java.sql.Timestamp;
 
 public class Computer extends Entity {
 	
-	private String name;
-	private Date introduced;
-	private Date discontinued;
+	private Timestamp introduced;
+	private Timestamp discontinued;
 	private Company company;
-	
-	public String getName() {
-		return name;
-	}
 
-	public void setName(String name) {
-		this.name = name;
-	}
-
-	public Date getIntroduced() {
+	public Timestamp getIntroduced() {
 		return introduced;
 	}
 
-	public void setIntroduced(Date introduced) {
+	public void setIntroduced(Timestamp introduced) {
 		this.introduced = introduced;
 	}
 
-	public Date getDiscontinued() {
+	public Timestamp getDiscontinued() {
 		return discontinued;
 	}
 
-	public void setDiscontinued(Date discontinued) {
+	public void setDiscontinued(Timestamp discontinued) {
 		this.discontinued = discontinued;
 	}
 
@@ -48,15 +38,15 @@ public class Computer extends Entity {
 	/**
 	 * General constructor with all params
 	 * @param name
-	 * @param introduced2
-	 * @param discontinued2
+	 * @param introduced
+	 * @param discontinued
 	 * @param company
 	 */
-	public Computer(BigInteger id,String name, Date introduced2, Date discontinued2, Company company) {
+	public Computer(Long id,String name, Timestamp introduced, Timestamp discontinued, Company company) {
 		this.id = id;
 		this.name = name;
-		this.introduced = introduced2;
-		this.discontinued = discontinued2;
+		this.introduced = introduced;
+		this.discontinued = discontinued;
 		this.company = company;
 	}
 

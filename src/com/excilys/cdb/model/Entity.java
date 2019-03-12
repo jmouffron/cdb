@@ -1,17 +1,24 @@
 package com.excilys.cdb.model;
 
-import java.math.BigInteger;
-
 public abstract class Entity {
-	protected BigInteger id;
+	protected Long id;
+	protected String name;
 
-	public BigInteger getId() {
+	public Long getId() {
 		return id;
 	}
 
-	public void setId(BigInteger id) {
+	public void setId(Long id) {
 		this.id = id;
 	}
 
 	abstract public String toString();
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 }

@@ -1,5 +1,7 @@
 package com.excilys.cdb.persistence;
 
-public interface IDaoFactory {
+import com.excilys.cdb.model.Entity;
 
+public interface IDaoFactory<T> {
+	abstract DaoInstance<T> getInstance();
 }
