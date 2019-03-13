@@ -8,9 +8,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.excilys.cdb.exceptions.ConnectionException;
 import com.excilys.cdb.mappers.CompanyMapper;
 import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Entity;
 
 /**
  * @author excilys
@@ -20,13 +20,14 @@ public class DaoCompany implements DaoInstance<Company> {
 	private final String INSERT = "INSERT INTO company VALUES(?);";
 	private final String SELECT_ALL = "Select * from company;";
 	private final String SELECT_ID = "Select * from company where id=?;";
+	private final String SELECT_NAME = "Select * from company where name=?;";
 	private final String UPDATE = "UPDATE company SET name=? WHERE id=?;";
 	private final String DELETE_ID = "DELETE FROM company WHERE id=? ;";
 	private final String DELETE_NAME = "DELETE FROM company WHERE name=? ;";
-	
+
 	private Connection conn;
 
-	DaoCompany(){
+	DaoCompany() {
 		this.conn = Datasource.getConnection();
 	}
 
@@ -68,7 +69,30 @@ public class DaoCompany implements DaoInstance<Company> {
 	}
 
 	@Override
-	public boolean create(Company newEntity) {
+	public Company getOneByName(String name) {
+		Company result = null;
+		PreparedStatement stmt = null;
+		ResultSet rs = null;
+		try {
+			stmt = this.conn.prepareStatement(SELECT_NAME);
+			stmt.setString(1, name);
+			rs = stmt.executeQuery();
+			rs.next();
+			result = CompanyMapper.map(rs);
+		} catch (SQLException sqlex) {
+			sqlex.printStackTrace();
+			try {
+				rs.close();
+				stmt.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public boolean create(Entity newEntity) {
 		PreparedStatement stmt = null;
 		int lineAffected = 0;
 		try {

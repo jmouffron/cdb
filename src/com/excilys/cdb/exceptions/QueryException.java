@@ -9,8 +9,8 @@ package com.excilys.cdb.exceptions;
  */
 public class QueryException extends DaoException {
 
-private static final long serialVersionUID = 1L;
-	
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * @param message
 	 * @param cause

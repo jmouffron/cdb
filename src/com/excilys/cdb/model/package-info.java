@@ -1,8 +1,5 @@
 /**
- * 
- */
-/**
  * @author excilys
  *
  */
-package model;
+package com.excilys.cdb.model;

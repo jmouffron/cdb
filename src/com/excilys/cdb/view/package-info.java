@@ -5,4 +5,4 @@
  * @author excilys
  *
  */
-package view;
+package com.excilys.cdb.view;

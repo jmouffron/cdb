@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.excilys.cdb.exceptions;
 
 /**
@@ -8,11 +5,16 @@ package com.excilys.cdb.exceptions;
  *
  */
 public class BadInputException extends ServiceException {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final String EXC_MSG = "Bad value inputted.";
-	
+
 	public BadInputException() {
 		super(EXC_MSG);
 	}
+
 	/**
 	 * @param message
 	 * @param cause
@@ -29,7 +31,7 @@ public class BadInputException extends ServiceException {
 	 * @param cause
 	 */
 	public BadInputException(String message, Throwable cause) {
-		super(EXC_MSG +message, cause);
+		super(EXC_MSG + message, cause);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -37,7 +39,7 @@ public class BadInputException extends ServiceException {
 	 * @param message
 	 */
 	public BadInputException(String message) {
-		super(EXC_MSG +message);
+		super(EXC_MSG + message);
 		// TODO Auto-generated constructor stub
 	}
 

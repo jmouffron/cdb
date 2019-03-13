@@ -5,4 +5,4 @@
  * @author excilys
  *
  */
-package exceptions;
+package com.excilys.cdb.exceptions;

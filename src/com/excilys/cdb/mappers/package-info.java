@@ -1,8 +1,5 @@
 /**
- * 
- */
-/**
  * @author excilys
  *
  */
-package mappers;
+package com.excilys.cdb.mappers;

@@ -9,6 +9,7 @@ package com.excilys.cdb.exceptions;
  */
 public class ConnectionException extends DaoException {
 	private final static String EXC_MSG = "The connection couldn't be established, change connection parameters.";
+
 	/**
 	 * 
 	 */

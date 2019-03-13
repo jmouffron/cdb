@@ -1,8 +1,5 @@
 /**
- * 
- */
-/**
  * @author excilys
  *
  */
-package controller;
+package com.excilys.cdb.controller;

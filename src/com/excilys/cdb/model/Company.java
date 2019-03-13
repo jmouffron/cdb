@@ -11,8 +11,16 @@ public class Company extends Entity {
 
 	@Override
 	public String toString() {
-		// TODO Auto-generated method stub
-		return this.name ;
+		return this.name;
 	}
 
+	@Override
+	public int hashCode() {
+		return super.hashCode();
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		return super.equals(obj);
+	}
 }

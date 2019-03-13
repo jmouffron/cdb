@@ -6,15 +6,14 @@ public class ServiceException extends Exception {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * @param message
 	 * @param cause
 	 * @param enableSuppression
 	 * @param writableStackTrace
 	 */
-	public ServiceException(String message, Throwable cause, boolean enableSuppression,
-			boolean writableStackTrace) {
+	public ServiceException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
 	}
 
@@ -40,4 +39,3 @@ public class ServiceException extends Exception {
 		super(cause);
 	}
 }
-

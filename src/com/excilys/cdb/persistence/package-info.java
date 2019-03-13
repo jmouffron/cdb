@@ -5,4 +5,4 @@
  * @author excilys
  *
  */
-package persistence;
+package com.excilys.cdb.persistence;

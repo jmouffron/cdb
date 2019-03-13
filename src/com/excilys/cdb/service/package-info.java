@@ -5,4 +5,4 @@
  * @author excilys
  *
  */
-package service;
+package com.excilys.cdb.service;
