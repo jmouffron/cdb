@@ -4,6 +4,16 @@
 # Log file
 *.log
 
+# Build target
+build/
+target/
+
+# Project Settings
+.project
+.settings
+.classpath
+main/java/resource
+
 # BlueJ files
 *.ctxt
 
