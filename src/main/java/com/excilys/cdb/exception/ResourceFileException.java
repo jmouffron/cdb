@@ -13,7 +13,6 @@ public class ResourceFileException extends Exception {
 	public ResourceFileException(String message, Throwable cause, boolean enableSuppression,
 			boolean writableStackTrace) {
 		super(message + "Resource File for jdbc Connection Not Found", cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -22,7 +21,6 @@ public class ResourceFileException extends Exception {
 	 */
 	public ResourceFileException(String message, Throwable cause) {
 		super(message + "Resource File for jdbc Connection Not Found", cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -30,7 +28,6 @@ public class ResourceFileException extends Exception {
 	 */
 	public ResourceFileException(String message) {
 		super(message + "Resource File for jdbc Connection Not Found");
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -38,7 +35,6 @@ public class ResourceFileException extends Exception {
 	 */
 	public ResourceFileException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 }

@@ -13,8 +13,8 @@ public class EntityListPage extends Page<Entity> {
 	private long startIndex;
 	private long pageIndex;
 
-	public EntityListPage(Data<Entity> data, long totalPages, long dataPerPage) throws ServiceException {
-		this.data = data;
+	public EntityListPage(Data<Entity> payload, long totalPages, long dataPerPage) throws ServiceException {
+		this.data = payload;
 		this.pageIndex = 0;
 		this.logger = LoggerFactory.getLogger(EntityListPage.class);
 		this.dataPerPage = dataPerPage;

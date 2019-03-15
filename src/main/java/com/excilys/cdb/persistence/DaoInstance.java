@@ -19,7 +19,7 @@ public interface DaoInstance<T extends Entity> {
 
 	abstract T getOneByName(String name);
 
-	abstract boolean create(Entity newEntity);
+	abstract boolean create(T newEntity);
 
 	abstract boolean updateById(Long id, T newEntity);
 

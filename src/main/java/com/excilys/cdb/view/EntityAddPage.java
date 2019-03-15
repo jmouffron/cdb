@@ -2,7 +2,6 @@ package com.excilys.cdb.view;
 
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.model.Entity;
 
 import org.slf4j.LoggerFactory;
 
@@ -10,7 +9,7 @@ import com.excilys.cdb.controller.MenuChoiceEnum;
 
 public class EntityAddPage extends Page<Computer> {
 
-	public EntityAddPage(Data<Entity> data) throws ServiceException {
+	public EntityAddPage(Data<Computer> data) throws ServiceException {
 		this.data = data;
 		this.logger = LoggerFactory.getLogger(EntityAddPage.class);
 	}

@@ -6,14 +6,18 @@ package com.excilys.cdb.exception;
 /**
  * @author excilys
  *
+ * A generic exception for the presentation layer
+ * 
  */
 public class PageException extends Exception {
+
+	private static final long serialVersionUID = -3827766013553488295L;
 
 	/**
 	 * 
 	 */
 	public PageException() {
-		// TODO Auto-generated constructor stub
+		super();
 	}
 
 	/**

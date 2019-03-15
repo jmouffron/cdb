@@ -91,14 +91,14 @@ public class DaoComputer implements DaoInstance<Computer> {
 	}
 
 	@Override
-	public boolean create(Entity newEntity) {
+	public boolean create(Computer newEntity) {
 		int linesAffected = 0;
 
 		try (PreparedStatement stmt = Datasource.getConnection().prepareStatement(INSERT);) {
-			stmt.setString(1, ((Computer) newEntity).getName());
-			stmt.setTimestamp(2, ((Computer) newEntity).getIntroduced());
-			stmt.setTimestamp(3, ((Computer) newEntity).getDiscontinued());
-			stmt.setLong(4, ((Computer) newEntity).getCompany().getId());
+			stmt.setString(1, newEntity.getName());
+			stmt.setTimestamp(2, newEntity.getIntroduced());
+			stmt.setTimestamp(3, newEntity.getDiscontinued());
+			stmt.setLong(4, newEntity.getCompany().getId());
 			linesAffected = stmt.executeUpdate();
 		} catch (SQLException sqlex) {
 			System.out.println(sqlex.getMessage());

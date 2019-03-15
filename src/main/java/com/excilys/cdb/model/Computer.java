@@ -95,7 +95,7 @@ public class Computer extends Entity {
 	}
 
 	static public class ComputerBuilder {
-		private Long id;
+		private Long id ;
 		private String name;
 		private Timestamp introduced = null;
 		private Timestamp discontinued = null;
@@ -103,7 +103,12 @@ public class Computer extends Entity {
 
 		public ComputerBuilder() {
 		}
-
+		
+		public ComputerBuilder setId(Long id) {
+			this.id = id;
+			return this;
+		}
+		
 		public ComputerBuilder setName(String name) {
 			this.name = name;
 			return this;

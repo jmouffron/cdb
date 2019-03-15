@@ -15,8 +15,7 @@ import com.excilys.cdb.view.*;
 /**
  * @author excilys
  * 
- *         A Front Controller class to handle user interaction. It is the app
- *         main entrypoint.
+ *         A Front Controller class to handle user interaction and view data injection.
  * 
  * @param <T>
  */
@@ -41,15 +40,11 @@ public class Controller<T extends Entity> {
 		return instance;
 	}
 
-	public static void main(String[] args) {
-
-		Controller<Entity> controller = Controller.getController();
-		controller.observeInput();
-		System.exit(0);
-
-	}
-
-	private void observeInput() {
+	/**
+	 * Starts the process of listening on user input
+	 *  and launches the application loop
+	 */
+	public void start() {
 		boolean looper = true;
 
 		while (looper) {
@@ -119,7 +114,7 @@ public class Controller<T extends Entity> {
 	private void listAllEntity(String serviceType) {
 		this.setService(serviceType);
 
-		List<Entity> entities = this.getAllEntities();
+		List<Entity> entities = (List<Entity>) this.getAllEntities();
 		Data<Entity> payload = new Data<>(entities);
 
 		long totalDataSize = entities.size();
@@ -182,10 +177,10 @@ public class Controller<T extends Entity> {
 		} while (introduced.after(discontinued));
 
 		Company company = (Company) getEntityById(companyId);
-		Entity newEntity = new Computer.ComputerBuilder().setName(name).setIntroduced(introduced)
+		Computer newEntity = new Computer.ComputerBuilder().setName(name).setIntroduced(introduced)
 				.setDiscontinued(discontinued).setCompany(company).build();
 
-		Data<Entity> payload = new Data<>(newEntity);
+		Data<Computer> payload = new Data<>(newEntity);
 		this.addEntity(newEntity);
 
 		try {
@@ -235,9 +230,9 @@ public class Controller<T extends Entity> {
 	 * 
 	 * @return List<Entity>
 	 */
-	private List<Entity> getAllEntities() {
+	private List<T> getAllEntities() {
 		// TODO Auto-generated method stub
-		return (List<Entity>) this.service.getAll();
+		return this.service.getAll();
 	}
 
 	/**
@@ -256,21 +251,6 @@ public class Controller<T extends Entity> {
 	}
 
 	/**
-	 * Fetches an Entity based on a given Name
-	 * 
-	 * @param name
-	 * @return An entity mapped from the database
-	 */
-	private T getEntityByName(String name) {
-		try {
-			return this.service.getOneByName(name);
-		} catch (BadInputException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	/**
 	 * Fetches an Entity based on a given Id.
 	 * 
 	 * @param newEntity
@@ -278,7 +258,7 @@ public class Controller<T extends Entity> {
 	 */
 	private boolean addEntity(Entity newEntity) {
 		try {
-			return this.service.create(newEntity);
+			return this.service.create((T) newEntity);
 		} catch (BadInputException e) {
 			e.printStackTrace();
 		}
@@ -295,6 +275,15 @@ public class Controller<T extends Entity> {
 	}
 
 	/**
+	 * Returns the service to act on the database
+	 * 
+	 * @return service of the controller
+	 */
+	public IService<T> getService() {
+		return this.service;
+	}
+	
+	/**
 	 * Sets the service to be used by the controller
 	 * 
 	 * @param serviceType
@@ -305,9 +294,5 @@ public class Controller<T extends Entity> {
 		} catch (ServiceException e) {
 			e.printStackTrace();
 		}
-	}
-
-	public IService<T> getService() {
-		return this.service;
 	}
 }

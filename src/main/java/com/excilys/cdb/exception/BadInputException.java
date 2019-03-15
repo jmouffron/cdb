@@ -2,6 +2,8 @@ package com.excilys.cdb.exception;
 
 /**
  * @author excilys
+ *	
+ * An Exception for bad inputs in the service layer
  *
  */
 public class BadInputException extends ServiceException {
@@ -23,7 +25,6 @@ public class BadInputException extends ServiceException {
 	 */
 	public BadInputException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(EXC_MSG + message, cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -32,7 +33,6 @@ public class BadInputException extends ServiceException {
 	 */
 	public BadInputException(String message, Throwable cause) {
 		super(EXC_MSG + message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -40,7 +40,6 @@ public class BadInputException extends ServiceException {
 	 */
 	public BadInputException(String message) {
 		super(EXC_MSG + message);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -48,7 +47,6 @@ public class BadInputException extends ServiceException {
 	 */
 	public BadInputException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 }

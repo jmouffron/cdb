@@ -7,7 +7,9 @@ import java.sql.SQLException;
 
 /**
  * @author excilys
- *
+ * 
+ * A generic exception for the dao layer exceptions
+ * 
  */
 public class DaoException extends SQLException {
 

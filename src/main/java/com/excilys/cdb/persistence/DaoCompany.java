@@ -90,7 +90,7 @@ public class DaoCompany implements DaoInstance<Company> {
 	}
 
 	@Override
-	public boolean create(Entity newEntity) {
+	public boolean create(Company newEntity) {
 		int lineAffected = 0;
 
 		try (PreparedStatement stmt = Datasource.getConnection().prepareStatement(INSERT);) {

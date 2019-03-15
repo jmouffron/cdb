@@ -1,12 +1,16 @@
 package com.excilys.cdb.service;
 
 import com.excilys.cdb.exception.ServiceException;
+import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.Entity;
 
-public class ServiceFactory {
+public class ServiceFactory<T extends Entity> {
 
 	public static final String COMPUTER_SERVICE = "computer";
 	public static final String COMPANY_SERVICE = "company";
 
+	
+	
 	public static IService<?> getService(String serviceType) throws ServiceException {
 		IService<?> service;
 		switch (serviceType) {
