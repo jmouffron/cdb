@@ -26,10 +26,10 @@ public class ComputerService implements IService<Computer> {
 
 	@Override
 	public Computer getOneById(Long id) throws BadInputException {
-		if (id < 0) {
+		if (id < 0L) {
 			log.debug("Bad id for fetching Computer!");
 			throw new BadInputException("Id chosen inferior to 0!");
-		}else if(id > Long.MAX_VALUE) {
+		} else if (id > Long.MAX_VALUE) {
 			log.debug("Bad id for fetching Computer!");
 			throw new BadInputException("Id chosen too big!");
 		}
@@ -47,23 +47,23 @@ public class ComputerService implements IService<Computer> {
 
 	@Override
 	public boolean create(Computer newEntity) throws BadInputException {
-		if(newEntity == null) {
+		if (newEntity == null) {
 			log.debug("Null NewEntity for update of Computer");
 			throw new BadInputException();
-		}else if (newEntity.getId() < 0) {
+		} else if (newEntity.getId() < 0L) {
 			log.debug("Bad Id for update of Computer");
 			throw new BadInputException();
-		}else if(newEntity.getName() == null || newEntity.getName().equals("")) {
+		} else if (newEntity.getName() == null || newEntity.getName().equals("")) {
 			log.debug("Null Name on NewEntity for update of Computer");
 			throw new BadInputException();
-		}else if(newEntity.getId() < 0) {
+		} else if (newEntity.getId() < 0) {
 			log.debug("Bad Id on NewEntity for update of Computer");
 			throw new BadInputException();
-		}else if(newEntity.getIntroduced().after(newEntity.getDiscontinued())) {
+		} else if (newEntity.getIntroduced().after(newEntity.getDiscontinued())) {
 			log.debug("Discontinued Date on NewEntity before Introduced Date for update of Computer");
 			throw new BadInputException();
 		}
-		
+
 		return this.dao.create(newEntity);
 	}
 
@@ -72,33 +72,33 @@ public class ComputerService implements IService<Computer> {
 		if (id < 0) {
 			log.debug("Bad Id for update of Computer");
 			throw new BadInputException();
-		}else if(newEntity == null) {
+		} else if (newEntity == null) {
 			log.debug("Null NewEntity for update of Computer");
 			throw new BadInputException();
-		}else if(newEntity.getName() == null || newEntity.getName().equals("")) {
+		} else if (newEntity.getName() == null || newEntity.getName().equals("")) {
 			log.debug("Null Name on NewEntity for update of Computer");
 			throw new BadInputException();
-		}else if(newEntity.getId() < 0) {
+		} else if (newEntity.getId() < 0L) {
 			log.debug("Bad Id on NewEntity for update of Computer");
 			throw new BadInputException();
-		}else if(newEntity.getIntroduced().after(newEntity.getDiscontinued())) {
+		} else if (newEntity.getIntroduced().after(newEntity.getDiscontinued())) {
 			log.debug("Discontinued Date on NewEntity before Introduced Date for update of Computer");
 			throw new BadInputException();
 		}
-		
+
 		return this.dao.updateById(id, newEntity);
 	}
 
 	@Override
 	public boolean deleteById(Long id) throws BadInputException {
-		if (id < 0) {
+		if (id < 0L) {
 			log.debug("Bad Id for deleting of Computer");
 			throw new BadInputException();
-		}else if(id > Long.MAX_VALUE) {
+		} else if (id > Long.MAX_VALUE) {
 			log.debug("Bad Input of id for deleting of Computer");
 			throw new BadInputException("Id too big inputted!");
 		}
-		
+
 		return this.dao.deleteById(id);
 	}
 

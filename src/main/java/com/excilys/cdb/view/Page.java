@@ -6,8 +6,8 @@ import com.excilys.cdb.controller.MenuChoiceEnum;
 
 /**
  * @author excilys
- *	
- * 	A page abstract class contract for data display in views
+ * 
+ *         A page abstract class contract for data display in views
  *
  * @param <T>
  */
@@ -24,7 +24,7 @@ public abstract class Page<T extends Entity> {
 	/**
 	 * Returns a MenuChoiceEnum that defines a user choice for the controller
 	 * 
-	 * @return MenuChoiceEnum 
+	 * @return MenuChoiceEnum
 	 */
 	public abstract MenuChoiceEnum show();
 }

@@ -6,7 +6,7 @@ package com.excilys.cdb.exception;
 /**
  * @author excilys
  *
- * A generic exception for the presentation layer
+ *         A generic exception for the presentation layer
  * 
  */
 public class PageException extends Exception {
@@ -25,7 +25,6 @@ public class PageException extends Exception {
 	 */
 	public PageException(String message) {
 		super(message);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -33,7 +32,6 @@ public class PageException extends Exception {
 	 */
 	public PageException(Throwable cause) {
 		super(cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -42,7 +40,6 @@ public class PageException extends Exception {
 	 */
 	public PageException(String message, Throwable cause) {
 		super(message, cause);
-		// TODO Auto-generated constructor stub
 	}
 
 	/**
@@ -53,7 +50,6 @@ public class PageException extends Exception {
 	 */
 	public PageException(String message, Throwable cause, boolean enableSuppression, boolean writableStackTrace) {
 		super(message, cause, enableSuppression, writableStackTrace);
-		// TODO Auto-generated constructor stub
 	}
 
 }

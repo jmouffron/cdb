@@ -6,7 +6,7 @@ package com.excilys.cdb.exception;
 /**
  * @author excilys
  * 
- * A query exception in the dao layer
+ *         A query exception in the dao layer
  * 
  */
 public class QueryException extends DaoException {

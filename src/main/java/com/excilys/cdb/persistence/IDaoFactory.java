@@ -5,8 +5,8 @@ import com.excilys.cdb.model.Entity;
 /**
  * @author excilys
  * 
- * A DaoFactory Interface to establish contract and abstraction
- * for factories to generate Daos
+ *         A DaoFactory Interface to establish contract and abstraction for
+ *         factories to generate Daos
  * 
  * @param <T>
  */

@@ -10,7 +10,8 @@ import com.excilys.cdb.model.Entity;
 /**
  * @author excilys
  *
- *	An encapsulator box to receive List of entities or individual entities
+ *         An encapsulator box to receive List of entities or individual
+ *         entities
  *
  */
 public class Data<T extends Entity> {
@@ -53,14 +54,14 @@ public class Data<T extends Entity> {
 
 	/**
 	 * 
-	 * Displays a definite number of items 
-	 * from the list of entities
-	 * in the Data object strating from a start index
-	 *  
+	 * Displays a definite number of items from the list of entities in the Data
+	 * object strating from a start index
+	 * 
 	 * @param startIndex
 	 * @param numberToShow
 	 */
 	public void list(long startIndex, long numberToShow) {
-		this.dataList.stream().skip(startIndex).limit(numberToShow).forEach(entity -> System.out.println("\t" + entity));
+		this.dataList.stream().skip(startIndex).limit(numberToShow)
+				.forEach(entity -> System.out.println("\t" + entity));
 	}
 }

@@ -21,7 +21,7 @@ public class Datasource {
 	static {
 		Properties props = new Properties();
 		try {
-			props.load(new FileInputStream("src/resource/jdbc.properties"));
+			props.load(new FileInputStream("src/main/java/resource/jdbc.properties"));
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 			System.out.println(e.getMessage());
@@ -45,7 +45,8 @@ public class Datasource {
 	/**
 	 * A private Constructor to never allow instantiation
 	 */
-	private Datasource() {}
+	private Datasource() {
+	}
 
 	/**
 	 * A static way to get a connection to the database

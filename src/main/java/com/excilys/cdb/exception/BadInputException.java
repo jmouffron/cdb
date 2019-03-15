@@ -2,8 +2,8 @@ package com.excilys.cdb.exception;
 
 /**
  * @author excilys
- *	
- * An Exception for bad inputs in the service layer
+ * 
+ *         An Exception for bad inputs in the service layer
  *
  */
 public class BadInputException extends ServiceException {

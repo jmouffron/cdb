@@ -5,9 +5,8 @@ import com.excilys.cdb.model.Entity;
 
 /**
  * @author excilys
- *	
- *	It is the app
- *         main entrypoint.
+ * 
+ *         It is the app main entrypoint.
  *
  */
 public class App {

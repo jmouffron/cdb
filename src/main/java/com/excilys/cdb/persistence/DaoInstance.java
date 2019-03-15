@@ -7,8 +7,7 @@ import com.excilys.cdb.model.Entity;
 /**
  * @author excilys
  * 
- * An interface to allow contract to instantiate Daos
- * to interact with
+ *         An interface to allow contract to instantiate Daos to interact with
  * 
  * @param <T>
  */

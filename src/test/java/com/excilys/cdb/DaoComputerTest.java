@@ -3,11 +3,6 @@ package com.excilys.cdb;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 
-import static org.mockito.Mockito.*;
-
-import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnit;
-import org.mockito.junit.MockitoRule;
 import org.mockito.junit.jupiter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,8 +85,8 @@ public class DaoComputerTest {
 		LocalDateTime dateTime = LocalDateTime.MIN.minusYears(1000);
 		Timestamp introduced = Timestamp.valueOf(dateTime);
 		Timestamp discontinued = Timestamp.valueOf(dateTime.minusHours(3));
-		Company companyDummy = new Company(id, "");
 		
+		Company companyDummy = new Company(id, "");		
 		Computer computerDummy = new Computer.ComputerBuilder()
 				.setId(id)
 				.setName(name)

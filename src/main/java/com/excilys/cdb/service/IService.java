@@ -10,8 +10,7 @@ public interface IService<T extends Entity> {
 	public abstract List<T> getAll();
 
 	/**
-	 * Commands the DAO related to the service to 
-	 * retrieve an Entity based on id
+	 * Commands the DAO related to the service to retrieve an Entity based on id
 	 * 
 	 * @param id
 	 * @return
@@ -20,9 +19,8 @@ public interface IService<T extends Entity> {
 	public abstract T getOneById(Long id) throws BadInputException;
 
 	/**
-	 * Commands the Dao related to the service to
-	 * retrieve an Entity based on name
-	 *  
+	 * Commands the Dao related to the service to retrieve an Entity based on name
+	 * 
 	 * @param name
 	 * @return
 	 * @throws BadInputException
@@ -30,8 +28,7 @@ public interface IService<T extends Entity> {
 	public abstract T getOneByName(String name) throws BadInputException;
 
 	/**
-	 * Commands the Dao related to the service to
-	 * create a new entity
+	 * Commands the Dao related to the service to create a new entity
 	 * 
 	 * @param newEntity
 	 * @return
@@ -41,8 +38,8 @@ public interface IService<T extends Entity> {
 
 	/**
 	 * 
-	 * Commands the Dao related to the service to
-	 * update an Entity based on id and data to update the entity
+	 * Commands the Dao related to the service to update an Entity based on id and
+	 * data to update the entity
 	 * 
 	 * @param id
 	 * @param newEntity
@@ -52,8 +49,7 @@ public interface IService<T extends Entity> {
 	public abstract boolean updateById(Long id, T newEntity) throws BadInputException;
 
 	/**
-	 * Commands the Dao related to the service to
-	 * delete an Entity based on id
+	 * Commands the Dao related to the service to delete an Entity based on id
 	 * 
 	 * @param id
 	 * @return
@@ -63,8 +59,7 @@ public interface IService<T extends Entity> {
 
 	/**
 	 * 
-	 * Commands the Dao related to the service to
-	 * delete an Entity based on name
+	 * Commands the Dao related to the service to delete an Entity based on name
 	 * 
 	 * @param name
 	 * @return

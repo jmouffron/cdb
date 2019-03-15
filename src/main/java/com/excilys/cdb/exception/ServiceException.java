@@ -3,7 +3,7 @@ package com.excilys.cdb.exception;
 /**
  * @author excilys
  * 
- * A generic exception for the service layer
+ *         A generic exception for the service layer
  *
  */
 public class ServiceException extends Exception {

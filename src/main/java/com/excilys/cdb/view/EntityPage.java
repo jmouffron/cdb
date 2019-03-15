@@ -17,7 +17,7 @@ public class EntityPage extends Page<Entity> {
 		System.out.println("==============================");
 		System.out.println(" |          Entity           | ");
 		System.out.println("==============================");
-
+		data.show();
 		System.out.println("==============================");
 		return MenuChoiceEnum.DEFAULT;
 	}

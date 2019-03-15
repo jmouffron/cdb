@@ -9,7 +9,6 @@ import java.util.List;
 
 import com.excilys.cdb.mapper.CompanyMapper;
 import com.excilys.cdb.model.Company;
-import com.excilys.cdb.model.Entity;
 
 /**
  * @author excilys

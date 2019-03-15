@@ -15,7 +15,8 @@ import com.excilys.cdb.view.*;
 /**
  * @author excilys
  * 
- *         A Front Controller class to handle user interaction and view data injection.
+ *         A Front Controller class to handle user interaction and view data
+ *         injection.
  * 
  * @param <T>
  */
@@ -41,8 +42,8 @@ public class Controller<T extends Entity> {
 	}
 
 	/**
-	 * Starts the process of listening on user input
-	 *  and launches the application loop
+	 * Starts the process of listening on user input and launches the application
+	 * loop
 	 */
 	public void start() {
 		boolean looper = true;
@@ -282,7 +283,7 @@ public class Controller<T extends Entity> {
 	public IService<T> getService() {
 		return this.service;
 	}
-	
+
 	/**
 	 * Sets the service to be used by the controller
 	 * 

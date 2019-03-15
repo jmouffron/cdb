@@ -29,11 +29,11 @@ public class CompanyService implements IService<Company> {
 		if (id <= 0) {
 			log.debug("Bad Input of id for fetching of Company");
 			throw new BadInputException("Non strictly positive id inputted!");
-		}else if(id > Long.MAX_VALUE) {
+		} else if (id > Long.MAX_VALUE) {
 			log.debug("Bad Input of id for fetching of Company");
 			throw new BadInputException("Id too big inputted!");
 		}
-		
+
 		return dao.getOneById(id);
 	}
 
@@ -43,48 +43,51 @@ public class CompanyService implements IService<Company> {
 			log.debug("Bad Input of id for fetching of Company");
 			throw new BadInputException("Bad name inputted!");
 		}
-		
+
 		return this.dao.getOneByName(name);
 	}
 
 	@Override
 	public boolean create(Company newEntity) throws BadInputException {
-		if(newEntity == null) {
+		if (newEntity == null) {
 			log.debug("Null NewEntity for update of Company");
 			throw new BadInputException();
-		}else if (newEntity.getId() < 0) {
+		} else if (newEntity.getId() < 0) {
 			log.debug("Bad Id for update of Company");
 			throw new BadInputException();
-		}else if(newEntity.getName() == null || newEntity.getName().equals("")) {
+		} else if (newEntity.getName() == null || newEntity.getName().equals("")) {
 			log.debug("Null Name on NewEntity for update of Company");
 			throw new BadInputException();
-		}else if(newEntity.getId() < 0) {
+		} else if (newEntity.getId() < 0) {
 			log.debug("Bad Id on NewEntity for update of Company");
 			throw new BadInputException();
 		}
-		
+
 		return this.dao.create(newEntity);
 	}
 
-	/* (non-Javadoc)
-	 * @see com.excilys.cdb.service.IService#updateById(java.lang.Long, com.excilys.cdb.model.Entity)
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see com.excilys.cdb.service.IService#updateById(java.lang.Long,
+	 * com.excilys.cdb.model.Entity)
 	 */
 	@Override
 	public boolean updateById(Long id, Company newEntity) throws BadInputException {
 		if (id < 0) {
 			log.debug("Bad Id for update of Company");
 			throw new BadInputException();
-		}else if(newEntity == null) {
+		} else if (newEntity == null) {
 			log.debug("Null NewEntity for update of Company");
 			throw new BadInputException();
-		}else if(newEntity.getName() == null || newEntity.getName().equals("")) {
+		} else if (newEntity.getName() == null || newEntity.getName().equals("")) {
 			log.debug("Null Name on NewEntity for update of Company");
 			throw new BadInputException();
-		}else if(newEntity.getId() < 0) {
+		} else if (newEntity.getId() < 0) {
 			log.debug("Bad Id on NewEntity for update of Company");
 			throw new BadInputException();
 		}
-		
+
 		return this.dao.updateById(id, newEntity);
 	}
 
@@ -93,11 +96,11 @@ public class CompanyService implements IService<Company> {
 		if (id < 0) {
 			log.debug("Bad Id for deleting of Company");
 			throw new BadInputException();
-		}else if(id > Long.MAX_VALUE) {
+		} else if (id > Long.MAX_VALUE) {
 			log.debug("Bad Input of id for deleting of Company");
 			throw new BadInputException("Id too big inputted!");
 		}
-		
+
 		return this.dao.deleteById(id);
 	}
 
@@ -106,8 +109,8 @@ public class CompanyService implements IService<Company> {
 		if (name == null || name.equals("")) {
 			log.debug("Bad Name for deleting of Company");
 			throw new BadInputException("Bad Name inputted");
-		}		
-		
+		}
+
 		return this.dao.deleteByName(name);
 	}
 

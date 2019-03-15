@@ -4,17 +4,11 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import com.excilys.cdb.persistence.Datasource;
 
 class ConnectionTest {
 	
@@ -25,7 +19,7 @@ class ConnectionTest {
 			badPropsPath = "src/java/resource/odbc.properties";
 	
 	String goodUrl = "jdbc:mysql://localhost:3306/computer-database-db?useSSL=false&autoReconnect=true",
-			goodDriver = "com.mysql.jdbc.cj.Driver", 
+			goodDriver = "com.mysql.cj.jdbc.Driver", 
 			goodUsername = "admincdb", 
 			goodPassword = "qwerty1234", 
 			goodPropsPath = "src/java/resource/jdbc.properties";

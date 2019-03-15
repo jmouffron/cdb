@@ -9,16 +9,14 @@ import java.util.List;
 
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.model.Entity;
 
 public class DaoComputer implements DaoInstance<Computer> {
 
 	private final String INSERT = "INSERT INTO computer VALUES(?,?,?,?);";
-	private final String SELECT_ALL = "SELECT pc.*, c.id, c.name FROM computer pc "
-			+ "INNER JOIN company c ON pc.company_id=c.id";
+	private final String SELECT_ALL = "SELECT pc.*, c.name FROM computer pc INNER JOIN company c ON pc.company_id=c.id";
 	private final String SELECT_ID = SELECT_ALL + " where pc.id=? ;";
 	private final String SELECT_NAME = SELECT_ALL + " where pc.name=? ;";
-	private final String UPDATE = "UPDATE computer SET name=?,introduced=?,discontinued=?,company_id=? WHERE id=? ;";
+	private final String UPDATE = "UPDATE computer SET name=?,introduced=?,discontinued=?,company_id=? WHERE pc.id=? ;";
 	private final String DELETE_ID = "DELETE FROM computer WHERE id=? ;";
 	private final String DELETE_NAME = "DELETE FROM computer WHERE name=? ;";
 

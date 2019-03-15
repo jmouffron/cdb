@@ -1,6 +1,7 @@
 package com.excilys.cdb.model;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 public class Computer extends Entity {
 
@@ -94,21 +95,27 @@ public class Computer extends Entity {
 		return true;
 	}
 
+	/**
+	 * @author excilys
+	 *
+	 *         An inner Builder class for computer entities
+	 *
+	 */
 	static public class ComputerBuilder {
-		private Long id ;
+		private Long id;
 		private String name;
-		private Timestamp introduced = null;
-		private Timestamp discontinued = null;
+		private Timestamp introduced = Timestamp.valueOf(LocalDateTime.now());
+		private Timestamp discontinued = Timestamp.valueOf(LocalDateTime.now().plusMinutes(3));
 		private Company company;
 
 		public ComputerBuilder() {
 		}
-		
+
 		public ComputerBuilder setId(Long id) {
 			this.id = id;
 			return this;
 		}
-		
+
 		public ComputerBuilder setName(String name) {
 			this.name = name;
 			return this;

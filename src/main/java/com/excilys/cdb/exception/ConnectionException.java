@@ -6,7 +6,7 @@ package com.excilys.cdb.exception;
 /**
  * @author excilys
  *
- * A database connection in the dao layer
+ *         A database connection in the dao layer
  *
  */
 public class ConnectionException extends DaoException {

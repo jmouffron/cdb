@@ -16,10 +16,7 @@ public class ControllerUtils {
 	static Function<Long, Boolean> isNotNullLong = inputVal -> inputVal != null;
 	static Function<String, Boolean> isNotNullString = inputVal -> !inputVal.equals("") || inputVal == null;
 	static Function<Long, Boolean> isPositive = inputVal -> inputVal <= 0 || inputVal == null;
-	static Function<String, Boolean> isPorAorE = inputVal -> {
-		return !inputVal.equals("P") || !inputVal.equals("A") || !inputVal.equals("E") || !inputVal.equals("")
-				|| inputVal == null;
-	};
+	static Function<String, Boolean> isPorAorE = inputVal -> !inputVal.equals("P") || !inputVal.equals("A") || !inputVal.equals("E") || !inputVal.equals("")|| inputVal == null;
 
 	public static long getLongInput(String message, Function<Long, Boolean> boolFunc) {
 		Long value = null;
@@ -50,7 +47,7 @@ public class ControllerUtils {
 			} catch (InputMismatchException e) {
 				error = true;
 			}
-		} while (error || boolFunc.apply(value));
+		} while (error || value.equals("") || value == null);
 
 		return value;
 	}
@@ -58,7 +55,7 @@ public class ControllerUtils {
 	public static Timestamp getTimestampInput(String message) {
 		Timestamp value = null;
 		boolean error;
-		SimpleDateFormat timestampFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+		SimpleDateFormat timestampFormatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss[.fffffffff]");
 
 		do {
 			error = false;
