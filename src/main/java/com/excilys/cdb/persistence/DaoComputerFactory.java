@@ -3,7 +3,7 @@ package com.excilys.cdb.persistence;
 import com.excilys.cdb.model.Computer;
 
 public class DaoComputerFactory implements IDaoFactory<Computer> {
-	private volatile DaoComputer instance = null;
+	private volatile DaoInstance<Computer> instance = null;
 
 	@Override
 	public DaoInstance<Computer> getDao() {

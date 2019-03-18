@@ -26,7 +26,7 @@ public class Controller<T extends Entity> {
 	private IService<T> service;
 	private volatile static Controller<Entity> instance;
 
-	private Controller(Page<T> page) {
+	private Controller(Page page) {
 		this.page = page;
 	}
 
@@ -185,7 +185,7 @@ public class Controller<T extends Entity> {
 		this.addEntity(newEntity);
 
 		try {
-			this.setPage(new EntityAddPage(payload));
+			this.setPage( new EntityAddPage(payload));
 		} catch (ServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

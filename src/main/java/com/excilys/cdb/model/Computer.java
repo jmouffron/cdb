@@ -29,9 +29,6 @@ public class Computer extends Entity {
 		return company;
 	}
 
-	/**
-	 * @param company
-	 */
 	public void setCompany(Company company) {
 		this.company = company;
 	}
@@ -105,7 +102,7 @@ public class Computer extends Entity {
 		private Long id;
 		private String name;
 		private Timestamp introduced = Timestamp.valueOf(LocalDateTime.now());
-		private Timestamp discontinued = Timestamp.valueOf(LocalDateTime.now().plusMinutes(3));
+		private Timestamp discontinued = null;
 		private Company company;
 
 		public ComputerBuilder() {

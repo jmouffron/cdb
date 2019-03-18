@@ -1,4 +1,4 @@
-package com.excilys.cdb;
+package com.excilys.cdb.test.persistence;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -18,11 +18,11 @@ class ConnectionTest {
 			badPassword = "azertyAzerty",
 			badPropsPath = "src/java/resource/odbc.properties";
 	
-	String goodUrl = "jdbc:mysql://localhost:3306/computer-database-db?useSSL=false&autoReconnect=true",
+	String goodUrl = "jdbc:mysql://localhost:3306/computer-database-db?autoReconnect=true&useSSL=false",
 			goodDriver = "com.mysql.cj.jdbc.Driver", 
 			goodUsername = "admincdb", 
 			goodPassword = "qwerty1234", 
-			goodPropsPath = "src/java/resource/jdbc.properties";
+			goodPropsPath = "src/main/java/resource/jdbc.properties";
 	
 	@Test
 	void givenGoodFilePath_whenLoadingProperties_thenSuceed() {

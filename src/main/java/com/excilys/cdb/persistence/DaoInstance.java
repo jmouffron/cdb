@@ -20,7 +20,7 @@ public interface DaoInstance<T extends Entity> {
 
 	abstract boolean create(T newEntity);
 
-	abstract boolean updateById(Long id, T newEntity);
+	abstract boolean updateById(T newEntity);
 
 	abstract boolean deleteById(Long id);
 

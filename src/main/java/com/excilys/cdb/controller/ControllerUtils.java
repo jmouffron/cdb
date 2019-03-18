@@ -1,7 +1,6 @@
 package com.excilys.cdb.controller;
 
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.function.Function;
@@ -14,7 +13,7 @@ public class ControllerUtils {
 
 	static Function<Long, Boolean> isStrictlyPositive = inputVal -> inputVal < 0 || inputVal == null;
 	static Function<Long, Boolean> isNotNullLong = inputVal -> inputVal != null;
-	static Function<String, Boolean> isNotNullString = inputVal -> !inputVal.equals("") || inputVal == null;
+	static Function<String, Boolean> isNotNullString = inputVal -> inputVal.equals("") || inputVal == null;
 	static Function<Long, Boolean> isPositive = inputVal -> inputVal <= 0 || inputVal == null;
 	static Function<String, Boolean> isPorAorE = inputVal -> !inputVal.equals("P") || !inputVal.equals("A") || !inputVal.equals("E") || !inputVal.equals("")|| inputVal == null;
 
@@ -30,7 +29,7 @@ public class ControllerUtils {
 			} catch (InputMismatchException e) {
 				error = true;
 			}
-		} while (error || boolFunc.apply(value));
+		} while ( error || boolFunc.apply(value) );
 
 		return value;
 	}
@@ -47,7 +46,7 @@ public class ControllerUtils {
 			} catch (InputMismatchException e) {
 				error = true;
 			}
-		} while (error || value.equals("") || value == null);
+		} while ( error || boolFunc.apply(value) );
 
 		return value;
 	}
@@ -55,18 +54,16 @@ public class ControllerUtils {
 	public static Timestamp getTimestampInput(String message) {
 		Timestamp value = null;
 		boolean error;
-		SimpleDateFormat timestampFormatter = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss[.fffffffff]");
-
+	 
 		do {
 			error = false;
 			System.out.println(message);
 			try {
 				value = Timestamp.valueOf(scan.nextLine());
-				timestampFormatter.format(value);
 			} catch (InputMismatchException e) {
 				error = true;
 			}
-		} while (error);
+		} while ( error );
 
 		return value;
 	}

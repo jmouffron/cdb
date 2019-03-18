@@ -1,9 +1,12 @@
-package com.excilys.cdb;
+package com.excilys.cdb.test.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -14,6 +17,7 @@ import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.persistence.DaoInstance;
 import com.excilys.cdb.service.IService;
 import com.excilys.cdb.service.ServiceFactory;
 
@@ -21,6 +25,7 @@ class ComputerServiceTest {
 	Logger log = LoggerFactory.getLogger(ComputerServiceTest.class);
 	
 	static IService<Computer> service;
+	static DaoInstance<Computer> daoComputer;
 	
 	@BeforeAll
 	static void setUp() {
@@ -39,8 +44,16 @@ class ComputerServiceTest {
 	@Test
 	void givenGoodInput_whenCreateUser_thenSuceed() {
 		Company companyDummy = new Company(600L, "company");
+		
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		
+		Timestamp introduced = Timestamp.valueOf( formatter.format( LocalDateTime.now() ) );
+		Timestamp discontinued = Timestamp.valueOf( formatter.format(LocalDateTime.now().plusYears(3) ));
+
 		Computer computerDummy = new Computer.ComputerBuilder()
 				.setId(600L)
+				.setIntroduced(introduced)
+				.setDiscontinued(discontinued)
 				.setName("New computer")
 				.setCompany(companyDummy)
 				.build();
@@ -77,14 +90,21 @@ class ComputerServiceTest {
 	@Test
 	void givenGoodInput_whenUpdateUser_thenSuceed() {
 		Company companyDummy = new Company(600L, "company");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		
+		Timestamp introduced = Timestamp.valueOf( formatter.format( LocalDateTime.now() ) );
+		Timestamp discontinued = Timestamp.valueOf( formatter.format(LocalDateTime.now().plusYears(3) ));
+		
 		Computer computerDummy = new Computer.ComputerBuilder()
 				.setId(600L)
+				.setIntroduced(introduced)
+				.setDiscontinued(discontinued)
 				.setName("New computer")
 				.setCompany(companyDummy)
 				.build();
 		  
 		try {
-			assertTrue(service.updateById(computerDummy.getId(), computerDummy));
+			assertTrue(service.updateById(computerDummy));
 		} catch (BadInputException e) {
 			log.debug("BadInputException launched!");
 			fail("BadInputException thrown with good inputs.");
@@ -107,7 +127,7 @@ class ComputerServiceTest {
 //				.build();
 //		  
 //		try {
-//			assertFalse(service.updateById(badComputerDummy.getId(), badComputerDummy));
+//			assertFalse(service.updateById(badComputerDummy));
 //			fail("BadInputException non thrown with bad inputs.");
 //		} catch (BadInputException e) {
 //			log.debug("BadInputException launched!");
@@ -116,8 +136,10 @@ class ComputerServiceTest {
 	
 	@Test
 	void givenGoodInput_whenDeleteUser_thenSuceed() {
-		Timestamp introduced = Timestamp.valueOf(LocalDateTime.now());
-		Timestamp discontinued = Timestamp.valueOf(LocalDateTime.now().plusYears(3));
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		
+		Timestamp introduced =Timestamp.valueOf( formatter.format( LocalDateTime.now() ) );
+		Timestamp discontinued = Timestamp.valueOf( formatter.format(LocalDateTime.now().plusYears(3) ));
 		
 		Company companyDummy = new Company(600L, "company");
 		Computer computerDummy = new Computer.ComputerBuilder()
@@ -129,8 +151,8 @@ class ComputerServiceTest {
 				.build();
 		
 		try {
-			service.create(computerDummy);
-			assertTrue(service.deleteById(computerDummy.getId()));
+			assertTrue( service.create(computerDummy) );
+			assertTrue( service.deleteById( computerDummy.getId() ) );
 		} catch (BadInputException e) {
 			log.debug("Delete Succeed BadInputException launched!");
 			fail("BadInputException thrown with good inputs.");

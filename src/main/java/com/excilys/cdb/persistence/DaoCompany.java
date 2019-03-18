@@ -7,6 +7,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.mapper.CompanyMapper;
 import com.excilys.cdb.model.Company;
 
@@ -16,13 +19,14 @@ import com.excilys.cdb.model.Company;
  */
 public class DaoCompany implements DaoInstance<Company> {
 	private final String INSERT = "INSERT INTO company VALUES(?);";
-	private final String SELECT_ALL = "Select * from company;";
-	private final String SELECT_ID = "Select * from company where id=?;";
-	private final String SELECT_NAME = "Select * from company where name=?;";
+	private final String SELECT_ALL = "SELECT * FROM company;";
+	private final String SELECT_ID = "SELECT * FROM company where id=?;";
+	private final String SELECT_NAME = "SELECT * FROM company where name=?;";
 	private final String UPDATE = "UPDATE company SET name=? WHERE id=?;";
 	private final String DELETE_ID = "DELETE FROM company WHERE id=? ;";
 	private final String DELETE_NAME = "DELETE FROM company WHERE name=? ;";
-
+	private final Logger log = LoggerFactory.getLogger(DaoCompany.class);
+	
 	@Override
 	public List<Company> getAll() {
 		List<Company> result = new ArrayList<>();
@@ -33,7 +37,7 @@ public class DaoCompany implements DaoInstance<Company> {
 				result.add(CompanyMapper.map(rs));
 			}
 		} catch (SQLException sqlex) {
-			System.out.println(sqlex.getMessage());
+			log.debug(sqlex.getMessage());
 		}
 
 		return result;
@@ -51,12 +55,12 @@ public class DaoCompany implements DaoInstance<Company> {
 			rs = stmt.executeQuery();
 			result = CompanyMapper.map(rs);
 		} catch (SQLException sqlex) {
-			System.out.println(sqlex.getMessage());
+			log.debug(sqlex.getMessage());
 			try {
 				rs.close();
 				stmt.close();
 			} catch (SQLException e) {
-				e.printStackTrace();
+				log.debug(e.getMessage());
 			}
 
 		}
@@ -76,12 +80,12 @@ public class DaoCompany implements DaoInstance<Company> {
 			rs.next();
 			result = CompanyMapper.map(rs);
 		} catch (SQLException sqlex) {
-			sqlex.printStackTrace();
+			log.debug(sqlex.getMessage());
 			try {
 				rs.close();
 				stmt.close();
 			} catch (SQLException e) {
-				e.printStackTrace();
+				log.debug(e.getMessage());
 			}
 		}
 
@@ -96,22 +100,22 @@ public class DaoCompany implements DaoInstance<Company> {
 			stmt.setString(1, newEntity.getName());
 			lineAffected = stmt.executeUpdate();
 		} catch (SQLException sqlex) {
-			System.out.println(sqlex.getMessage());
+			log.debug(sqlex.getMessage());
 		}
 
 		return lineAffected > 0 ? true : false;
 	}
 
 	@Override
-	public boolean updateById(Long id, Company newEntity) {
+	public boolean updateById(Company newEntity) {
 		int lineAffected = 0;
 
 		try (PreparedStatement stmt = Datasource.getConnection().prepareStatement(UPDATE);) {
 			stmt.setString(1, newEntity.getName());
-			stmt.setLong(2, id);
+			stmt.setLong(2, newEntity.getId());
 			lineAffected = stmt.executeUpdate();
 		} catch (SQLException sqlex) {
-			System.out.println(sqlex.getMessage());
+			log.debug(sqlex.getMessage());
 		}
 
 		return lineAffected > 0 ? true : false;
@@ -125,7 +129,7 @@ public class DaoCompany implements DaoInstance<Company> {
 			stmt.setLong(1, id);
 			lineAffected = stmt.executeUpdate();
 		} catch (SQLException sqlex) {
-			System.out.println(sqlex.getMessage());
+			log.debug(sqlex.getMessage());
 		}
 
 		return lineAffected > 0 ? true : false;
@@ -139,7 +143,7 @@ public class DaoCompany implements DaoInstance<Company> {
 			stmt.setString(1, name);
 			lineAffected = stmt.executeUpdate();
 		} catch (SQLException sqlex) {
-			System.out.println(sqlex.getMessage());
+			log.debug(sqlex.getMessage());
 		}
 
 		return lineAffected > 0 ? true : false;

@@ -1,5 +1,6 @@
 package com.excilys.cdb.persistence;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -7,18 +8,24 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
 
 public class DaoComputer implements DaoInstance<Computer> {
 
-	private final String INSERT = "INSERT INTO computer VALUES(?,?,?,?);";
+	private final String INSERT = "INSERT INTO computer VALUES(?,?,?,?,?);";
+	private final String MAX_ID = "SELECT MAX(id)+1 from computer;";
 	private final String SELECT_ALL = "SELECT pc.*, c.name FROM computer pc INNER JOIN company c ON pc.company_id=c.id";
 	private final String SELECT_ID = SELECT_ALL + " where pc.id=? ;";
 	private final String SELECT_NAME = SELECT_ALL + " where pc.name=? ;";
-	private final String UPDATE = "UPDATE computer SET name=?,introduced=?,discontinued=?,company_id=? WHERE pc.id=? ;";
+	private final String UPDATE = "UPDATE computer SET name=?,introduced=?,discontinued=?,company_id=? WHERE id=? ;";
 	private final String DELETE_ID = "DELETE FROM computer WHERE id=? ;";
 	private final String DELETE_NAME = "DELETE FROM computer WHERE name=? ;";
+
+	private final Logger log = LoggerFactory.getLogger(DaoComputer.class);
 
 	@Override
 	public List<Computer> getAll() {
@@ -32,7 +39,7 @@ public class DaoComputer implements DaoInstance<Computer> {
 			}
 
 		} catch (SQLException sqlex) {
-			System.out.println(sqlex.getMessage());
+			sqlex.printStackTrace();
 		}
 
 		return result;
@@ -91,22 +98,33 @@ public class DaoComputer implements DaoInstance<Computer> {
 	@Override
 	public boolean create(Computer newEntity) {
 		int linesAffected = 0;
+		Connection conn = Datasource.getConnection();
+		Long maxId = 0L;
 
-		try (PreparedStatement stmt = Datasource.getConnection().prepareStatement(INSERT);) {
-			stmt.setString(1, newEntity.getName());
-			stmt.setTimestamp(2, newEntity.getIntroduced());
-			stmt.setTimestamp(3, newEntity.getDiscontinued());
-			stmt.setLong(4, newEntity.getCompany().getId());
+		try (PreparedStatement maxStmt = conn.prepareStatement(MAX_ID);
+				PreparedStatement stmt = conn.prepareStatement(INSERT);) {
+			ResultSet maxIdRs = maxStmt.executeQuery();
+			
+			while( maxIdRs.next() ) {
+				maxId = maxIdRs.getLong(1);
+			}
+			
+			stmt.setLong(1, maxId);
+			stmt.setString(2, newEntity.getName());
+			stmt.setTimestamp(3, newEntity.getIntroduced());
+			stmt.setTimestamp(4, newEntity.getDiscontinued());
+			stmt.setLong(5, newEntity.getCompany().getId());
+
 			linesAffected = stmt.executeUpdate();
 		} catch (SQLException sqlex) {
-			System.out.println(sqlex.getMessage());
+			sqlex.printStackTrace();
 		}
 
 		return linesAffected > 0 ? true : false;
 	}
 
 	@Override
-	public boolean updateById(Long id, Computer newEntity) {
+	public boolean updateById(Computer newEntity) {
 		int lineAffected = 0;
 
 		try (PreparedStatement stmt = Datasource.getConnection().prepareStatement(UPDATE);) {
@@ -114,9 +132,10 @@ public class DaoComputer implements DaoInstance<Computer> {
 			stmt.setTimestamp(2, newEntity.getIntroduced());
 			stmt.setTimestamp(3, newEntity.getDiscontinued());
 			stmt.setLong(4, newEntity.getCompany().getId());
+			stmt.setLong(5, newEntity.getId());
 			lineAffected = stmt.executeUpdate();
 		} catch (SQLException sqlex) {
-			System.out.println(sqlex.getMessage());
+			sqlex.printStackTrace();
 		}
 
 		return lineAffected > 0 ? true : false;
@@ -130,7 +149,7 @@ public class DaoComputer implements DaoInstance<Computer> {
 			stmt.setLong(1, id);
 			lineAffected = stmt.executeUpdate();
 		} catch (SQLException sqlex) {
-			System.out.println(sqlex.getMessage());
+			sqlex.printStackTrace();
 		}
 
 		return lineAffected > 0 ? true : false;
@@ -144,7 +163,7 @@ public class DaoComputer implements DaoInstance<Computer> {
 			stmt.setString(1, name);
 			lineAffected = stmt.executeUpdate();
 		} catch (SQLException sqlex) {
-			System.out.println(sqlex.getMessage());
+			sqlex.printStackTrace();
 		}
 
 		return lineAffected > 0 ? true : false;
