@@ -53,7 +53,6 @@ public class Data<T extends Entity> {
 	}
 
 	/**
-	 * 
 	 * Displays a definite number of items from the list of entities in the Data
 	 * object strating from a start index
 	 * 

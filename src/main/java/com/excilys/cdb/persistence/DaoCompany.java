@@ -12,12 +12,13 @@ import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.mapper.CompanyMapper;
 import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Computer;
 
 /**
  * @author excilys
  *
  */
-public class DaoCompany implements DaoInstance<Company> {
+public class DaoCompany implements IDaoInstance<Company> {
 	private final String INSERT = "INSERT INTO company VALUES(?);";
 	private final String SELECT_ALL = "SELECT * FROM company;";
 	private final String SELECT_ID = "SELECT * FROM company where id=?;";
@@ -26,6 +27,21 @@ public class DaoCompany implements DaoInstance<Company> {
 	private final String DELETE_ID = "DELETE FROM company WHERE id=? ;";
 	private final String DELETE_NAME = "DELETE FROM company WHERE name=? ;";
 	private final Logger log = LoggerFactory.getLogger(DaoCompany.class);
+	
+	private static volatile IDaoInstance<Company> instance = null;
+	  
+	private DaoCompany() { }
+	  
+	public static IDaoInstance<Company> getDao() {
+	  if (instance == null) {
+	    synchronized (DaoCompany.class) {
+	      if (instance == null) {
+	        instance = new DaoCompany();
+	      }
+	    }
+	  }
+	  return instance;
+	}
 	
 	@Override
 	public List<Company> getAll() {
@@ -141,6 +157,20 @@ public class DaoCompany implements DaoInstance<Company> {
 
 		try (PreparedStatement stmt = Datasource.getConnection().prepareStatement(DELETE_NAME);) {
 			stmt.setString(1, name);
+			lineAffected = stmt.executeUpdate();
+		} catch (SQLException sqlex) {
+			log.debug(sqlex.getMessage());
+		}
+
+		return lineAffected > 0 ? true : false;
+	}
+
+	@Override
+	public boolean createDTO(Company newEntity) {
+		int lineAffected = 0;
+
+		try (PreparedStatement stmt = Datasource.getConnection().prepareStatement(INSERT);) {
+			stmt.setString(1, newEntity.getName());
 			lineAffected = stmt.executeUpdate();
 		} catch (SQLException sqlex) {
 			log.debug(sqlex.getMessage());

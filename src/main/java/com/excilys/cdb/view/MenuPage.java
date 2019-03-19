@@ -1,9 +1,10 @@
 package com.excilys.cdb.view;
 
+import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.controller.ControllerUtils;
 import com.excilys.cdb.controller.MenuChoiceEnum;
 import com.excilys.cdb.model.Entity;
-import org.slf4j.LoggerFactory;
 
 public class MenuPage extends Page<Entity> {
 
@@ -14,7 +15,7 @@ public class MenuPage extends Page<Entity> {
 	@Override
 	public MenuChoiceEnum show() {
 		String value;
-		
+
 		System.out.println("Choisissez une option parmi les choix possibles suivants depuis la BDD:");
 		System.out.println("1. Afficher une liste de tous les manufactureurs.");
 		System.out.println("2. Afficher une liste de tous les ordinateurs.");

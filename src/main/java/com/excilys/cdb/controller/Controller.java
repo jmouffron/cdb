@@ -5,26 +5,31 @@ import java.util.List;
 
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.exception.ServiceException;
-import com.excilys.cdb.model.*;
-
+import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.Entity;
 import com.excilys.cdb.service.IService;
 import com.excilys.cdb.service.ServiceFactory;
-
-import com.excilys.cdb.view.*;
+import com.excilys.cdb.view.Data;
+import com.excilys.cdb.view.EntityAddPage;
+import com.excilys.cdb.view.EntityDeletePage;
+import com.excilys.cdb.view.EntityListPage;
+import com.excilys.cdb.view.EntityPage;
+import com.excilys.cdb.view.EntityUpdatePage;
+import com.excilys.cdb.view.MenuPage;
+import com.excilys.cdb.view.Page;
 
 /**
+ * A Front Controller class to handle user interaction and view data injection.
+ * 
  * @author excilys
- * 
- *         A Front Controller class to handle user interaction and view data
- *         injection.
- * 
- * @param <T>
+ * @param <T> Entity
  */
 public class Controller<T extends Entity> {
 	private Page<T> page;
 	private MenuChoiceEnum request;
 	private IService<T> service;
-	private volatile static Controller<Entity> instance;
+	private static volatile Controller<Entity> instance;
 
 	private Controller(Page page) {
 		this.page = page;
@@ -49,7 +54,7 @@ public class Controller<T extends Entity> {
 		boolean looper = true;
 
 		while (looper) {
-			this.request = this.page.show();
+      this.request = this.page.show();
 
 			switch (this.request) {
 			case FETCH_ALL_COMPANY:
@@ -185,7 +190,7 @@ public class Controller<T extends Entity> {
 		this.addEntity(newEntity);
 
 		try {
-			this.setPage( new EntityAddPage(payload));
+			this.setPage(new EntityAddPage(payload));
 		} catch (ServiceException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

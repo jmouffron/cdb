@@ -15,7 +15,8 @@ public class ControllerUtils {
 	static Function<Long, Boolean> isNotNullLong = inputVal -> inputVal != null;
 	static Function<String, Boolean> isNotNullString = inputVal -> inputVal.equals("") || inputVal == null;
 	static Function<Long, Boolean> isPositive = inputVal -> inputVal <= 0 || inputVal == null;
-	static Function<String, Boolean> isPorAorE = inputVal -> !inputVal.equals("P") || !inputVal.equals("A") || !inputVal.equals("E") || !inputVal.equals("")|| inputVal == null;
+	static Function<String, Boolean> isPorAorE = inputVal -> !inputVal.equals("P") || !inputVal.equals("A")
+			|| !inputVal.equals("E") || !inputVal.equals("") || inputVal == null;
 
 	public static long getLongInput(String message, Function<Long, Boolean> boolFunc) {
 		Long value = null;
@@ -29,7 +30,7 @@ public class ControllerUtils {
 			} catch (InputMismatchException e) {
 				error = true;
 			}
-		} while ( error || boolFunc.apply(value) );
+		} while (error || boolFunc.apply(value));
 
 		return value;
 	}
@@ -46,7 +47,7 @@ public class ControllerUtils {
 			} catch (InputMismatchException e) {
 				error = true;
 			}
-		} while ( error || boolFunc.apply(value) );
+		} while (error || boolFunc.apply(value));
 
 		return value;
 	}
@@ -54,7 +55,7 @@ public class ControllerUtils {
 	public static Timestamp getTimestampInput(String message) {
 		Timestamp value = null;
 		boolean error;
-	 
+
 		do {
 			error = false;
 			System.out.println(message);
@@ -63,7 +64,7 @@ public class ControllerUtils {
 			} catch (InputMismatchException e) {
 				error = true;
 			}
-		} while ( error );
+		} while (error);
 
 		return value;
 	}

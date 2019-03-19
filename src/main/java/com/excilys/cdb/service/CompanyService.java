@@ -9,15 +9,15 @@ import org.slf4j.LoggerFactory;
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.persistence.DaoCompanyFactory;
-import com.excilys.cdb.persistence.DaoInstance;
+import com.excilys.cdb.persistence.IDaoInstance;
 import com.excilys.cdb.validator.ServiceValidator;
 
 public class CompanyService implements IService<Company> {
-	private DaoInstance<Company> dao;
+	private IDaoInstance<Company> dao;
 	private Logger log;
 
 	public CompanyService() {
-		this.dao = new DaoCompanyFactory().getDao();
+		this.dao = DaoCompanyFactory.getComputerFactory().getDao();
 		this.log = LoggerFactory.getLogger(CompanyService.class);
 	}
 
@@ -28,19 +28,18 @@ public class CompanyService implements IService<Company> {
 	public List<Company> getAll() {
 		return this.dao.getAll();
 	}
-	
+
 	/*
 	 * @see com.excilys.cdb.service.IService#searchByName(java.lang.String)
 	 */
 	@Override
 	public List<Company> searchByName(String name) {
-		List<Company> filteredCompanies = this.dao.getAll().stream()
-				.filter(company -> company.getName().matches(name))
+		List<Company> filteredCompanies = this.dao.getAll().stream().filter(company -> company.getName().matches(name))
 				.collect(Collectors.toList());
 		return filteredCompanies;
 	}
-	
-	/* 
+
+	/*
 	 * @see com.excilys.cdb.service.IService#getOneById(java.lang.Long)
 	 */
 	@Override
@@ -56,7 +55,7 @@ public class CompanyService implements IService<Company> {
 		return dao.getOneById(id);
 	}
 
-	/* 
+	/*
 	 * @see com.excilys.cdb.service.IService#getOneByName(java.lang.String)
 	 */
 	@Override
@@ -69,7 +68,7 @@ public class CompanyService implements IService<Company> {
 		return this.dao.getOneByName(name);
 	}
 
-	/* 
+	/*
 	 * @see com.excilys.cdb.service.IService#create(com.excilys.cdb.model.Entity)
 	 */
 	@Override
@@ -91,7 +90,7 @@ public class CompanyService implements IService<Company> {
 		return this.dao.create(newEntity);
 	}
 
-	/* 
+	/*
 	 * @see com.excilys.cdb.service.IService#updateById(java.lang.Long,
 	 * com.excilys.cdb.model.Entity)
 	 */
@@ -102,7 +101,7 @@ public class CompanyService implements IService<Company> {
 		return this.dao.updateById(newEntity);
 	}
 
-	/* 
+	/*
 	 * @see com.excilys.cdb.service.IService#deleteById(java.lang.Long)
 	 */
 	@Override
@@ -112,7 +111,7 @@ public class CompanyService implements IService<Company> {
 		return this.dao.deleteById(id);
 	}
 
-	/* 
+	/*
 	 * @see com.excilys.cdb.service.IService#deleteByName(java.lang.String)
 	 */
 	@Override
@@ -122,19 +121,20 @@ public class CompanyService implements IService<Company> {
 		return this.dao.deleteByName(name);
 	}
 
-	/* 
+	/*
 	 * @see com.excilys.cdb.service.IService#getDao()
 	 */
 	@Override
-	public DaoInstance<Company> getDao() {
+	public IDaoInstance<Company> getDao() {
 		return getDao();
 	}
 
-	/* 
-	 * @see com.excilys.cdb.service.IService#setDao(com.excilys.cdb.persistence.DaoInstance)
+	/*
+	 * @see com.excilys.cdb.service.IService#setDao(com.excilys.cdb.persistence.
+	 * DaoInstance)
 	 */
 	@Override
-	public void setDao(DaoInstance<Company> dao) {
+	public void setDao(IDaoInstance<Company> dao) {
 		this.dao = dao;
 	}
 

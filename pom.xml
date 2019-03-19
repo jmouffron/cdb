@@ -59,6 +59,16 @@
 			<artifactId>logback-classic</artifactId>
 			<version>1.3.0-alpha4</version>
 		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>jstl</artifactId>
+			<version>1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>3.0-alpha-1</version>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -106,5 +116,17 @@
 				</plugin>
 			</plugins>
 		</pluginManagement>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>3.2.2</version>
+			</plugin>
+		</plugins>
 	</build>
+	<description>A 2-month fulltime java training around an incremental project. Java / JSP / Servlet / Maven / JUnit / Mockito / Selenium / Spring / Hibernate / JPA / Hikari CP / Jackson / Spring MVC / Spring Security / Gatling </description>
+	<organization>
+		<name>Excilys</name>
+		<url>http://excilys.com</url>
+	</organization>
 </project>

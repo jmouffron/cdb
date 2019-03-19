@@ -1,6 +1,13 @@
 package com.excilys.cdb.test.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
@@ -37,19 +44,11 @@ class CompanyTest {
 	}
 	
 	@Test
-	void givenIncompleteInput_whenCreatingCompany_thenFail() {
-		Company companyNameNull = new Company(1L, null);
-		Company companyIdNull= new Company(1L, null);
-		
-		assertNull(companyNameNull);
-		assertNull(companyIdNull);
-	}
-	
-	@Test
 	void givenBadInput_whenCreatingCompany_thenFail() {
 		Company companyTested = new Company(-1L, null);
 		
-		assertNull(companyTested);
+		assertFalse( companyTested.getId() > 0 );
+		assertTrue( companyTested.getName() == null || companyTested.getName().isEmpty() );
 	}
 	
 	@Test

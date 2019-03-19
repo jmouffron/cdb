@@ -1,10 +1,11 @@
 package com.excilys.cdb.view;
 
-import com.excilys.cdb.exception.ServiceException;
-import com.excilys.cdb.model.Entity;
 import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.controller.ControllerUtils;
 import com.excilys.cdb.controller.MenuChoiceEnum;
+import com.excilys.cdb.exception.ServiceException;
+import com.excilys.cdb.model.Entity;
 
 public class EntityListPage extends Page<Entity> {
 	private long dataPerPage;

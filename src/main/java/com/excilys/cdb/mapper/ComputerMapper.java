@@ -18,17 +18,12 @@ public class ComputerMapper {
 
 		Long companyId = rs.getLong("company_id");
 		String companyName = rs.getString("c.name");
-		
+
 		Company company = new Company(companyId, companyName);
 
-		Computer computer = new Computer.ComputerBuilder()
-				.setId(id)
-				.setName(name)
-				.setIntroduced(introduced)
-				.setDiscontinued(discontinued)
-				.setCompany(company)
-				.build();
-		
+		Computer computer = new Computer.ComputerBuilder().setId(id).setName(name).setIntroduced(introduced)
+				.setDiscontinued(discontinued).setCompany(company).build();
+
 		return computer;
 	}
 

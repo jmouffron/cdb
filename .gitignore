@@ -10,10 +10,10 @@ target/
 .metadata/
 
 # Project Settings
-.project
-.settings
-.classpath
-main/java/resource
+*.project
+*.settings
+*.classpath
+*/main/java/resource
 
 # BlueJ files
 *.ctxt

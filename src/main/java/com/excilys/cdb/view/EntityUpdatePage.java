@@ -1,9 +1,9 @@
 package com.excilys.cdb.view;
 
+import com.excilys.cdb.controller.MenuChoiceEnum;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.model.Computer;
 import org.slf4j.LoggerFactory;
-import com.excilys.cdb.controller.MenuChoiceEnum;
 
 public class EntityUpdatePage extends Page<Computer> {
 

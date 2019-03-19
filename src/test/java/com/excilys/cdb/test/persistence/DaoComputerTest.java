@@ -1,49 +1,46 @@
 package com.excilys.cdb.test.persistence;
 
-import org.junit.jupiter.api.*;
-import org.junit.jupiter.api.extension.ExtendWith;
-
-import org.mockito.junit.jupiter.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.mock;
 
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.persistence.DaoInstance;
-import com.excilys.cdb.persistence.Datasource;
+import com.excilys.cdb.persistence.DaoComputer;
+import com.excilys.cdb.persistence.DaoComputerFactory;
+import com.excilys.cdb.persistence.IDaoInstance;
+import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.IService;
 import com.excilys.cdb.service.ServiceFactory;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @ExtendWith(MockitoExtension.class)
 public class DaoComputerTest {
 
 	private static final Logger log = LoggerFactory.getLogger(DaoComputerTest.class);
-
-	private static IService<Computer> service;
+	private static IDaoInstance<Computer> daoTested;
 	
 	@BeforeAll
-	static void setUp() {
-		try {
-			service = (IService<Computer>) ServiceFactory.getService(ServiceFactory.COMPUTER_SERVICE);
-		} catch (ServiceException e) {
-			log.debug(e.getMessage());
-			fail(e.getMessage());
-		}
+	static void setUp() {	
+	  daoTested = DaoComputerFactory.getComputerFactory().getDao();
 	}
 	
 	@BeforeAll
-	static void tearDown() {
-		service = null;
-	}
+	static void tearDown() { }
 	
 	@Test
 	void givenGoodInput_whenCreateUser_thenSuceed() {
@@ -54,12 +51,10 @@ public class DaoComputerTest {
 				.setCompany(companyDummy)
 				.build();
 		
-		DaoInstance<Computer> daoTested = service.getDao();
-		
-		assertTrue(daoTested.create(computerDummy));
+		assertTrue( daoTested.create(computerDummy) );
      
-        List<Computer> computers = daoTested.getAll();
-        int computerSize = computers.size() - 1;
+    List<Computer> computers = daoTested.getAll();
+    int computerSize = computers.size() - 1;
         
 		assertEquals(computerDummy, computers.get(computerSize));
 	}
@@ -81,13 +76,11 @@ public class DaoComputerTest {
 				.setCompany(companyDummy)
 				.build();
 		
-		DaoInstance<Computer> daoTested = service.getDao();
-		
 		assertFalse(daoTested.create(computerDummy));
 		
 		List<Computer> computers = daoTested.getAll();
-        int computerSize = computers.size() - 1;
+    int computerSize = computers.size() - 1;
 
-        assertNotEquals(computerDummy.getName(), computers.get(computerSize).getName());
+    assertNotEquals(computerDummy.getName(), computers.get(computerSize).getName());
 	}
 }

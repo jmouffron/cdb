@@ -1,6 +1,12 @@
 package com.excilys.cdb.test.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -87,10 +93,11 @@ class ComputerBuilderTest {
 				.setCompany(company);
 		
 		Computer computer = computerBuilderTested.build();
-		Computer otherComputer = new Computer(0L, name, Timestamp.valueOf(LocalDateTime.now()), null, company);
+		Computer otherComputer = new Computer(id, name, Timestamp.valueOf(LocalDateTime.now()), null, company);
 		
-		assertTrue( computer.getIntroduced().before( computer.getDiscontinued() ) );
-		assertTrue( computer.getId()>0 );
+		assertNull( computer.getDiscontinued() );
+		assertNotNull( computer.getIntroduced() );
+		assertTrue( computer.getId() > 0 );
 		assertEquals( otherComputer, computer );
 	}
 	
@@ -110,7 +117,7 @@ class ComputerBuilderTest {
 		Computer otherComputer = new Computer(0L, name, Timestamp.valueOf(LocalDateTime.now()), discontinued, company);
 		
 		assertFalse( computer.getIntroduced().before( computer.getDiscontinued() ) );
-		assertFalse( computer.getId()>0 );
+		assertFalse( computer.getId() > 0 );
 		assertNotEquals( otherComputer, computer );
 	}
 }

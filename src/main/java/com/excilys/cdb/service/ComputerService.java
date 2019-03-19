@@ -9,15 +9,15 @@ import org.slf4j.LoggerFactory;
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.DaoComputerFactory;
-import com.excilys.cdb.persistence.DaoInstance;
+import com.excilys.cdb.persistence.IDaoInstance;
 import com.excilys.cdb.validator.ServiceValidator;
 
 public class ComputerService implements IService<Computer> {
-	private DaoInstance<Computer> dao;
+	private IDaoInstance<Computer> dao;
 	private Logger log;
 
 	public ComputerService() {
-		this.dao = new DaoComputerFactory().getDao();
+		this.dao = DaoComputerFactory.getComputerFactory().getDao();
 		this.log = LoggerFactory.getLogger(ComputerService.class);
 	}
 
@@ -30,6 +30,7 @@ public class ComputerService implements IService<Computer> {
 	 * @param name
 	 * @return
 	 */
+	@Override
 	public List<Computer> searchByName(String name) {
 		List<Computer> filteredComputers = this.dao.getAll().stream()
 				.filter(computer -> computer.getName().matches(name) || computer.getCompany().getName().matches(name))
@@ -102,7 +103,7 @@ public class ComputerService implements IService<Computer> {
 	 * @see com.excilys.cdb.service.IService#getDao()
 	 */
 	@Override
-	public DaoInstance<Computer> getDao() {
+	public IDaoInstance<Computer> getDao() {
 		return this.dao;
 	}
 
@@ -111,7 +112,7 @@ public class ComputerService implements IService<Computer> {
 	 * DaoInstance)
 	 */
 	@Override
-	public void setDao(DaoInstance<Computer> dao) {
+	public void setDao(IDaoInstance<Computer> dao) {
 		this.dao = dao;
 	}
 }

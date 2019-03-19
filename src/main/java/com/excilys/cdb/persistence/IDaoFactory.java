@@ -16,5 +16,5 @@ public interface IDaoFactory<T extends Entity> {
 	 * 
 	 * @return DaoInstance<T extends Entity>
 	 */
-	public DaoInstance<T> getDao();
+	public IDaoInstance<T> getDao();
 }

@@ -1,8 +1,9 @@
 package com.excilys.cdb.view;
 
-import com.excilys.cdb.model.Entity;
 import org.slf4j.Logger;
+
 import com.excilys.cdb.controller.MenuChoiceEnum;
+import com.excilys.cdb.model.Entity;
 
 /**
  * @author excilys

@@ -1,10 +1,22 @@
 package com.excilys.cdb.test.model;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
+import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.model.Computer.ComputerBuilder;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.AfterAll;
@@ -13,18 +25,20 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static org.mockito.Mockito.*;
-import com.excilys.cdb.model.Company;
-import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.model.Computer.ComputerBuilder;
+
 
 class ComputerTest {
 
 	private static ComputerBuilder computerBuilderMock;
+	private static ComputerBuilder computerBuilderBadMock;
 	private static Computer computerDummy;
-
-	static Long id = 1L, badId = -1L;
-	static String name = "name", otherName = "other " + name, badName = "";
+	private static Computer computerBad;
+	
+	static Long id = 1L;
+	static Long badId = -1L;
+	static String name = "name";
+	static String otherName = "other " + name;
+	static String badName = "";
 
 	static Timestamp introduced = Timestamp.valueOf(LocalDateTime.now().minusDays(3));
 	static Timestamp discontinued = Timestamp.valueOf(LocalDateTime.now());
@@ -39,36 +53,40 @@ class ComputerTest {
 
 	@BeforeAll
 	static void setUpBeforeClass() throws Exception {
-		computerBuilderMock = mock(ComputerBuilder.class);
-		computerDummy = new Computer(id, name, introduced, discontinued, company);
-
-		when(computerBuilderMock.setId(anyLong())).thenReturn(computerBuilderMock);
-		when(computerBuilderMock.setName(anyString())).thenReturn(computerBuilderMock);
-		when(computerBuilderMock.setIntroduced(any())).thenReturn(computerBuilderMock);
-		when(computerBuilderMock.setDiscontinued(any())).thenReturn(computerBuilderMock);
-		when(computerBuilderMock.setCompany(any())).thenReturn(computerBuilderMock);
-		when(computerBuilderMock.build()).thenReturn(computerDummy);
-
+	  computerBuilderMock = mock(ComputerBuilder.class);
+	  computerBuilderBadMock = mock(ComputerBuilder.class);
+	  computerDummy = new Computer(id, name, introduced, discontinued, company);
+	  computerBad = new Computer(badId, badName, badIntroduced, badDiscontinued, badCompany);
+	    
+	  when(computerBuilderMock.setId(any())).thenReturn(computerBuilderMock);
+	  when(computerBuilderMock.setName(any())).thenReturn(computerBuilderMock);
+	  when(computerBuilderMock.setIntroduced(any())).thenReturn(computerBuilderMock);
+	  when(computerBuilderMock.setDiscontinued(any())).thenReturn(computerBuilderMock);
+	  when(computerBuilderMock.setCompany(any())).thenReturn(computerBuilderMock);
+	  when(computerBuilderMock.build()).thenReturn(computerDummy);
+	    
+	  when(computerBuilderBadMock.setId(any())).thenReturn(computerBuilderMock);
+	  when(computerBuilderBadMock.setName(any())).thenReturn(computerBuilderMock);
+	  when(computerBuilderBadMock.setIntroduced(any())).thenReturn(computerBuilderMock);
+	  when(computerBuilderBadMock.setDiscontinued(any())).thenReturn(computerBuilderMock);
+	  when(computerBuilderBadMock.setCompany(any())).thenReturn(computerBuilderMock);
+	  when(computerBuilderBadMock.build()).thenReturn(computerBad);
 	}
 
 	@AfterAll
 	static void tearDownAfterClass() throws Exception {
-	}
-
-	@BeforeEach
-	void setUp() throws Exception {
-	}
-
-	@AfterEach
-	void tearDown() throws Exception {
-		computerDummy = null;
-		computerBuilderMock = null;
+    computerDummy = null;
+    computerBuilderMock = null;
 	}
 
 	@Test
 	void givenGoodInput_whenCreatingComputer_thenSuceed() {
-		Computer computerTested = computerBuilderMock.setId(id).setName(name).setIntroduced(introduced)
-				.setDiscontinued(discontinued).setCompany(company).build();
+		Computer computerTested = computerBuilderMock
+		    .setId(id)
+		    .setName(name)
+		    .setIntroduced(introduced)
+				.setDiscontinued(discontinued)
+				.setCompany(company).build();
 
 		verify(computerBuilderMock, times(1)).setId(id);
 		verify(computerBuilderMock, times(1)).setName(name);
@@ -86,16 +104,28 @@ class ComputerTest {
 
 	@Test
 	void givenBadInput_whenCreatingComputer_thenFail() {
-		Computer computerTested = new Computer.ComputerBuilder().setId(badId).setName(badName)
-				.setIntroduced(badIntroduced).setDiscontinued(badDiscontinued).setCompany(badCompany).build();
+		Computer computerTested = computerBuilderMock
+		    .setId(badId)
+		    .setName(badName)
+				.setIntroduced(badIntroduced)
+				.setDiscontinued(badDiscontinued)
+				.setCompany(badCompany)
+				.build();
+		
+    verify(computerBuilderBadMock, times(1)).setId(badId);
+    verify(computerBuilderBadMock, times(1)).setName(badName);
+    verify(computerBuilderBadMock, times(1)).setIntroduced(badIntroduced);
+    verify(computerBuilderBadMock, times(1)).setDiscontinued(badDiscontinued);
+    verify(computerBuilderBadMock, times(1)).setCompany(badCompany);
+    
+		
+    assertNotNull(computerTested);
+    assertFalse( computerTested.getId() > 0 );
+    assertFalse( computerTested.getName() != null || !computerTested.getName().isEmpty() );
+    assertFalse( computerTested.getCompany().getId() > 0 );
+    assertFalse( computerTested.getCompany().getName() != null || !computerTested.getCompany().getName().isEmpty() );
+    assertFalse( computerTested.getIntroduced().before( computerTested.getDiscontinued() ) );
 
-		assertFalse( computerTested.getIntroduced().before(computerTested.getDiscontinued()) );
-
-		verify(computerBuilderMock, times(1)).setId(badId);
-		verify(computerBuilderMock, times(1)).setName(badName);
-		verify(computerBuilderMock, times(1)).setIntroduced(badIntroduced);
-		verify(computerBuilderMock, times(1)).setDiscontinued(badDiscontinued);
-		verify(computerBuilderMock, times(1)).setCompany(badCompany);
 	}
 
 	@Test
