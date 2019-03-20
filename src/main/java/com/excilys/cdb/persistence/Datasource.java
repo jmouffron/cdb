@@ -8,6 +8,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author excilys
  *
@@ -17,16 +20,17 @@ public class Datasource {
 	private static String driver;
 	private static String username;
 	private static String password;
+	private static Logger log;
 
 	static {
+	  log = LoggerFactory.getLogger(Datasource.class);
 		Properties props = new Properties();
 		try {
-			props.load(new FileInputStream("src/main/java/resource/jdbc.properties"));
+			props.load( new FileInputStream( "WebContent/WEB-INF/jdbc.properties" ) );
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			System.out.println(e.getMessage());
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
+			log.error(e.getMessage());
+		} catch (IOException e) {
+		  log.error(e.getMessage());
 		}
 		driver = props.getProperty("jdbc.driver");
 		url = props.getProperty("jdbc.url");
@@ -37,8 +41,7 @@ public class Datasource {
 		try {
 			Class.forName(driver);
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-			System.out.println(e.getMessage());
+		  log.error(e.getMessage());
 		}
 	}
 
@@ -58,7 +61,7 @@ public class Datasource {
 		try {
 			return DriverManager.getConnection(url, username, password);
 		} catch (SQLException e) {
-			e.printStackTrace();
+		  log.error(e.getMessage());
 		}
 		return null;
 	}

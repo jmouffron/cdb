@@ -3,6 +3,8 @@ package com.excilys.cdb.model;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+import com.excilys.cdb.utils.DateUtils;
+
 public class Computer extends Entity {
 
 	private Timestamp introduced;
@@ -52,7 +54,7 @@ public class Computer extends Entity {
 	@Override
 	public String toString() {
 		return "Computer of id " + this.id + ", of name " + this.name + ", introduced in " + this.introduced
-				+ ", discontinued in " + this.discontinued + " manufactur� par " + this.company;
+				+ ", discontinued in " + this.discontinued + " manufacturé par " + this.company;
 	}
 
 	@Override
@@ -101,7 +103,7 @@ public class Computer extends Entity {
 	static public class ComputerBuilder {
 		private Long id;
 		private String name;
-		private Timestamp introduced = Timestamp.valueOf(LocalDateTime.now());
+		private Timestamp introduced = DateUtils.getNowTimestamp();
 		private Timestamp discontinued = null;
 		private Company company;
 

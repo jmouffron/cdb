@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.persistence.Datasource;
 
 public class DaoComputer implements IDaoInstance<Computer> {
 

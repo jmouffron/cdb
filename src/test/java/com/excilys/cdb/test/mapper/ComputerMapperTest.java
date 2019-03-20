@@ -9,15 +9,9 @@ import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-
-import com.excilys.cdb.mapper.ComputerMapper;
 
 class ComputerMapperTest {
 

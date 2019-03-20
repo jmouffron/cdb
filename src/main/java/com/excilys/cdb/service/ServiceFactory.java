@@ -7,7 +7,9 @@ public class ServiceFactory<T extends Entity> {
 
 	public static final String COMPUTER_SERVICE = "computer";
 	public static final String COMPANY_SERVICE = "company";
-
+	
+	private ServiceFactory() { }
+	
 	public static IService<?> getService(String serviceType) throws ServiceException {
 		IService<?> service;
 		switch (serviceType) {

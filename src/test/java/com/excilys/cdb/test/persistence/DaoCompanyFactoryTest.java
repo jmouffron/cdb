@@ -2,33 +2,22 @@ package com.excilys.cdb.test.persistence;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.excilys.cdb.model.Company;
+import com.excilys.cdb.persistence.DaoCompanyFactory;
+import com.excilys.cdb.persistence.IDaoFactory;
 
 class DaoCompanyFactoryTest {
 
-  @BeforeAll
-  static void setUpBeforeClass() throws Exception {
-  }
-
-  @AfterAll
-  static void tearDownAfterClass() throws Exception {
-  }
-
-  @BeforeEach
-  void setUp() throws Exception {
-  }
-
-  @AfterEach
-  void tearDown() throws Exception {
-  }
+  static IDaoFactory<Company> factoryTested;
 
   @Test
-  void test() {
-    fail("Not yet implemented");
+  void givenFactoryMethod_whenCreatingDao_thenSuceed() {
+    factoryTested = DaoCompanyFactory.getCompanyFactory();
+    
+    assertTrue(factoryTested instanceof DaoCompanyFactory);
+    assertNotNull(factoryTested.getDao());
   }
 
 }

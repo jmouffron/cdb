@@ -6,9 +6,11 @@ public class DaoCompanyFactory implements IDaoFactory<Company> {
   private static volatile IDaoFactory<Company> instance;
   private static IDaoInstance<Company> daoCompany;
   
-  public static IDaoFactory<Company> getComputerFactory() {
+  private DaoCompanyFactory() {  }
+  
+  public static IDaoFactory<Company> getCompanyFactory() {
     if (instance == null) {
-      synchronized (DaoComputerFactory.class) {
+      synchronized (DaoCompanyFactory.class) {
         if (instance == null) {
           instance = new DaoCompanyFactory();
         }

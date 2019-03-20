@@ -4,31 +4,27 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 
-import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.persistence.DaoComputer;
 import com.excilys.cdb.persistence.DaoComputerFactory;
+import com.excilys.cdb.persistence.Datasource;
 import com.excilys.cdb.persistence.IDaoInstance;
-import com.excilys.cdb.service.ComputerService;
-import com.excilys.cdb.service.IService;
-import com.excilys.cdb.service.ServiceFactory;
+import com.excilys.cdb.utils.DateUtils;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.temporal.TemporalAmount;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@ExtendWith(MockitoExtension.class)
 public class DaoComputerTest {
 
 	private static final Logger log = LoggerFactory.getLogger(DaoComputerTest.class);
@@ -63,9 +59,8 @@ public class DaoComputerTest {
 	void givenBadInput_whenCreateUser_thenFail() {
 		Long id = -100L;
 		String name = null;
-		LocalDateTime dateTime = LocalDateTime.now().minusYears(1000);
-		Timestamp introduced = Timestamp.valueOf(dateTime);
-		Timestamp discontinued = Timestamp.valueOf(dateTime.minusHours(3));
+		Timestamp introduced = DateUtils.getBeforeNowTimestamp(Period.ofYears(1000));
+		Timestamp discontinued = DateUtils.getBeforeNowTimestamp(Period.ofYears(1003));
 		
 		Company companyDummy = new Company(id, "");		
 		Computer computerDummy = new Computer.ComputerBuilder()

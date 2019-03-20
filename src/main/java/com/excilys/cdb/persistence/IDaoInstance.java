@@ -2,8 +2,6 @@ package com.excilys.cdb.persistence;
 
 import java.util.List;
 
-import com.excilys.cdb.model.Computer;
-
 /**
  * An interface to allow contract to instantiate Daos to interact with
  * 

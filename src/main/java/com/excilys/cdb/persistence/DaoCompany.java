@@ -1,5 +1,6 @@
 package com.excilys.cdb.persistence;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,8 +20,9 @@ import com.excilys.cdb.model.Computer;
  *
  */
 public class DaoCompany implements IDaoInstance<Company> {
-	private final String INSERT = "INSERT INTO company VALUES(?);";
+	private final String INSERT = "INSERT INTO company VALUES(?,?);";
 	private final String SELECT_ALL = "SELECT * FROM company;";
+	private final String MAX_ID = "SELECT MAX(id)+1 FROM company;";
 	private final String SELECT_ID = "SELECT * FROM company where id=?;";
 	private final String SELECT_NAME = "SELECT * FROM company where name=?;";
 	private final String UPDATE = "UPDATE company SET name=? WHERE id=?;";
@@ -111,9 +113,18 @@ public class DaoCompany implements IDaoInstance<Company> {
 	@Override
 	public boolean create(Company newEntity) {
 		int lineAffected = 0;
-
-		try (PreparedStatement stmt = Datasource.getConnection().prepareStatement(INSERT);) {
-			stmt.setString(1, newEntity.getName());
+		ResultSet maxRs = null;
+		Connection conn = Datasource.getConnection();
+		
+		try (
+		    PreparedStatement maxStmt = conn.prepareStatement(MAX_ID);
+		    PreparedStatement stmt = conn.prepareStatement(INSERT);
+		) {
+		  maxRs = maxStmt.executeQuery(); 
+		  maxRs.next();
+		  long maxId = maxRs.getLong(1);
+		  stmt.setLong(1, maxId);
+		  stmt.setString(1, newEntity.getName());
 			lineAffected = stmt.executeUpdate();
 		} catch (SQLException sqlex) {
 			log.debug(sqlex.getMessage());

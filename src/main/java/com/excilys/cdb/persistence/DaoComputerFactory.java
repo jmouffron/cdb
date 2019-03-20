@@ -6,6 +6,8 @@ public class DaoComputerFactory implements IDaoFactory<Computer> {
 	private static volatile IDaoFactory<Computer> instance;
 	private static IDaoInstance<Computer> daoComputer;
 	
+	private DaoComputerFactory() {	}
+	
 	public static IDaoFactory<Computer> getComputerFactory() {
 	  if (instance == null) {
       synchronized (DaoComputerFactory.class) {

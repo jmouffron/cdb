@@ -65,11 +65,11 @@ class ComputerTest {
 	  when(computerBuilderMock.setCompany(any())).thenReturn(computerBuilderMock);
 	  when(computerBuilderMock.build()).thenReturn(computerDummy);
 	    
-	  when(computerBuilderBadMock.setId(any())).thenReturn(computerBuilderMock);
-	  when(computerBuilderBadMock.setName(any())).thenReturn(computerBuilderMock);
-	  when(computerBuilderBadMock.setIntroduced(any())).thenReturn(computerBuilderMock);
-	  when(computerBuilderBadMock.setDiscontinued(any())).thenReturn(computerBuilderMock);
-	  when(computerBuilderBadMock.setCompany(any())).thenReturn(computerBuilderMock);
+	  when(computerBuilderBadMock.setId(any())).thenReturn(computerBuilderBadMock);
+	  when(computerBuilderBadMock.setName(any())).thenReturn(computerBuilderBadMock);
+	  when(computerBuilderBadMock.setIntroduced(any())).thenReturn(computerBuilderBadMock);
+	  when(computerBuilderBadMock.setDiscontinued(any())).thenReturn(computerBuilderBadMock);
+	  when(computerBuilderBadMock.setCompany(any())).thenReturn(computerBuilderBadMock);
 	  when(computerBuilderBadMock.build()).thenReturn(computerBad);
 	}
 
@@ -104,7 +104,7 @@ class ComputerTest {
 
 	@Test
 	void givenBadInput_whenCreatingComputer_thenFail() {
-		Computer computerTested = computerBuilderMock
+		Computer computerTested = computerBuilderBadMock
 		    .setId(badId)
 		    .setName(badName)
 				.setIntroduced(badIntroduced)
@@ -121,9 +121,9 @@ class ComputerTest {
 		
     assertNotNull(computerTested);
     assertFalse( computerTested.getId() > 0 );
-    assertFalse( computerTested.getName() != null || !computerTested.getName().isEmpty() );
+    assertFalse( !computerTested.getName().isEmpty() );
     assertFalse( computerTested.getCompany().getId() > 0 );
-    assertFalse( computerTested.getCompany().getName() != null || !computerTested.getCompany().getName().isEmpty() );
+    assertFalse( !computerTested.getCompany().getName().isEmpty() );
     assertFalse( computerTested.getIntroduced().before( computerTested.getDiscontinued() ) );
 
 	}

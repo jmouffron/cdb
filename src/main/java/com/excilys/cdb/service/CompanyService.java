@@ -17,7 +17,7 @@ public class CompanyService implements IService<Company> {
 	private Logger log;
 
 	public CompanyService() {
-		this.dao = DaoCompanyFactory.getComputerFactory().getDao();
+		this.dao = DaoCompanyFactory.getCompanyFactory().getDao();
 		this.log = LoggerFactory.getLogger(CompanyService.class);
 	}
 
