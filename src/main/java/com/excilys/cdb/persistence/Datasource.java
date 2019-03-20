@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.util.Optional;
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -24,20 +25,21 @@ public class Datasource {
 
 	static {
 	  log = LoggerFactory.getLogger(Datasource.class);
+	  
 		Properties props = new Properties();
 		try {
-			props.load( new FileInputStream( "WebContent/WEB-INF/jdbc.properties" ) );
+			props.load( new FileInputStream( "/home/excilys/eclipse-workspace/cdb/src/main/webapp/resource/jdbc.properties" ) );
 		} catch (FileNotFoundException e) {
 			log.error(e.getMessage());
 		} catch (IOException e) {
 		  log.error(e.getMessage());
 		}
+		
 		driver = props.getProperty("jdbc.driver");
 		url = props.getProperty("jdbc.url");
 		username = props.getProperty("jdbc.username");
 		password = props.getProperty("jdbc.password");
 
-		// Récupération du driver dans le contexte
 		try {
 			Class.forName(driver);
 		} catch (ClassNotFoundException e) {
@@ -48,22 +50,23 @@ public class Datasource {
 	/**
 	 * A private Constructor to never allow instantiation
 	 */
-	private Datasource() {
-	}
+	private Datasource() { }
 
 	/**
 	 * A static way to get a connection to the database
 	 * 
 	 * @return Connection
 	 */
-	public static Connection getConnection() {
-		// Récupération de la connexion
+	public static Optional<Connection> getConnection() {
+	  Connection result = null;
+	  
 		try {
-			return DriverManager.getConnection(url, username, password);
+		  result = DriverManager.getConnection(url, username, password);
 		} catch (SQLException e) {
 		  log.error(e.getMessage());
 		}
-		return null;
+		
+		return Optional.ofNullable(result);
 	}
 
 }

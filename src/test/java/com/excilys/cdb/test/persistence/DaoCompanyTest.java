@@ -35,7 +35,7 @@ class DaoCompanyTest {
     
     assertTrue( daoTested.create(companyDummy) );
      
-    List<Company> companies = daoTested.getAll();
+    List<Company> companies = daoTested.getAll().get();
     int computerSize = companies.size() - 1;
         
     assertEquals(companyDummy, companies.get(computerSize));
@@ -49,7 +49,7 @@ class DaoCompanyTest {
     
     assertFalse(daoTested.create(companyDummy));
     
-    List<Company> companies = daoTested.getAll();
+    List<Company> companies = daoTested.getAll().get();
     int computerSize = companies.size() - 1;
 
     assertNotEquals(companyDummy.getName(), companies.get(computerSize).getName());

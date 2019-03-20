@@ -61,37 +61,37 @@ public class ComputerDTO extends EntityDTO {
 	 *         An inner Builder class for computer entities
 	 *
 	 */
-	static public class ComputerBuilder {
+	static public class ComputerDTOBuilder {
 		private Long id;
 		private String name;
 		private Timestamp introduced = Timestamp.valueOf(LocalDateTime.now());
 		private Timestamp discontinued = null;
 		private long company_id;
 
-		public ComputerBuilder() {
+		public ComputerDTOBuilder() {
 		}
 
-		public ComputerBuilder setId(Long id) {
+		public ComputerDTOBuilder setId(Long id) {
 			this.id = id;
 			return this;
 		}
 
-		public ComputerBuilder setName(String name) {
+		public ComputerDTOBuilder setName(String name) {
 			this.name = name;
 			return this;
 		}
 
-		public ComputerBuilder setIntroduced(Timestamp introduced) {
+		public ComputerDTOBuilder setIntroduced(Timestamp introduced) {
 			this.introduced = introduced;
 			return this;
 		}
 
-		public ComputerBuilder setDiscontinued(Timestamp discontinued) {
+		public ComputerDTOBuilder setDiscontinued(Timestamp discontinued) {
 			this.discontinued = discontinued;
 			return this;
 		}
 
-		public ComputerBuilder setCompany(long company_id) {
+		public ComputerDTOBuilder setCompanyId(long company_id) {
 			this.company_id = company_id;
 			return this;
 		}

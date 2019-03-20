@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.Period;
 import java.time.format.DateTimeFormatter;
 
 import org.junit.jupiter.api.AfterAll;
@@ -21,6 +22,7 @@ import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.IDaoInstance;
 import com.excilys.cdb.service.IService;
 import com.excilys.cdb.service.ServiceFactory;
+import com.excilys.cdb.utils.DateUtils;
 
 class ComputerServiceTest {
   private static Logger log = LoggerFactory.getLogger(ComputerServiceTest.class);
@@ -28,20 +30,12 @@ class ComputerServiceTest {
   static IService<Computer> service;
   static IDaoInstance<Computer> daoComputer;
 
-  static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+  static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-mm-dd hh:mm:ss");
 
-  static LocalDateTime dateTime = LocalDateTime.now().minusYears(3);
-  static LocalDateTime dateTimeNewer = LocalDateTime.now();
-
-  String textDateTime = dateTime.format(formatter);
-  String textDateTimeNewer = dateTimeNewer.format(formatter);
-  LocalDateTime newer = LocalDateTime.parse(textDateTimeNewer, formatter);
-  LocalDateTime older = LocalDateTime.parse(textDateTime, formatter);
-
-  Timestamp badIntroduced = Timestamp.valueOf(newer);
-  Timestamp badDiscontinued = Timestamp.valueOf(older);
-  Timestamp introduced = Timestamp.valueOf(older);
-  Timestamp discontinued = Timestamp.valueOf(newer);
+  Timestamp badIntroduced = DateUtils.getNowTimestamp();
+  Timestamp badDiscontinued = DateUtils.getBeforeNowTimestamp(Period.ofYears(3));
+  Timestamp introduced = DateUtils.getBeforeNowTimestamp(Period.ofYears(3));
+  Timestamp discontinued = DateUtils.getNowTimestamp();
 
   @BeforeAll
   static void setUp() {

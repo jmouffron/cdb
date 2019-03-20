@@ -1,6 +1,7 @@
 package com.excilys.cdb.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.persistence.IDaoInstance;
@@ -12,7 +13,7 @@ public interface IService<Entity> {
 	 * 
 	 * @return List<T extends Entity>
 	 */
-	public abstract List<Entity> getAll();
+	public abstract Optional<List<Entity>> getAll();
 
 	/**
 	 * Commands the DAO related to the service to retrieve an Entity T based on id
@@ -21,7 +22,7 @@ public interface IService<Entity> {
 	 * @return <T extends Entity>
 	 * @throws BadInputException
 	 */
-	public abstract Entity getOneById(Long id) throws BadInputException;
+	public abstract Optional<Entity> getOneById(Long id) throws BadInputException;
 
 	/**
 	 * Commands the Dao related to the service to retrieve an Entity T based on name
@@ -30,7 +31,7 @@ public interface IService<Entity> {
 	 * @return <T extends Entity>
 	 * @throws BadInputException
 	 */
-	public abstract Entity getOneByName(String name) throws BadInputException;
+	public abstract Optional<Entity> getOneByName(String name) throws BadInputException;
 
 	/**
 	 * Commands the Dao related to the service to create a new entity

@@ -86,14 +86,14 @@ class ComputerBuilderTest {
 		String name = "name";
 		Long id = 600L;
 		Company company = new Company(1L, "name");
-
+		
+		Computer otherComputer = new Computer(id, name, Timestamp.valueOf(LocalDateTime.now()), null, company);
 		ComputerBuilder computerBuilderTested = new ComputerBuilder()
 				.setId(id)
 				.setName(name)
 				.setCompany(company);
 		
 		Computer computer = computerBuilderTested.build();
-		Computer otherComputer = new Computer(id, name, Timestamp.valueOf(LocalDateTime.now()), null, company);
 		
 		assertNull( computer.getDiscontinued() );
 		assertNotNull( computer.getIntroduced() );

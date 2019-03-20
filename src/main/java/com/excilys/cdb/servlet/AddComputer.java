@@ -4,7 +4,8 @@ import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.service.IService;
+import com.excilys.cdb.service.CompanyService;
+import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.ServiceFactory;
 
 import java.io.IOException;
@@ -31,8 +32,8 @@ import org.slf4j.LoggerFactory;
 public class AddComputer extends HttpServlet {
   private static final long serialVersionUID = 1L;
   private static final Logger logger = LoggerFactory.getLogger(AddComputer.class);
-  private IService<Computer> computerService;
-  private IService<Company> companyService;
+  private ComputerService computerService;
+  private CompanyService companyService;
 
 	/**
 	 * Default constructor.
@@ -40,8 +41,8 @@ public class AddComputer extends HttpServlet {
 	public AddComputer() {
 		super();
 		try {
-			this.computerService = (IService<Computer>) ServiceFactory.getService(ServiceFactory.COMPUTER_SERVICE);
-			this.companyService = (IService<Company>) ServiceFactory.getService(ServiceFactory.COMPANY_SERVICE);
+			this.computerService = (ComputerService) ServiceFactory.getService(ServiceFactory.COMPUTER_SERVICE);
+			this.companyService = (CompanyService) ServiceFactory.getService(ServiceFactory.COMPANY_SERVICE);
 		} catch (ServiceException e) {
 			logger.debug(e.getMessage());
 		}
@@ -62,19 +63,18 @@ public class AddComputer extends HttpServlet {
 	
 		Computer computer = null;
 		try {
-			computer = this.computerService.getOneByName(computerName);
+			computer = this.computerService.getOneByName(computerName).get();
 		} catch (BadInputException e) {
 			logger.debug(e.getMessage());
 			response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), e.getMessage());
 		}
-		List<Company> companies = this.companyService.getAll();
+		List<Company> companies = this.companyService.getAll().get();
 	
 		HttpSession session = request.getSession(true);
 		session.setAttribute("companies", companies);
 		session.setAttribute("computer", computer);
 	
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/dashboard");
-		dispatcher.forward(request, response);
+		this.getServletContext().getRequestDispatcher("/views/addComputer.jsp").forward(request, response);
 	}
 	
 	/**
@@ -92,7 +92,7 @@ public class AddComputer extends HttpServlet {
 	
 		Computer computer = null;
 		try {
-			computer = this.computerService.getOneByName(computerName);
+			computer = this.computerService.getOneByName(computerName).get();
 		} catch (BadInputException e) {
 			logger.debug(e.getMessage());
 			response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), e.getMessage());
@@ -109,8 +109,7 @@ public class AddComputer extends HttpServlet {
       HttpSession session = request.getSession(true);
       session.setAttribute("success", "Computer " + computer.getName() + " successfully created!");
       
-      RequestDispatcher dispatcher = request.getRequestDispatcher("/dashboard");
-      dispatcher.forward(request, response);
+      this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
     }
   }
 

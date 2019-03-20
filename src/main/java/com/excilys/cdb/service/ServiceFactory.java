@@ -10,17 +10,17 @@ public class ServiceFactory<T extends Entity> {
 	
 	private ServiceFactory() { }
 	
-	public static IService<?> getService(String serviceType) throws ServiceException {
-		IService<?> service;
+	public static IService getService(String serviceType) throws ServiceException {
+		IService service = null;
 		switch (serviceType) {
-		case COMPUTER_SERVICE:
-			service = new ComputerService();
-			break;
-		case COMPANY_SERVICE:
-			service = new CompanyService();
-			break;
-		default:
-			throw new ServiceException("Problems creating the Services!");
+  		case COMPUTER_SERVICE:
+  			service = ComputerService.getService();
+  			break;
+  		case COMPANY_SERVICE:
+  			service = CompanyService.getService();
+  			break;
+  		default:
+  			throw new ServiceException("Problems creating the Services!");
 		}
 
 		return service;

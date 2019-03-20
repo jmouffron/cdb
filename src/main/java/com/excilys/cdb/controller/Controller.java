@@ -238,7 +238,7 @@ public class Controller<T extends Entity> {
 	 */
 	private List<T> getAllEntities() {
 		// TODO Auto-generated method stub
-		return this.service.getAll();
+		return this.service.getAll().get();
 	}
 
 	/**
@@ -249,7 +249,7 @@ public class Controller<T extends Entity> {
 	 */
 	private Entity getEntityById(Long id) {
 		try {
-			return this.service.getOneById(id);
+			return this.service.getOneById(id).get();
 		} catch (BadInputException e) {
 			e.printStackTrace();
 		}
@@ -296,7 +296,7 @@ public class Controller<T extends Entity> {
 	 */
 	private void setService(String serviceType) {
 		try {
-			this.service = (IService<T>) ServiceFactory.getService(serviceType);
+			this.service = ServiceFactory.getService(serviceType);
 		} catch (ServiceException e) {
 			e.printStackTrace();
 		}

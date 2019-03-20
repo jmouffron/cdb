@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 
+import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 
@@ -26,5 +27,18 @@ public class ComputerMapper {
 
 		return computer;
 	}
+	
+	static public ComputerDTO mapDTO(Computer computer) throws SQLException {
+	  
+	  ComputerDTO computerDTO = new ComputerDTO.ComputerDTOBuilder()
+	      .setId(computer.getId())
+	      .setName(computer.getName())
+	      .setIntroduced(computer.getIntroduced())
+	      .setDiscontinued(computer.getDiscontinued())
+	      .setCompanyId(computer.getCompany().getId())
+	      .build();
+
+    return computerDTO;
+  }
 
 }

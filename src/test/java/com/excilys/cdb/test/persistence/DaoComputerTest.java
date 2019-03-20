@@ -4,20 +4,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
 
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.DaoComputerFactory;
-import com.excilys.cdb.persistence.Datasource;
 import com.excilys.cdb.persistence.IDaoInstance;
 import com.excilys.cdb.utils.DateUtils;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.Period;
-import java.time.temporal.TemporalAmount;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -49,7 +44,7 @@ public class DaoComputerTest {
 		
 		assertTrue( daoTested.create(computerDummy) );
      
-    List<Computer> computers = daoTested.getAll();
+    List<Computer> computers = daoTested.getAll().get();
     int computerSize = computers.size() - 1;
         
 		assertEquals(computerDummy, computers.get(computerSize));
@@ -73,7 +68,7 @@ public class DaoComputerTest {
 		
 		assertFalse(daoTested.create(computerDummy));
 		
-		List<Computer> computers = daoTested.getAll();
+		List<Computer> computers = daoTested.getAll().get();
     int computerSize = computers.size() - 1;
 
     assertNotEquals(computerDummy.getName(), computers.get(computerSize).getName());

@@ -33,7 +33,7 @@ import com.excilys.cdb.service.ServiceFactory;
 public class DashBoard extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private static final Logger logger = LoggerFactory.getLogger(DashBoard.class);
-	private IService<?> computerService;
+	private IService<Computer> computerService;
 
 	/**
 	 * Default constructor.
@@ -41,7 +41,7 @@ public class DashBoard extends HttpServlet {
 	public DashBoard() {
 		super();
 		try {
-			this.computerService = ServiceFactory.getService(ServiceFactory.COMPUTER_SERVICE);
+			this.computerService = (IService<Computer>) ServiceFactory.getService(ServiceFactory.COMPUTER_SERVICE);
 		} catch (ServiceException e) {
 			logger.debug(e.getMessage());
 		}
@@ -54,7 +54,7 @@ public class DashBoard extends HttpServlet {
 	}
 
 	private List<Computer> searchByName(String name) {
-		List<Computer> computers = (List<Computer>) this.computerService.getAll();
+		List<Computer> computers = this.computerService.getAll().get();
 		List<Computer> filteredComputers = computers.stream()
 				.filter(computer -> computer.getName().matches(name) || computer.getCompany().getName().matches(name))
 				.collect(Collectors.toList());
@@ -68,31 +68,30 @@ public class DashBoard extends HttpServlet {
 	@Override
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		String searchName = request.getParameter("search");
-		String entitiesPerPage = request.getParameter("entitiesPerPage");
-		
-		List<Computer> computers;
-		if (searchName == null) {
-			searchName = "";
-			computers = (List<Computer>) this.computerService.getAll();
-		} else {
-			computers = this.searchByName(searchName);
-		}
-		int computerNumber = computers.size();
+    String searchName = request.getParameter("search");
+    String entitiesPerPage = request.getParameter("entitiesPerPage");
+    
+    List<Computer> computers;
+    if (searchName == null) {
+      searchName = "";
+      computers = (List<Computer>) this.computerService.getAll().get();
+    } else {
+      computers = this.searchByName(searchName);
+    }
+    int computerNumber = computers.size();
     HttpSession session = request.getSession(true);
     session.setAttribute("search", searchName);
     session.setAttribute("computers", computers);
     session.setAttribute("computerNumber", computerNumber);
-    
-		if ( !entitiesPerPage.isEmpty() || entitiesPerPage != null ) {
-		  int[] pages = paginate(computerNumber, Integer.parseInt( entitiesPerPage ));
-	    session.setAttribute("pages", pages);
-		}
+	    
+//	    if ( !entitiesPerPage.equals("") || entitiesPerPage != null) {
+//	      int[] pages = paginate(computerNumber, Integer.parseInt( entitiesPerPage ));
+//	      session.setAttribute("pages", pages);
+//	    }
 
-		logger.info(getServletName() + " has been called.");
+    logger.info(getServletName() + " has been called.");
 
-		RequestDispatcher dispatcher = request.getRequestDispatcher("/dashboard");
-		dispatcher.forward(request, response);
+	  this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
 	}
 
 	/**

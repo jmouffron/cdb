@@ -1,6 +1,8 @@
 package com.excilys.cdb.model;
 
-public abstract class Entity {
+import java.io.Serializable;
+
+public abstract class Entity implements Serializable{
 	@Override
 	public int hashCode() {
 		final int prime = 31;

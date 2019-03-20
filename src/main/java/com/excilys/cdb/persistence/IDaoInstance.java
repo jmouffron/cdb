@@ -1,6 +1,7 @@
 package com.excilys.cdb.persistence;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * An interface to allow contract to instantiate Daos to interact with
@@ -10,11 +11,11 @@ import java.util.List;
  * @param <T>
  */
 public interface IDaoInstance<Entity> {
-	abstract List<Entity> getAll();
+	abstract Optional<List<Entity>> getAll();
 
-	abstract Entity getOneById(Long id);
+	abstract Optional<Entity> getOneById(Long id);
 
-	abstract Entity getOneByName(String name);
+	abstract Optional<Entity> getOneByName(String name);
 
 	abstract boolean create(Entity newEntity);
 
@@ -24,5 +25,5 @@ public interface IDaoInstance<Entity> {
 
 	abstract boolean deleteByName(String name);
 
-	public abstract boolean createDTO(Entity newEntity);
+	abstract boolean createDTO(Entity newEntity);
 }

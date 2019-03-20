@@ -1,13 +1,5 @@
 package com.excilys.cdb.test.mapper;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.fail;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.lenient;
-import static org.mockito.Mockito.mock;
-
 import java.sql.ResultSet;
 
 import org.junit.jupiter.api.AfterAll;

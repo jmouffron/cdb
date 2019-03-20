@@ -55,7 +55,7 @@ public class DeleteComputer extends HttpServlet {
 
 		Computer computer = null;
 		try {
-			computer = (Computer) this.service.getOneByName(computerName);
+			computer = (Computer) this.service.getOneByName(computerName).get();
 		} catch (BadInputException e) {
 			response.sendError(ErrorCode.FILE_NOT_FOUND.getErrorCode(), e.getMessage());
 		}
@@ -81,13 +81,12 @@ public class DeleteComputer extends HttpServlet {
 		String computerName = request.getParameter("computerName");
 		if (computerName == null) {
 			response.sendError(ErrorCode.FILE_NOT_FOUND.getErrorCode(), "No correct computer name found!");
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/deleteComputer");
-			dispatcher.forward(request, response);
+			this.getServletContext().getRequestDispatcher("/views/deleteComputer.jsp").forward(request, response);
 		}
 
 		Computer computer = null;
 		try {
-			computer = (Computer) this.service.getOneByName(computerName);
+			computer = (Computer) this.service.getOneByName(computerName).get();
 		} catch (BadInputException e) {
 			response.sendError(ErrorCode.FILE_NOT_FOUND.getErrorCode(), e.getMessage());
 		}
@@ -95,8 +94,7 @@ public class DeleteComputer extends HttpServlet {
 		if (computer == null) {
 			response.sendError(ErrorCode.FILE_NOT_FOUND.getErrorCode(), "Null computer found!");
 
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/deleteComputer");
-			dispatcher.forward(request, response);
+			this.getServletContext().getRequestDispatcher("/views/deleteComputer.jsp").forward(request, response);
 		}
 		boolean isDeleted = false;
 		try {
@@ -104,15 +102,13 @@ public class DeleteComputer extends HttpServlet {
 		} catch (BadInputException e) {
 			response.sendError(ErrorCode.FILE_NOT_FOUND.getErrorCode(), "Couldn't delete computer!" + e.getMessage());
 
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/deleteComputer");
-			dispatcher.forward(request, response);
+			this.getServletContext().getRequestDispatcher("/views/deleteComputer.jsp").forward(request, response);
 		}
 		if (isDeleted) {
 			HttpSession session = request.getSession(true);
 			session.setAttribute("success", "The computer " + computer.getName() + " has been correctly deleted!");
 
-			RequestDispatcher dispatcher = request.getRequestDispatcher("/dashboard");
-			dispatcher.forward(request, response);
+			this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
 		}
 
 	}

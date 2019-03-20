@@ -1,13 +1,14 @@
 package com.excilys.cdb.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 
 import com.excilys.cdb.utils.DateUtils;
 
-public class Computer extends Entity {
+public class Computer extends Entity implements Serializable{
 
-	private Timestamp introduced;
+  private static final long serialVersionUID = 2256380163459893961L;
+  private Timestamp introduced;
 	private Timestamp discontinued;
 	private Company company;
 

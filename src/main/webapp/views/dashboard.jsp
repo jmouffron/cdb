@@ -19,7 +19,7 @@
 <body>
 	<header class="navbar navbar-inverse navbar-fixed-top">
 		<div class="container">
-			<a class="navbar-brand" href="cdb/views/dashboard"> Application - Computer
+			<a class="navbar-brand" href="/dashboard"> Application - Computer
 				Database </a>
 		</div>
 	</header>
@@ -45,7 +45,7 @@
 					</form>
 				</div>
 				<div class="pull-right">
-					<a class="btn btn-success" id="addComputer" href="cdb/views/addComputer">Add
+					<a class="btn btn-success" id="addComputer" href="/addComputer">Add
 						Computer</a> <a class="btn btn-default" id="editComputer" href="#"
 						onclick="$.fn.toggleEditMode();">Edit</a>
 				</div>
@@ -85,7 +85,7 @@
 						<tr>
 							<td class="editMode"><input type="checkbox" name="cb"
 								class="cb" value="0"></td>
-							<td><a href="cdb/views/editComputer" onclick="">${computer.name}</a></td>
+							<td><a href="/editComputer" onclick="">${computer.name}</a></td>
 							<td>${computer.introduced}</td>
 							<td>${computer.discontinued}</td>
 							<td>${computer.company.name}</td>

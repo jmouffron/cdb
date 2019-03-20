@@ -60,12 +60,12 @@ public class EditComputer extends HttpServlet {
 
 		Computer computer = null;
 		try {
-			computer = this.computerService.getOneByName(computerName);
+			computer = this.computerService.getOneByName(computerName).get();
 		} catch (BadInputException e) {
 			logger.debug(e.getMessage());
 			response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), e.getMessage());
 		}
-		List<Company> companies = this.companyService.getAll();
+		List<Company> companies = this.companyService.getAll().get();
 
 		HttpSession session = request.getSession(true);
 		session.setAttribute("companies", companies);
@@ -90,7 +90,7 @@ public class EditComputer extends HttpServlet {
 
 		Computer computer = null;
 		try {
-			computer = this.computerService.getOneByName(computerName);
+			computer = this.computerService.getOneByName(computerName).get();
 		} catch (BadInputException e) {
 			logger.debug(e.getMessage());
 			response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), e.getMessage());

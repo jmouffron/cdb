@@ -1,6 +1,7 @@
 package com.excilys.cdb.service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
@@ -13,16 +14,28 @@ import com.excilys.cdb.persistence.IDaoInstance;
 import com.excilys.cdb.validator.ServiceValidator;
 
 public class ComputerService implements IService<Computer> {
+  private static ComputerService instance;
 	private IDaoInstance<Computer> dao;
 	private Logger log;
 
-	public ComputerService() {
+	private ComputerService() {
 		this.dao = DaoComputerFactory.getComputerFactory().getDao();
 		this.log = LoggerFactory.getLogger(ComputerService.class);
 	}
+	
+	public static ComputerService getService() {
+	  if ( instance == null ) {
+	    synchronized( ComputerService.class ) {
+	      if (instance == null ) {
+	        return new ComputerService();
+	      }
+	    }
+	  }
+	  return instance;
+	}
 
 	@Override
-	public List<Computer> getAll() {
+	public Optional<List<Computer>> getAll() {
 		return this.dao.getAll();
 	}
 
@@ -32,7 +45,8 @@ public class ComputerService implements IService<Computer> {
 	 */
 	@Override
 	public List<Computer> searchByName(String name) {
-		List<Computer> filteredComputers = this.dao.getAll().stream()
+		List<Computer> filteredComputers = this.dao.getAll().get()
+		    .stream()
 				.filter(computer -> computer.getName().matches(name) || computer.getCompany().getName().matches(name))
 				.collect(Collectors.toList());
 		return filteredComputers;
@@ -42,7 +56,7 @@ public class ComputerService implements IService<Computer> {
 	 * @see com.excilys.cdb.service.IService#getOneById(java.lang.Long)
 	 */
 	@Override
-	public Computer getOneById(Long id) throws BadInputException {
+	public Optional<Computer> getOneById(Long id) throws BadInputException {
 		ServiceValidator.idValidator(id, "Computer");
 
 		return this.dao.getOneById(id);
@@ -52,7 +66,7 @@ public class ComputerService implements IService<Computer> {
 	 * @see com.excilys.cdb.service.IService#getOneByName(java.lang.String)
 	 */
 	@Override
-	public Computer getOneByName(String name) throws BadInputException {
+	public Optional<Computer> getOneByName(String name) throws BadInputException {
 		ServiceValidator.nameValidator(name, "Computer");
 
 		return this.dao.getOneByName(name);

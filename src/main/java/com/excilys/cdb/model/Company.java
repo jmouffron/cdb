@@ -1,8 +1,12 @@
 package com.excilys.cdb.model;
 
-public class Company extends Entity {
+import java.io.Serializable;
 
-	public Company(Long id, String name) {
+public class Company extends Entity implements Serializable {
+
+  private static final long serialVersionUID = 3942228965283035652L;
+
+  public Company(Long id, String name) {
 		this.id = id;
 		this.name = name;
 	}
