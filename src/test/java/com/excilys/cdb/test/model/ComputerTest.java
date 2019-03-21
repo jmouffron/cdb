@@ -30,8 +30,8 @@ class ComputerTest {
 	private static Computer computerDummy;
 	private static Computer computerBad;
 	
-	static Long id = 1L;
-	static Long badId = -1L;
+	static long id = 1L;
+	static long badId = -1L;
 	static String name = "name";
 	static String otherName = "other " + name;
 	static String badName = "";

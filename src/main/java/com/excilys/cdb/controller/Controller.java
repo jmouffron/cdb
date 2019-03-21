@@ -3,6 +3,9 @@ package com.excilys.cdb.controller;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.model.Company;
@@ -26,12 +29,13 @@ import com.excilys.cdb.view.Page;
  * @param <T> Entity
  */
 public class Controller<T extends Entity> {
-	private Page<T> page;
+	private static final Logger logger = LoggerFactory.getLogger(Controller.class);
+  private Page<T> page;
 	private MenuChoiceEnum request;
 	private IService<T> service;
 	private static volatile Controller<Entity> instance;
 
-	private Controller(Page page) {
+	private Controller(Page<T> page) {
 		this.page = page;
 	}
 
@@ -118,10 +122,14 @@ public class Controller<T extends Entity> {
 	 * @throws ServiceException
 	 */
 	private void listAllEntity(String serviceType) {
-		this.setService(serviceType);
+		try {
+      this.setService(serviceType);
+    } catch (ServiceException e1) {
+      logger.error("Bad service instantiation in controller");
+    }
 
-		List<Entity> entities = (List<Entity>) this.getAllEntities();
-		Data<Entity> payload = new Data<>(entities);
+		List<Entity> entities = this.getAllEntities();
+		Data<Entity> payload = new Data<Entity>(entities);
 
 		long totalDataSize = entities.size();
 
@@ -143,13 +151,17 @@ public class Controller<T extends Entity> {
 	private void showComputer() {
 		long id = 0L;
 
-		this.setService(ServiceFactory.COMPUTER_SERVICE);
+		try {
+      this.setService(ServiceFactory.COMPUTER_SERVICE);
+    } catch (ServiceException e1) {
+      logger.error("Bad service instantiation in controller");
+    }
 
 		id = ControllerUtils.getLongInput("Choisissez un id d'entité supérieur à 0:",
 				ControllerUtils.isStrictlyPositive);
 
 		Entity entity = this.getEntityById(id);
-		Data<Entity> payload = new Data<>(entity);
+		Data<Entity> payload = new Data<Entity>(entity);
 
 		try {
 			this.setPage(new EntityPage(payload));
@@ -165,7 +177,11 @@ public class Controller<T extends Entity> {
 	 */
 	private void createComputer() {
 
-		this.setService(ServiceFactory.COMPUTER_SERVICE);
+		try {
+      this.setService(ServiceFactory.COMPUTER_SERVICE);
+    } catch (ServiceException e1) {
+      logger.error("Bad service instantiation in controller");
+    }
 		String name;
 		Timestamp introduced, discontinued;
 		Long companyId;
@@ -186,15 +202,11 @@ public class Controller<T extends Entity> {
 		Computer newEntity = new Computer.ComputerBuilder().setName(name).setIntroduced(introduced)
 				.setDiscontinued(discontinued).setCompany(company).build();
 
-		Data<Computer> payload = new Data<>(newEntity);
+		Data<Entity> payload = new Data<Entity>(newEntity);
 		this.addEntity(newEntity);
 
-		try {
-			this.setPage(new EntityAddPage(payload));
-		} catch (ServiceException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		this.setPage(new EntityAddPage(payload));
+
 	}
 
 	/**
@@ -203,12 +215,11 @@ public class Controller<T extends Entity> {
 	 * @throws ServiceException
 	 */
 	private void updateComputer() {
-		this.setService(ServiceFactory.COMPUTER_SERVICE);
-
 		try {
+		  this.setService(ServiceFactory.COMPUTER_SERVICE);
 			this.setPage(new EntityUpdatePage());
 		} catch (ServiceException e) {
-			e.printStackTrace();
+		  logger.error("Bad service instantiation in controller");
 		}
 	}
 
@@ -218,13 +229,17 @@ public class Controller<T extends Entity> {
 	 * @throws ServiceException
 	 */
 	private void deleteComputer() {
-		this.setService(ServiceFactory.COMPUTER_SERVICE);
+		try {
+      this.setService(ServiceFactory.COMPUTER_SERVICE);
+    } catch (ServiceException e1) {
+      logger.error("Bad service instantiation in controller");
+    }
 
 		try {
-			this.setPage(new EntityDeletePage());
-		} catch (ServiceException e) {
-			e.printStackTrace();
-		}
+      this.setPage(new EntityDeletePage());
+    } catch (ServiceException e) {
+      logger.error("Bad Page instantiation in controller");
+    }
 	}
 
 	/*
@@ -236,9 +251,8 @@ public class Controller<T extends Entity> {
 	 * 
 	 * @return List<Entity>
 	 */
-	private List<T> getAllEntities() {
-		// TODO Auto-generated method stub
-		return this.service.getAll().get();
+	private List<Entity> getAllEntities() {
+		return (List<Entity>) this.service.getAll().get();
 	}
 
 	/**
@@ -293,12 +307,19 @@ public class Controller<T extends Entity> {
 	 * Sets the service to be used by the controller
 	 * 
 	 * @param serviceType
+	 * @throws ServiceException 
 	 */
-	private void setService(String serviceType) {
-		try {
-			this.service = ServiceFactory.getService(serviceType);
-		} catch (ServiceException e) {
-			e.printStackTrace();
+	private void setService(String serviceType) throws ServiceException {
+		switch(serviceType) {
+		  case ServiceFactory.COMPUTER_SERVICE:
+		    this.service = (IService<T>) ServiceFactory.getComputerService();
+		    break;
+		  case ServiceFactory.COMPANY_SERVICE:
+        this.service = (IService<T>) ServiceFactory.getCompanyService();
+        break;
+      default:
+        logger.error("Wrong type of services asked in controller.");
+        throw new ServiceException("Wrong type of services asked in controller.");
 		}
 	}
 }

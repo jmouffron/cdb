@@ -14,34 +14,34 @@ import com.excilys.cdb.model.Entity;
  *         entities
  *
  */
-public class Data<T extends Entity> {
-	private List<T> dataList;
-	private T data;
+public class Data<Entity> {
+	private List<Entity> dataList;
+	private Entity data;
 
 	/**
 	 * 
 	 */
-	public Data(List<T> dataList) {
+	public Data(List<Entity> dataList) {
 		this.dataList = dataList;
 	}
 
-	public Data(T data) {
+	public Data(Entity data) {
 		this.data = data;
 	}
 
-	public List<T> getDataList() {
+	public List<Entity> getDataList() {
 		return dataList;
 	}
 
-	public T getData() {
+	public Entity getData() {
 		return data;
 	}
 
-	public void setData(List<T> data) {
+	public void setData(List<Entity> data) {
 		this.dataList = data;
 	}
 
-	public void setData(T data) {
+	public void setData(Entity data) {
 		this.data = data;
 	}
 

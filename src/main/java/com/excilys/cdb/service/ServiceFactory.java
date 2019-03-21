@@ -1,6 +1,5 @@
 package com.excilys.cdb.service;
 
-import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.model.Entity;
 
 public class ServiceFactory<T extends Entity> {
@@ -10,20 +9,11 @@ public class ServiceFactory<T extends Entity> {
 	
 	private ServiceFactory() { }
 	
-	public static IService getService(String serviceType) throws ServiceException {
-		IService service = null;
-		switch (serviceType) {
-  		case COMPUTER_SERVICE:
-  			service = ComputerService.getService();
-  			break;
-  		case COMPANY_SERVICE:
-  			service = CompanyService.getService();
-  			break;
-  		default:
-  			throw new ServiceException("Problems creating the Services!");
-		}
-
-		return service;
+  public static ComputerService getComputerService(){
+		return ComputerService.getService();
 	}
-
+  
+  public static CompanyService getCompanyService(){
+    return CompanyService.getService();
+  }
 }

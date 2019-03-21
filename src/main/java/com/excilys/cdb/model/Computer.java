@@ -44,7 +44,7 @@ public class Computer extends Entity implements Serializable{
 	 * @param discontinued
 	 * @param company
 	 */
-	public Computer(Long id, String name, Timestamp introduced, Timestamp discontinued, Company company) {
+	public Computer(long id, String name, Timestamp introduced, Timestamp discontinued, Company company) {
 		this.id = id;
 		this.name = name;
 		this.introduced = introduced;
@@ -57,52 +57,56 @@ public class Computer extends Entity implements Serializable{
 		return "Computer of id " + this.id + ", of name " + this.name + ", introduced in " + this.introduced
 				+ ", discontinued in " + this.discontinued + " manufacturé par " + this.company;
 	}
+	
+	
 
 	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((company == null) ? 0 : company.hashCode());
-		result = prime * result + ((discontinued == null) ? 0 : discontinued.hashCode());
-		result = prime * result + ((introduced == null) ? 0 : introduced.hashCode());
-		return result;
-	}
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + ((company == null) ? 0 : company.hashCode());
+    result = prime * result + ((discontinued == null) ? 0 : discontinued.hashCode());
+    result = prime * result + ((introduced == null) ? 0 : introduced.hashCode());
+    return result;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		Computer other = (Computer) obj;
-		if (company == null) {
-			if (other.company != null)
-				return false;
-		} else if (!company.equals(other.company))
-			return false;
-		if (discontinued == null) {
-			if (other.discontinued != null)
-				return false;
-		} else if (!discontinued.equals(other.discontinued))
-			return false;
-		if (introduced == null) {
-			if (other.introduced != null)
-				return false;
-		} else if (!introduced.equals(other.introduced))
-			return false;
-		return true;
-	}
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    Computer other = (Computer) obj;
+    if (company == null) {
+      if (other.company != null)
+        return false;
+    } else if (!company.equals(other.company))
+      return false;
+    if (discontinued == null) {
+      if (other.discontinued != null)
+        return false;
+    } else if (!discontinued.equals(other.discontinued))
+      return false;
+    if (introduced == null) {
+      if (other.introduced != null)
+        return false;
+    } else if (!introduced.equals(other.introduced))
+      return false;
+    return true;
+  }
 
-	/**
+
+
+  /**
 	 * @author excilys
 	 *
 	 *         An inner Builder class for computer entities
 	 *
 	 */
 	static public class ComputerBuilder {
-		private Long id;
+		private long id;
 		private String name;
 		private Timestamp introduced = DateUtils.getNowTimestamp();
 		private Timestamp discontinued = null;
@@ -111,7 +115,7 @@ public class Computer extends Entity implements Serializable{
 		public ComputerBuilder() {
 		}
 
-		public ComputerBuilder setId(Long id) {
+		public ComputerBuilder setId(long id) {
 			this.id = id;
 			return this;
 		}

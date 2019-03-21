@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 
@@ -16,7 +15,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.exception.BadInputException;
-import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.IDaoInstance;
@@ -39,12 +37,7 @@ class ComputerServiceTest {
 
   @BeforeAll
   static void setUp() {
-    try {
-      service = (IService<Computer>) ServiceFactory.getService(ServiceFactory.COMPUTER_SERVICE);
-    } catch (ServiceException e) {
-      log.debug("BadInputException launched!");
-      log.error(e.getMessage());
-    }
+      service = ServiceFactory.getComputerService();
   }
 
   @AfterAll

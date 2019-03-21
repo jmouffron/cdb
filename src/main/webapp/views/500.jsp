@@ -1,5 +1,4 @@
-<%@page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1"%>
+<%@include file="/views/taglibs.jsp" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,30 +6,22 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <!-- Bootstrap -->
-<link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
-<link href="../css/font-awesome.css" rel="stylesheet" media="screen">
-<link href="../css/main.css" rel="stylesheet" media="screen">
+<%@include file="/views/css.jsp" %>
 </head>
 <body>
-	<header class="navbar navbar-inverse navbar-fixed-top">
-		<div class="container">
-			<a class="navbar-brand" href="dashboard.html"> Application -
-				Computer Database </a>
-		</div>
-	</header>
+	<%@include file="/views/header.jsp" %>
 
 	<section id="main">
 		<div class="container">
 			<div class="alert alert-danger">
 				Error 500: An error has occured! <br />
 				<!-- stacktrace -->
+				${stackTrace}
 			</div>
 		</div>
 	</section>
 
-	<script src="../js/jquery.min.js"></script>
-	<script src="../js/bootstrap.min.js"></script>
-	<script src="../js/dashboard.js"></script>
+	<%@include file="/views/js.jsp" %>
 
 </body>
 </html>

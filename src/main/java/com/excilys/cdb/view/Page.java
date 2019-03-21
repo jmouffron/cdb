@@ -12,7 +12,7 @@ import com.excilys.cdb.model.Entity;
  *
  * @param <T>
  */
-public abstract class Page<T extends Entity> {
+public abstract class Page<Entity> {
 	/**
 	 * Logging object
 	 */
@@ -20,7 +20,7 @@ public abstract class Page<T extends Entity> {
 	/**
 	 * Data encapsulator object for the view
 	 */
-	protected Data<T> data;
+	protected Data<com.excilys.cdb.model.Entity> data;
 
 	/**
 	 * Returns a MenuChoiceEnum that defines a user choice for the controller

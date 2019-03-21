@@ -2,7 +2,7 @@ package com.excilys.cdb.dto;
 
 public class CompanyDTO extends EntityDTO {
 
-	public CompanyDTO(Long id, String name) {
+	public CompanyDTO(long id, String name) {
 		this.id = id;
 		this.name = name;
 	}

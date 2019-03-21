@@ -39,13 +39,9 @@ public class AddComputer extends HttpServlet {
 	 * Default constructor.
 	 */
 	public AddComputer() {
-		super();
-		try {
-			this.computerService = (ComputerService) ServiceFactory.getService(ServiceFactory.COMPUTER_SERVICE);
-			this.companyService = (CompanyService) ServiceFactory.getService(ServiceFactory.COMPANY_SERVICE);
-		} catch (ServiceException e) {
-			logger.debug(e.getMessage());
-		}
+		  super();
+			this.computerService = ServiceFactory.getComputerService();
+			this.companyService = ServiceFactory.getCompanyService();
 	}
 	
 	/**

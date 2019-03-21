@@ -46,11 +46,11 @@ public class CompanyService implements IService<Company> {
    * @see com.excilys.cdb.service.IService#searchByName(java.lang.String)
    */
   @Override
-  public List<Company> searchByName(String name) {
+  public Optional<List<Company>> searchByName(String name) {
     List<Company> filteredCompanies = this.dao.getAll().get().stream()
         .filter(company -> company.getName().matches(name)).collect(Collectors.toList());
 
-    return filteredCompanies;
+    return Optional.ofNullable(filteredCompanies);
   }
 
   /*

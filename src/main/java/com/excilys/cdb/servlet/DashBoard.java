@@ -2,10 +2,7 @@ package com.excilys.cdb.servlet;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,97 +14,116 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.excilys.cdb.exception.ServiceException;
+import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.service.IService;
+import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.ServiceFactory;
+import com.excilys.cdb.view.IndexPagination;
+import com.excilys.cdb.view.Pagination;
 
 /**
  * Servlet implementation class DashBoard
  */
-@WebServlet(
-  description = "The main web entry point to the app, a dashboard about the database entities",
-  urlPatterns = {
-	  "/DashBoard", "/dashBoard", "/", "/home", "/index.html", "/index"
-})
+@WebServlet(description = "The main web entry point to the app, a dashboard about the database entities", urlPatterns = {
+    "/DashBoard", "/dashBoard", "/", "/home", "/index.html", "/index" })
 public class DashBoard extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-	private static final Logger logger = LoggerFactory.getLogger(DashBoard.class);
-	private IService<Computer> computerService;
+  private static final long serialVersionUID = 1L;
+  private static final Logger logger = LoggerFactory.getLogger(DashBoard.class);
+  private Pagination pagination;
+  private ComputerService computerService;
 
-	/**
-	 * Default constructor.
-	 */
-	public DashBoard() {
-		super();
-		try {
-			this.computerService = (IService<Computer>) ServiceFactory.getService(ServiceFactory.COMPUTER_SERVICE);
-		} catch (ServiceException e) {
-			logger.debug(e.getMessage());
-		}
-	}
+  /**
+   * Default constructor.
+   */
+  public DashBoard() {
+    super();
+    this.computerService = ServiceFactory.getComputerService();
+  }
 
-	@Override
-	public void init(ServletConfig config) throws ServletException {
-		super.init(config);
-		logger.info("initialisation de la servlet DashBoard.");
-	}
+  @Override
+  public void init(ServletConfig config) throws ServletException {
+    super.init(config);
+    logger.info("Initialisation de la servlet DashBoard.");
+    pagination = new Pagination(this.computerService.getAll().get(), 0, IndexPagination.IDX_10);
+  }
 
-	private List<Computer> searchByName(String name) {
-		List<Computer> computers = this.computerService.getAll().get();
-		List<Computer> filteredComputers = computers.stream()
-				.filter(computer -> computer.getName().matches(name) || computer.getCompany().getName().matches(name))
-				.collect(Collectors.toList());
-		return filteredComputers;
-	}
+  /**
+   * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
+   *      response)
+   */
+  @Override
+  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-	/**
-	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
     String searchName = request.getParameter("search");
-    String entitiesPerPage = request.getParameter("entitiesPerPage");
+    String index = request.getParameter("startIndex");
+    String perPage = request.getParameter("perPage");
+    String newPage = request.getParameter("page");
+
+    List<Computer> computers = null;
+    IndexPagination entitiesPerPage;
+    int startIndex;
+    int page;
     
-    List<Computer> computers;
-    if (searchName == null) {
+    if (searchName == null || searchName.isEmpty()) {
       searchName = "";
-      computers = (List<Computer>) this.computerService.getAll().get();
+      computers = this.computerService.getAll().get();
     } else {
-      computers = this.searchByName(searchName);
+      computers = this.computerService.searchByName(searchName).get();
     }
-    int computerNumber = computers.size();
+    if (perPage == null) {
+      entitiesPerPage = IndexPagination.IDX_10;
+    } else {
+      entitiesPerPage = IndexPagination.valueOf(perPage);
+    }
+    if (index == null) {
+      startIndex = 0;
+    } else {
+      startIndex = Integer.parseInt(index);
+    }
+    if (newPage == null || newPage.equals("0")) {
+      page = 1;
+    } else {
+      page = Integer.parseInt(newPage);
+    }
+    
     HttpSession session = request.getSession(true);
     session.setAttribute("search", searchName);
-    session.setAttribute("computers", computers);
-    session.setAttribute("computerNumber", computerNumber);
-	    
-//	    if ( !entitiesPerPage.equals("") || entitiesPerPage != null) {
-//	      int[] pages = paginate(computerNumber, Integer.parseInt( entitiesPerPage ));
-//	      session.setAttribute("pages", pages);
-//	    }
+    session.setAttribute("index", startIndex);
+    
+    try {
+      pagination.setPerPage(entitiesPerPage);
+    } catch (PageException e) {
+      logger.error(e.getMessage());
+      session.setAttribute("stackTrace", e.getStackTrace());
+      response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getStackTrace().toString());
+    }
+    
+    pagination.setElements(computers);
+    pagination.navigate(page);
+    
+    try {
+      session.setAttribute("computerNumber", pagination.getSize());
+      session.setAttribute("totalPages", pagination.getTotalPages());
+      session.setAttribute("pages", pagination.getPages());
+      session.setAttribute("computers", pagination.list().get());
+      session.setAttribute("currentPage", pagination.getCurrentPage());
+    } catch (PageException e) {
+      logger.error(e.getMessage());
+      session.setAttribute("stackTrace", e.getStackTrace());
+      response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getStackTrace().toString());
+    }
 
-    logger.info(getServletName() + " has been called.");
+    logger.info(getServletName() + " has been called with URL: " + request.getRequestURI());
+    this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
+  }
 
-	  this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
-	}
+  /**
+   * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
+   *      response)
+   */
+  @Override
+  protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    doGet(request, response);
+  }
 
-	/**
-	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
-	 *      response)
-	 */
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		doGet(request, response);
-	}
-	
-	private int[] paginate(int numberTotal, int numberPerPage) {
-	  int pageNumber = numberPerPage / numberTotal;
-	  int[] pages = IntStream.rangeClosed(1, pageNumber).toArray();
-	  
-	  return pages;
-	}
 }

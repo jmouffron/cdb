@@ -29,10 +29,9 @@ public class DaoCompany implements IDaoInstance<Company> {
   private final String UPDATE = "UPDATE company SET name=? WHERE id=?;";
   private final String DELETE_ID = "DELETE FROM company WHERE id=? ;";
   private final String DELETE_NAME = "DELETE FROM company WHERE name=? ;";
+  
   private final Logger log = LoggerFactory.getLogger(DaoCompany.class);
-
   private static volatile IDaoInstance<Company> instance = null;
-  private static volatile Connection conn;
 
   private DaoCompany() {
   }

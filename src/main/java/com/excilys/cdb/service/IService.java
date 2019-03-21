@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.excilys.cdb.exception.BadInputException;
+import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.IDaoInstance;
 
 public interface IService<Entity> {
@@ -90,5 +91,5 @@ public interface IService<Entity> {
 	 * @param String name
 	 * @return List<T extends Entity>
 	 */
-	public abstract List<Entity> searchByName(String name);
+	public abstract Optional<List<Entity>> searchByName(String name);
 }

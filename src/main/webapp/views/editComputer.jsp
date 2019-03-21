@@ -1,9 +1,5 @@
-<%@page language="java" contentType="text/html; charset=ISO-8859-1"
-	pageEncoding="ISO-8859-1"%>
-<%@page import="com.excilys.cdb.model.*"%>
-<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@include file="/views/taglibs.jsp" %>
 <%@page info="Computer database | Edit Computer"%>
-<%@page session="true" isThreadSafe="true"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,17 +7,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <!-- Bootstrap -->
-<link href="../css/bootstrap.min.css" rel="stylesheet" media="screen">
-<link href="../css/font-awesome.css" rel="stylesheet" media="screen">
-<link href="../css/main.css" rel="stylesheet" media="screen">
+<%@include file="/views/css.jsp" %>
+<%@include file="/views/favicons.jsp" %>
 </head>
 <body>
-	<header class="navbar navbar-inverse navbar-fixed-top">
-		<div class="container">
-			<a class="navbar-brand" href="/dashboard"> Application - Computer
-				Database </a>
-		</div>
-	</header>
+	<%@include file="/views/header.jsp" %>
+	
 	<section id="main">
 		<div class="container">
 			<div class="row">

@@ -44,12 +44,13 @@ public class ComputerService implements IService<Computer> {
 	 * @return
 	 */
 	@Override
-	public List<Computer> searchByName(String name) {
+	public Optional<List<Computer>> searchByName(String name) {
+	  String regex = "(.*)" + name + "(.*)";
 		List<Computer> filteredComputers = this.dao.getAll().get()
 		    .stream()
-				.filter(computer -> computer.getName().matches(name) || computer.getCompany().getName().matches(name))
+				.filter(computer -> computer.getName().matches(regex) || computer.getCompany().getName().matches(regex) )
 				.collect(Collectors.toList());
-		return filteredComputers;
+		return Optional.ofNullable(filteredComputers);
 	}
 
 	/*

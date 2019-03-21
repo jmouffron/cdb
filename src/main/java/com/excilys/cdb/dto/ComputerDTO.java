@@ -5,23 +5,23 @@ import java.time.LocalDateTime;
 
 public class ComputerDTO extends EntityDTO {
 
-	private Timestamp introduced;
-	private Timestamp discontinued;
+	private String introduced;
+	private String discontinued;
 	private long companyId;
 
-	public Timestamp getIntroduced() {
+	public String getIntroduced() {
 		return introduced;
 	}
 
-	public void setIntroduced(Timestamp introduced) {
+	public void setIntroduced(String introduced) {
 		this.introduced = introduced;
 	}
 
-	public Timestamp getDiscontinued() {
+	public String getDiscontinued() {
 		return discontinued;
 	}
 
-	public void setDiscontinued(Timestamp discontinued) {
+	public void setDiscontinued(String discontinued) {
 		this.discontinued = discontinued;
 	}
 
@@ -41,7 +41,7 @@ public class ComputerDTO extends EntityDTO {
 	 * @param discontinued
 	 * @param company
 	 */
-	public ComputerDTO(Long id, String name, Timestamp introduced, Timestamp discontinued, long company_id) {
+	public ComputerDTO(long id, String name, String introduced, String discontinued, long company_id) {
 		this.id = id;
 		this.name = name;
 		this.introduced = introduced;
@@ -62,10 +62,10 @@ public class ComputerDTO extends EntityDTO {
 	 *
 	 */
 	static public class ComputerDTOBuilder {
-		private Long id;
+		private long id;
 		private String name;
-		private Timestamp introduced = Timestamp.valueOf(LocalDateTime.now());
-		private Timestamp discontinued = null;
+		private String introduced = Timestamp.valueOf(LocalDateTime.now()).toString();
+		private String discontinued = null;
 		private long company_id;
 
 		public ComputerDTOBuilder() {
@@ -81,12 +81,12 @@ public class ComputerDTO extends EntityDTO {
 			return this;
 		}
 
-		public ComputerDTOBuilder setIntroduced(Timestamp introduced) {
+		public ComputerDTOBuilder setIntroduced(String introduced) {
 			this.introduced = introduced;
 			return this;
 		}
 
-		public ComputerDTOBuilder setDiscontinued(Timestamp discontinued) {
+		public ComputerDTOBuilder setDiscontinued(String discontinued) {
 			this.discontinued = discontinued;
 			return this;
 		}
@@ -101,37 +101,38 @@ public class ComputerDTO extends EntityDTO {
 		}
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + (int) (companyId ^ (companyId >>> 32));
-		result = prime * result + ((discontinued == null) ? 0 : discontinued.hashCode());
-		result = prime * result + ((introduced == null) ? 0 : introduced.hashCode());
-		return result;
-	}
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = super.hashCode();
+    result = prime * result + (int) (companyId ^ (companyId >>> 32));
+    result = prime * result + ((discontinued == null) ? 0 : discontinued.hashCode());
+    result = prime * result + ((introduced == null) ? 0 : introduced.hashCode());
+    return result;
+  }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (!super.equals(obj))
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		ComputerDTO other = (ComputerDTO) obj;
-		if (companyId != other.companyId)
-			return false;
-		if (discontinued == null) {
-			if (other.discontinued != null)
-				return false;
-		} else if (!discontinued.equals(other.discontinued))
-			return false;
-		if (introduced == null) {
-			if (other.introduced != null)
-				return false;
-		} else if (!introduced.equals(other.introduced))
-			return false;
-		return true;
-	}
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj)
+      return true;
+    if (!super.equals(obj))
+      return false;
+    if (getClass() != obj.getClass())
+      return false;
+    ComputerDTO other = (ComputerDTO) obj;
+    if (companyId != other.companyId)
+      return false;
+    if (discontinued == null) {
+      if (other.discontinued != null)
+        return false;
+    } else if (!discontinued.equals(other.discontinued))
+      return false;
+    if (introduced == null) {
+      if (other.introduced != null)
+        return false;
+    } else if (!introduced.equals(other.introduced))
+      return false;
+    return true;
+  }
+
 }
