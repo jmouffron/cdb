@@ -54,15 +54,14 @@ public class DashBoard extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
-    String searchName = request.getParameter("search");
-    String index = request.getParameter("startIndex");
-    String perPage = request.getParameter("perPage");
-    String newPage = request.getParameter("page");
-
     List<Computer> computers = null;
     IndexPagination entitiesPerPage;
     int startIndex;
     int page;
+    String searchName = request.getParameter("search");
+    String index = request.getParameter("startIndex");
+    String perPage = request.getParameter("perPage");
+    String newPage = request.getParameter("page");
     
     if (searchName == null || searchName.isEmpty()) {
       searchName = "";
@@ -116,7 +115,7 @@ public class DashBoard extends HttpServlet {
     logger.info(getServletName() + " has been called with URL: " + request.getRequestURI());
     this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
   }
-
+  
   /**
    * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse
    *      response)

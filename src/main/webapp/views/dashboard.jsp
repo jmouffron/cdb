@@ -67,12 +67,12 @@
 											class="fa fa-trash-o fa-lg"></i>
 									</a>
 								</span></th>
-								<th>Computer name</th>
-								<th>Introduced date</th>
+								<th>Computer name <a href="${ctx}/?"><i class="fa fa-arrow-down"></i></a></th>
+								<th>Introduced date <a href="${ctx}/?"><i class="fa fa-arrow-down"></i></a></th>
 								<!-- Table header for Discontinued Date -->
-								<th>Discontinued date</th>
+								<th>Discontinued date <a href="${ctx}/?"><i class="fa fa-arrow-down"></i></a></th>
 								<!-- Table header for Company -->
-								<th>Company</th>
+								<th>Company <a href="${ctx}/?"><i class="fa fa-arrow-down"></i></a></th>
 
 							</tr>
 						</thead>

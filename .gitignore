@@ -7,13 +7,13 @@
 # Build target
 build/
 target/
-.metadata/
+/.metadata
 
 # Project Settings
-*.project
-*.settings
-*.classpath
-*/main/java/resource
+/.project
+/.settings
+/.classpath
+/main/resource
 
 # BlueJ files
 *.ctxt

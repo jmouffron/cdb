@@ -19,18 +19,20 @@ import com.excilys.cdb.persistence.Datasource;
 
 public class DaoComputer implements IDaoInstance<Computer> {
 
-  private final String INSERT = "INSERT INTO computer VALUES(?,?,?,?,?);";
-  private final String MAX_ID = "SELECT MAX(id)+1 from computer;";
+  private final String DELETE_ID = "DELETE FROM computer WHERE id=? ";
+  private final String DELETE_NAME = "DELETE FROM computer WHERE name=? ";
+  private final String DESC = "DESC";
+  private final String INSERT = "INSERT INTO computer VALUES(?,?,?,?,?)";
+  private final String MAX_ID = "SELECT MAX(id)+1 from computer";
   private final String SELECT_ALL = "SELECT pc.*, c.name FROM computer pc INNER JOIN company c ON pc.company_id=c.id";
-  private final String SELECT_ID = SELECT_ALL + " where pc.id=? ;";
-  private final String SELECT_NAME = SELECT_ALL + " where pc.name=? ;";
-  private final String UPDATE = "UPDATE computer SET name=?,introduced=?,discontinued=?,company_id=? WHERE id=? ;";
-  private final String DELETE_ID = "DELETE FROM computer WHERE id=? ;";
-  private final String DELETE_NAME = "DELETE FROM computer WHERE name=? ;";
+  private final String SELECT_ID = SELECT_ALL + " where pc.id=? ";
+  private final String SELECT_NAME = SELECT_ALL + " where pc.name=? ";
+  private final String UPDATE = "UPDATE computer SET name=?,introduced=?,discontinued=?,company_id=? WHERE id=? ";
+  private final String ORDER_BY = SELECT_ALL + "ORDER BY ?";
 
   private final Logger log = LoggerFactory.getLogger(DaoComputer.class);
   private static volatile IDaoInstance<Computer> instance = null;
-
+  
   private DaoComputer() {
   }
 
@@ -70,7 +72,25 @@ public class DaoComputer implements IDaoInstance<Computer> {
 
     return Optional.ofNullable(result);
   }
+  
+  @Override
+  public Optional<List<Computer>> getAllOrderedBy(String orderBy, boolean desc) {
+    List<Computer> result = new ArrayList<>();
+    String QUERY = desc ? ORDER_BY+ DESC: ORDER_BY;
+    
+    try (Statement stmt = getConnection().createStatement(); ResultSet rs = stmt.executeQuery(QUERY);) {
 
+      while (rs.next()) {
+        result.add(ComputerMapper.map(rs));
+      }
+
+    } catch (SQLException sqlex) {
+      log.debug(sqlex.getMessage());
+    }
+
+    return Optional.ofNullable(result);
+  }
+  
   @Override
   public Optional<Computer> getOneById(Long id) {
     Computer result = null;

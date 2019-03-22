@@ -21,14 +21,18 @@ import com.excilys.cdb.model.Company;
  *
  */
 public class DaoCompany implements IDaoInstance<Company> {
-  private final String INSERT = "INSERT INTO company VALUES(?,?);";
-  private final String SELECT_ALL = "SELECT * FROM company;";
+  
+  private final String DELETE_ID = "DELETE FROM company WHERE id=? ";
+  private final String DELETE_NAME = "DELETE FROM company WHERE name=? ";
+  private final String DESC = " DESC";
+  private final String INSERT = "INSERT INTO company VALUES(?,?)";
   private final String MAX_ID = "SELECT MAX(id)+1 FROM company;";
-  private final String SELECT_ID = "SELECT * FROM company where id=?;";
-  private final String SELECT_NAME = "SELECT * FROM company where name=?;";
-  private final String UPDATE = "UPDATE company SET name=? WHERE id=?;";
-  private final String DELETE_ID = "DELETE FROM company WHERE id=? ;";
-  private final String DELETE_NAME = "DELETE FROM company WHERE name=? ;";
+  private final String SELECT_ALL = "SELECT * FROM company";
+  private final String SELECT_ID = "SELECT * FROM company where id=?";
+  private final String SELECT_NAME = "SELECT * FROM company where name=?";
+  private final String UPDATE = "UPDATE company SET name=? WHERE id=?";
+  private final String ORDER_BY = SELECT_ALL + "ORDER BY ?";
+
   
   private final Logger log = LoggerFactory.getLogger(DaoCompany.class);
   private static volatile IDaoInstance<Company> instance = null;
@@ -61,6 +65,21 @@ public class DaoCompany implements IDaoInstance<Company> {
     List<Company> result = new ArrayList<>();
 
     try (Statement stmt = getConnection().createStatement(); ResultSet rs = stmt.executeQuery(SELECT_ALL);) {
+      while (rs.next()) {
+        result.add(CompanyMapper.map(rs));
+      }
+    } catch (SQLException sqlex) {
+      log.error(sqlex.getMessage());
+    }
+
+    return Optional.ofNullable(result);
+  }
+  
+  @Override
+  public Optional<List<Company>> getAllOrderedBy(String orderBy, boolean desc) {
+    List<Company> result = new ArrayList<>();
+
+    try (Statement stmt = getConnection().createStatement(); ResultSet rs = stmt.executeQuery(ORDER_BY);) {
       while (rs.next()) {
         result.add(CompanyMapper.map(rs));
       }

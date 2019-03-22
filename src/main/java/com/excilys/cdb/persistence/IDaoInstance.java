@@ -26,4 +26,6 @@ public interface IDaoInstance<Entity> {
 	abstract boolean deleteByName(String name);
 
 	abstract boolean createDTO(Entity newEntity);
+	
+	abstract Optional<List<Entity>> getAllOrderedBy(String orderBy, boolean desc);
 }
