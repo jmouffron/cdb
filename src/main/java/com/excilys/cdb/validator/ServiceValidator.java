@@ -6,9 +6,12 @@ package com.excilys.cdb.validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.excilys.cdb.dto.CompanyDTO;
+import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.utils.DateUtils;
 
 /**
  * @author excilys
@@ -23,7 +26,7 @@ public class ServiceValidator {
 			log.debug("Null NewEntity for update of " + entity);
 			throw new BadInputException();
 		}
-		if (newEntity.getId() < 0L) {
+		if (newEntity.getId() <= 0L) {
 			log.debug("Bad Id for update of " + entity);
 			throw new BadInputException();
 		}
@@ -34,22 +37,35 @@ public class ServiceValidator {
 
 		return true;
 	}
-
+	
+  public static boolean companyDTOValidator(CompanyDTO newEntity) throws BadInputException {
+    if (newEntity == null) {
+      log.debug("Null NewEntity for update of company");
+      throw new BadInputException();
+    }
+    if (newEntity.getId() <= 0L) {
+      log.debug("Bad Id for update of company");
+      throw new BadInputException();
+    }
+    if (newEntity.getName() == null || newEntity.getName().isEmpty()) {
+      log.debug("Null Name on NewEntity for update of company");
+      throw new BadInputException();
+    }
+    
+    return true;
+  }
+	
 	public static boolean computerValidator(Computer newEntity, String entity) throws BadInputException {
 		if (newEntity == null) {
 			log.debug("Null NewEntity for update of " + entity);
 			throw new BadInputException();
 		}
-		if (newEntity.getId() < 0) {
-			log.debug("Bad Id for update of " + entity);
-			throw new BadInputException();
-		}
+    if (newEntity.getId() <= 0L) {
+      log.debug("Bad Id on NewEntity for update of " + entity);
+      throw new BadInputException();
+    }
 		if (newEntity.getName() == null || newEntity.getName().equals("")) {
 			log.debug("Null Name on NewEntity for update of " + entity);
-			throw new BadInputException();
-		}
-		if (newEntity.getId() < 0L) {
-			log.debug("Bad Id on NewEntity for update of " + entity);
 			throw new BadInputException();
 		}
 		if (newEntity.getIntroduced() == null && newEntity.getDiscontinued() != null) {
@@ -70,9 +86,41 @@ public class ServiceValidator {
 
 		return true;
 	}
+	
+  public static boolean computerDTOValidator(ComputerDTO newEntity, String entity) throws BadInputException {
+    if (newEntity == null) {
+      log.debug("Null NewEntity for update of " + entity);
+      throw new BadInputException();
+    }
+    if (newEntity.getId() <= 0L) {
+      log.debug("Bad Id on NewEntity for update of " + entity);
+      throw new BadInputException();
+    }
+    if (newEntity.getName() == null || newEntity.getName().equals("")) {
+      log.debug("Null Name on NewEntity for update of " + entity);
+      throw new BadInputException();
+    }
+    if (newEntity.getIntroduced() == null && newEntity.getDiscontinued() != null) {
+      log.debug("Discontinued Date on NewEntity without Introduced Date for update of " + entity);
+      throw new BadInputException();
+    }
+    if (newEntity.getIntroduced() != null && newEntity.getDiscontinued() != null) {
+      if (DateUtils.stringToTimestamp( newEntity.getIntroduced() ).after( DateUtils.stringToTimestamp( newEntity.getIntroduced() ) ) ) {
+        log.debug("Discontinued Date on NewEntity before Introduced Date for update of " + entity);
+        throw new BadInputException();
+      }
+    }
+    if (newEntity.getCompanyId() <= 0L ) {
+      log.debug("Null Company on NewEntity for update of " + entity);
+      throw new BadInputException();
+    }
+
+    return true;
+    
+  }
 
 	public static boolean idValidator(Long id, String entity) throws BadInputException {
-		if (id < 0L) {
+		if (id <= 0L) {
 			log.debug("Bad Id for deleting of " + entity);
 			throw new BadInputException();
 		}
@@ -92,4 +140,5 @@ public class ServiceValidator {
 
 		return true;
 	}
+
 }

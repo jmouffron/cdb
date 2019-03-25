@@ -7,13 +7,17 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.BadInputException;
+import com.excilys.cdb.exception.DaoException;
+import com.excilys.cdb.exception.ServiceException;
+import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.DaoComputerFactory;
 import com.excilys.cdb.persistence.IDaoInstance;
 import com.excilys.cdb.validator.ServiceValidator;
 
-public class ComputerService implements IService<Computer> {
+public class ComputerService implements IService<ComputerDTO> {
   private static ComputerService instance;
 	private IDaoInstance<Computer> dao;
 	private Logger log;
@@ -34,22 +38,67 @@ public class ComputerService implements IService<Computer> {
 	  return instance;
 	}
 
+	/* (non-Javadoc)
+	 * @see com.excilys.cdb.service.IService#getAll()
+	 */
 	@Override
-	public Optional<List<Computer>> getAll() {
-		return this.dao.getAll();
+	public Optional<List<ComputerDTO>> getAll() throws ServiceException {
+	  List<ComputerDTO> list = null;
+    try {
+      list = this.dao
+          .getAll()
+          .get().stream()
+          .map(ComputerMapper::mapToDTO)
+          .map(Optional::get)
+          .collect(Collectors.toList());
+    } catch (DaoException e) {
+      log.error(e.getMessage());
+      throw new ServiceException("Couldn't order by in computers !");
+    }
+
+    return Optional.ofNullable(list);
 	}
+	
+	/* (non-Javadoc)
+	 * @see com.excilys.cdb.service.IService#orderBy(java.lang.String, boolean)
+	 */
+	@Override
+  public Optional<List<ComputerDTO>> orderBy(String name, boolean isDesc) throws ServiceException {
+      List<ComputerDTO> list = null;
+      try {
+        list = this.dao.getAllOrderedBy(name, isDesc).get().stream()
+            .map(ComputerMapper::mapToDTO)
+            .map(Optional::get)
+            .collect(Collectors.toList());
+      } catch (DaoException e) {
+        log.error(e.getMessage());
+        throw new ServiceException(e.getMessage());
+      }
+    return Optional.ofNullable(list);
+  }
 
 	/**
 	 * @param name
 	 * @return
+	 * @throws DaoException 
+	 * @throws ServiceException 
 	 */
 	@Override
-	public Optional<List<Computer>> searchByName(String name) {
-	  String regex = "(.*)" + name + "(.*)";
-		List<Computer> filteredComputers = this.dao.getAll().get()
-		    .stream()
-				.filter(computer -> computer.getName().matches(regex) || computer.getCompany().getName().matches(regex) )
-				.collect(Collectors.toList());
+	public Optional<List<ComputerDTO>> searchByName(String name) throws ServiceException {
+	  String regex = "(?i)(.*)" + name + "(.*)";
+		List<ComputerDTO> filteredComputers = null;
+    try {
+      filteredComputers = this.dao.getAll().get()
+            .stream()
+        		.filter(computer -> computer.getName().matches(regex) || computer.getCompany().getName().matches(regex) )
+        		.map(ComputerMapper::mapToDTO)
+        		.map(Optional::get)
+        		.collect(Collectors.toList());
+    } catch (DaoException e) {
+      log.error(e.getMessage());
+      throw new ServiceException("Couldn't search in computers !");
+    }
+		
 		return Optional.ofNullable(filteredComputers);
 	}
 
@@ -57,30 +106,35 @@ public class ComputerService implements IService<Computer> {
 	 * @see com.excilys.cdb.service.IService#getOneById(java.lang.Long)
 	 */
 	@Override
-	public Optional<Computer> getOneById(Long id) throws BadInputException {
+	public Optional<ComputerDTO> getOneById(Long id) throws BadInputException {
 		ServiceValidator.idValidator(id, "Computer");
 
-		return this.dao.getOneById(id);
+		return ComputerMapper.mapToDTO( this.dao.getOneById(id).get() );
 	}
 
 	/*
 	 * @see com.excilys.cdb.service.IService#getOneByName(java.lang.String)
 	 */
 	@Override
-	public Optional<Computer> getOneByName(String name) throws BadInputException {
+	public Optional<ComputerDTO> getOneByName(String name) throws BadInputException {
 		ServiceValidator.nameValidator(name, "Computer");
 
-		return this.dao.getOneByName(name);
+		return ComputerMapper.mapToDTO( this.dao.getOneByName(name).get() );
 	}
 
 	/*
 	 * @see com.excilys.cdb.service.IService#create(com.excilys.cdb.model.Entity)
 	 */
 	@Override
-	public boolean create(Computer newEntity) throws BadInputException {
-		ServiceValidator.computerValidator(newEntity, "Computer");
-
-		return this.dao.create(newEntity);
+	public boolean create(ComputerDTO newEntity) throws ServiceException {
+		ServiceValidator.computerDTOValidator(newEntity, "Computer");
+		Computer computer = ComputerMapper.mapToComputer(newEntity).get();
+		try {
+      return this.dao.create(computer);
+    } catch (DaoException e) {
+      log.error(e.getMessage());
+      throw new ServiceException("Couldn't create Computer");
+    }
 	}
 
 	/*
@@ -88,46 +142,58 @@ public class ComputerService implements IService<Computer> {
 	 * com.excilys.cdb.service.IService#updateById(com.excilys.cdb.model.Entity)
 	 */
 	@Override
-	public boolean updateById(Computer newEntity) throws BadInputException {
-		ServiceValidator.computerValidator(newEntity, "Computer");
-
-		return this.dao.updateById(newEntity);
+	public boolean updateById(ComputerDTO newEntity) throws ServiceException {
+		ServiceValidator.computerDTOValidator(newEntity, "Computer");
+    Computer computer = ComputerMapper.mapToComputer(newEntity).get();
+    
+		try {
+      return this.dao.updateById(computer);
+    } catch (DaoException e) {
+      log.error(e.getMessage());
+      throw new ServiceException("Couldn't update entity!");
+    }
 	}
 
 	/*
 	 * @see com.excilys.cdb.service.IService#deleteById(java.lang.Long)
 	 */
 	@Override
-	public boolean deleteById(Long id) throws BadInputException {
+	public boolean deleteById(Long id) throws ServiceException {
 		ServiceValidator.idValidator(id, "Computer");
 
-		return this.dao.deleteById(id);
+		try {
+      return this.dao.deleteById(id);
+    } catch (DaoException e) {
+      log.error(e.getMessage());
+      throw new ServiceException("Couldn't delete by id!");
+    }
 	}
 
 	/*
 	 * @see com.excilys.cdb.service.IService#deleteByName(java.lang.String)
 	 */
 	@Override
-	public boolean deleteByName(String name) throws BadInputException {
+	public boolean deleteByName(String name) throws ServiceException {
 		ServiceValidator.nameValidator(name, "Computer");
 
-		return this.dao.deleteByName(name);
+		try {
+      return this.dao.deleteByName(name);
+    } catch (DaoException e) {
+      log.error(e.getMessage());
+      throw new ServiceException("Couldn't delete by id!");
+    }
 	}
 
 	/*
 	 * @see com.excilys.cdb.service.IService#getDao()
 	 */
 	@Override
-	public IDaoInstance<Computer> getDao() {
+	public IDaoInstance getDao() {
 		return this.dao;
 	}
 
-	/*
-	 * @see com.excilys.cdb.service.IService#setDao(com.excilys.cdb.persistence.
-	 * DaoInstance)
-	 */
-	@Override
-	public void setDao(IDaoInstance<Computer> dao) {
-		this.dao = dao;
-	}
+  @Override
+  public void setDao(IDaoInstance dao) {
+    this.dao = dao;    
+  }
 }

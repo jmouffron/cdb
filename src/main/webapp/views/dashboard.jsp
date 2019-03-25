@@ -13,7 +13,7 @@
 </head>
 <body>
 	<%@include file="/views/header.jsp"%>
-
+	<%@include file="/views/feedback.jsp"%>	
 	<section id="main">
 		<div class="container">
 			<c:choose>
@@ -26,7 +26,7 @@
 			</c:choose>
 			<div id="actions" class="form-horizontal">
 				<div class="pull-left">
-					<form id="searchForm" action="${ctx}/?search=${search}"
+					<form id="searchForm" action="${ctx}/?search=${search}&toOrder=${toOrder}"
 						method="GET" class="form-inline">
 
 						<input type="search" id="searchbox" name="search"
@@ -67,12 +67,12 @@
 											class="fa fa-trash-o fa-lg"></i>
 									</a>
 								</span></th>
-								<th>Computer name <a href="${ctx}/?"><i class="fa fa-arrow-down"></i></a></th>
-								<th>Introduced date <a href="${ctx}/?"><i class="fa fa-arrow-down"></i></a></th>
+								<th>Computer name <a href="${ctx}/?page=${currentPage}&search=${search}&toOrder=0"><i class="fa fa-arrow-down"></i></a></th>
+								<th>Introduced date <a href="${ctx}/?page=${currentPage}&search=${search}&toOrder=1"><i class="fa fa-arrow-down"></i></a></th>
 								<!-- Table header for Discontinued Date -->
-								<th>Discontinued date <a href="${ctx}/?"><i class="fa fa-arrow-down"></i></a></th>
+								<th>Discontinued date <a href="${ctx}/?page=${currentPage}&search=${search}&toOrder=2"><i class="fa fa-arrow-down"></i></a></th>
 								<!-- Table header for Company -->
-								<th>Company <a href="${ctx}/?"><i class="fa fa-arrow-down"></i></a></th>
+								<th>Company <a href="${ctx}/?page=${currentPage}&search=${earch}&toOrder=4"><i class="fa fa-arrow-down"></i></a></th>
 
 							</tr>
 						</thead>
@@ -101,7 +101,7 @@
 			<ul class="pagination">
 				<%-- <c:if test = "${pages > 0}"> --%>
 				<li>
-				<a href="${ctx}?page=${ currentPage - 1 > 0 ? currentPage -1: 1}&search=${search}"
+				<a href="${ctx}?page=${ currentPage - 1 > 0 ? currentPage -1: 1}&search=${search}&toOrder=${toOrder}"
 					aria-label="Previous">
 					 <span aria-hidden="true">&laquo;</span>
 				</a>
@@ -112,10 +112,10 @@
 					<c:choose>
 						<c:when test="${i == currentPage}">
 							<li class="active"><a
-								href="${ctx}?page=${i}&search=${search}">${i}</a></li>
+								href="${ctx}?page=${i}&search=${search}&toOrder=${toOrder}">${i}</a></li>
 						</c:when>
 						<c:otherwise>
-							<li><a href="${ctx}?page=${i}&search=${search}">${i}</a></li>
+							<li><a href="${ctx}?page=${i}&search=${search}&toOrder=${toOrder}">${i}</a></li>
 						</c:otherwise>
 					</c:choose>
 

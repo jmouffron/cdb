@@ -7,8 +7,6 @@ import java.util.stream.IntStream;
 
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.PageException;
-import com.excilys.cdb.mapper.ComputerMapper;
-import com.excilys.cdb.model.Computer;
 
 /**
  * Une classe pour gérer la pagination
@@ -18,13 +16,13 @@ import com.excilys.cdb.model.Computer;
  */
 public class Pagination {
 
-  private List<Computer> elements;
+  private List<ComputerDTO> elements;
   private int startIndex;
   private IndexPagination perPage;
   private int totalPages;
   private int currentPage;
 
-  public Pagination(List<Computer> elements, int startIndex, IndexPagination perPage) {
+  public Pagination(List<ComputerDTO> elements, int startIndex, IndexPagination perPage) {
     this.elements = elements;
     this.startIndex = startIndex;
     this.perPage = perPage;
@@ -52,7 +50,7 @@ public class Pagination {
     }
   }
   
-  public void setElements(List<Computer> elements) {
+  public void setElements(List<ComputerDTO> elements) {
     this.elements = elements;
     this.totalPages = this.elements.size() / this.perPage.getIndex();
   }
@@ -112,7 +110,7 @@ public class Pagination {
     }
     
     List<ComputerDTO> filteredElements = this.elements.stream().skip(startIndex).limit(perPage.getIndex())
-        .map(ComputerMapper::mapDTO).map(Optional::get).collect(Collectors.toList());
+        .collect(Collectors.toList());
 
     return Optional.ofNullable(filteredElements);
   }

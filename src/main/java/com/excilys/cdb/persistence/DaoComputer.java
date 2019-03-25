@@ -24,15 +24,15 @@ public class DaoComputer implements IDaoInstance<Computer> {
   private final String DESC = "DESC";
   private final String INSERT = "INSERT INTO computer VALUES(?,?,?,?,?)";
   private final String MAX_ID = "SELECT MAX(id)+1 from computer";
-  private final String SELECT_ALL = "SELECT pc.*, c.name FROM computer pc INNER JOIN company c ON pc.company_id=c.id";
+  private final String SELECT_ALL = "SELECT pc.id, pc.name as pc_name, pc.introduced, pc.discontinued, pc.company_id, c.name as cp_name FROM computer pc INNER JOIN company c ON pc.company_id=c.id";
   private final String SELECT_ID = SELECT_ALL + " where pc.id=? ";
   private final String SELECT_NAME = SELECT_ALL + " where pc.name=? ";
   private final String UPDATE = "UPDATE computer SET name=?,introduced=?,discontinued=?,company_id=? WHERE id=? ";
-  private final String ORDER_BY = SELECT_ALL + "ORDER BY ?";
+  private final String ORDER_BY = SELECT_ALL + " ORDER BY ";
 
   private final Logger log = LoggerFactory.getLogger(DaoComputer.class);
   private static volatile IDaoInstance<Computer> instance = null;
-  
+
   private DaoComputer() {
   }
 
@@ -72,12 +72,12 @@ public class DaoComputer implements IDaoInstance<Computer> {
 
     return Optional.ofNullable(result);
   }
-  
+
   @Override
-  public Optional<List<Computer>> getAllOrderedBy(String orderBy, boolean desc) {
+  public Optional<List<Computer>> getAllOrderedBy(String orderBy, boolean desc) throws DaoException {
     List<Computer> result = new ArrayList<>();
-    String QUERY = desc ? ORDER_BY+ DESC: ORDER_BY;
-    
+    String QUERY = desc ? ORDER_BY + orderBy + DESC : ORDER_BY + orderBy;
+
     try (Statement stmt = getConnection().createStatement(); ResultSet rs = stmt.executeQuery(QUERY);) {
 
       while (rs.next()) {
@@ -85,12 +85,14 @@ public class DaoComputer implements IDaoInstance<Computer> {
       }
 
     } catch (SQLException sqlex) {
-      log.debug(sqlex.getMessage());
+      log.error(sqlex.getMessage());
+
+      throw new DaoException(sqlex.getMessage());
     }
 
     return Optional.ofNullable(result);
   }
-  
+
   @Override
   public Optional<Computer> getOneById(Long id) {
     Computer result = null;

@@ -14,9 +14,10 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.excilys.cdb.dto.CompanyDTO;
+import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.BadInputException;
-import com.excilys.cdb.model.Company;
-import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.ServiceFactory;
@@ -53,14 +54,20 @@ public class EditComputer extends HttpServlet {
       response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), "No Computer Name chosen for this request!");
     }
 
-    Computer computer = null;
+    ComputerDTO computer = null;
     try {
       computer = this.computerService.getOneByName(computerName).get();
     } catch (BadInputException e) {
-      logger.debug(e.getMessage());
+      logger.error(e.getMessage());
       response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), e.getMessage());
     }
-    List<Company> companies = this.companyService.getAll().get();
+    List<CompanyDTO> companies = null;
+    try {
+      companies = this.companyService.getAll().get();
+    } catch (ServiceException e) {
+      logger.error(e.getMessage());
+      response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), e.getMessage());
+    }
 
     HttpSession session = request.getSession(true);
     session.setAttribute("companies", companies);
@@ -82,7 +89,7 @@ public class EditComputer extends HttpServlet {
       response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), "No Computer Name chosen for this request!");
     }
 
-    Computer computer = null;
+    ComputerDTO computer = null;
     try {
       computer = this.computerService.getOneByName(computerName).get();
     } catch (BadInputException e) {
@@ -93,7 +100,7 @@ public class EditComputer extends HttpServlet {
     boolean isUpdated = false;
     try {
       isUpdated = this.computerService.updateById(computer);
-    } catch (BadInputException e) {
+    } catch ( ServiceException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }

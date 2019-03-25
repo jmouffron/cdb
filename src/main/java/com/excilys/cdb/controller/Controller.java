@@ -128,7 +128,12 @@ public class Controller<T extends Entity> {
       logger.error("Bad service instantiation in controller");
     }
 
-		List<Entity> entities = this.getAllEntities();
+		List<Entity> entities = null;
+    try {
+      entities = this.getAllEntities();
+    } catch (ServiceException e) {
+      logger.error(e.getMessage());
+    }
 		Data<Entity> payload = new Data<Entity>(entities);
 
 		long totalDataSize = entities.size();
@@ -160,7 +165,13 @@ public class Controller<T extends Entity> {
 		id = ControllerUtils.getLongInput("Choisissez un id d'entité supérieur à 0:",
 				ControllerUtils.isStrictlyPositive);
 
-		Entity entity = this.getEntityById(id);
+		Entity entity = null;
+    try {
+      entity = this.getEntityById(id);
+    } catch (ServiceException e1) {
+      // TODO Auto-generated catch block
+      e1.printStackTrace();
+    }
 		Data<Entity> payload = new Data<Entity>(entity);
 
 		try {
@@ -198,7 +209,12 @@ public class Controller<T extends Entity> {
 					.getTimestampInput("Veuillez entrer la date de fin de fonction de l'ordinateur");
 		} while (introduced.after(discontinued));
 
-		Company company = (Company) getEntityById(companyId);
+		Company company = null;
+    try {
+      company = (Company) getEntityById(companyId);
+    } catch (ServiceException e) {
+      logger.error(e.getMessage());
+    }
 		Computer newEntity = new Computer.ComputerBuilder().setName(name).setIntroduced(introduced)
 				.setDiscontinued(discontinued).setCompany(company).build();
 
@@ -250,8 +266,9 @@ public class Controller<T extends Entity> {
 	 * Fetches all instance of a certain type of entity from the database
 	 * 
 	 * @return List<Entity>
+	 * @throws ServiceException 
 	 */
-	private List<Entity> getAllEntities() {
+	private List<Entity> getAllEntities() throws ServiceException {
 		return (List<Entity>) this.service.getAll().get();
 	}
 
@@ -260,8 +277,9 @@ public class Controller<T extends Entity> {
 	 * 
 	 * @param id
 	 * @return An entity mapped from the database
+	 * @throws ServiceException 
 	 */
-	private Entity getEntityById(Long id) {
+	private Entity getEntityById(Long id) throws ServiceException {
 		try {
 			return this.service.getOneById(id).get();
 		} catch (BadInputException e) {
@@ -279,7 +297,7 @@ public class Controller<T extends Entity> {
 	private boolean addEntity(Entity newEntity) {
 		try {
 			return this.service.create((T) newEntity);
-		} catch (BadInputException e) {
+		} catch (ServiceException e) {
 			e.printStackTrace();
 		}
 		return false;

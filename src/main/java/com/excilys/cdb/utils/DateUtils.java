@@ -8,9 +8,12 @@ import java.time.temporal.TemporalAmount;
 public class DateUtils {
   private static DateTimeFormatter timestampFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
   
-  private DateUtils(){
-    
+  private DateUtils(){}
+  
+  public static Timestamp stringToTimestamp(String toBeParsed) {
+    return Timestamp.valueOf(toBeParsed);
   }
+  
   public static Timestamp getNowTimestamp() {
     LocalDateTime dateTime = LocalDateTime.now();
     

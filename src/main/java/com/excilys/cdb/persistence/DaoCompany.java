@@ -21,19 +21,18 @@ import com.excilys.cdb.model.Company;
  *
  */
 public class DaoCompany implements IDaoInstance<Company> {
-  
+
   private final String DELETE_ID = "DELETE FROM company WHERE id=? ";
   private final String DELETE_NAME = "DELETE FROM company WHERE name=? ";
-  private final String DESC = " DESC";
+  private final String DESC = " DESC;";
   private final String INSERT = "INSERT INTO company VALUES(?,?)";
   private final String MAX_ID = "SELECT MAX(id)+1 FROM company;";
-  private final String SELECT_ALL = "SELECT * FROM company";
-  private final String SELECT_ID = "SELECT * FROM company where id=?";
-  private final String SELECT_NAME = "SELECT * FROM company where name=?";
+  private final String SELECT_ALL = "SELECT id, name FROM company ";
+  private final String SELECT_ID = "SELECT id, name FROM company where id=?";
+  private final String SELECT_NAME = "SELECT id, name FROM company where name=?";
   private final String UPDATE = "UPDATE company SET name=? WHERE id=?";
-  private final String ORDER_BY = SELECT_ALL + "ORDER BY ?";
+  private final String ORDER_BY = SELECT_ALL + "ORDER BY ";
 
-  
   private final Logger log = LoggerFactory.getLogger(DaoCompany.class);
   private static volatile IDaoInstance<Company> instance = null;
 
@@ -74,17 +73,21 @@ public class DaoCompany implements IDaoInstance<Company> {
 
     return Optional.ofNullable(result);
   }
-  
-  @Override
-  public Optional<List<Company>> getAllOrderedBy(String orderBy, boolean desc) {
-    List<Company> result = new ArrayList<>();
 
-    try (Statement stmt = getConnection().createStatement(); ResultSet rs = stmt.executeQuery(ORDER_BY);) {
+  @Override
+  public Optional<List<Company>> getAllOrderedBy(String orderBy, boolean desc) throws DaoException {
+    List<Company> result = new ArrayList<>();
+    String QUERY = desc ? ORDER_BY + orderBy + DESC : ORDER_BY + orderBy;
+
+    try (Statement stmt = getConnection().createStatement(); ResultSet rs = stmt.executeQuery(QUERY);) {
+
       while (rs.next()) {
         result.add(CompanyMapper.map(rs));
       }
+
     } catch (SQLException sqlex) {
-      log.error(sqlex.getMessage());
+      log.error(QUERY + sqlex.getMessage());
+      throw new DaoException(sqlex.getMessage());
     }
 
     return Optional.ofNullable(result);
@@ -184,28 +187,57 @@ public class DaoCompany implements IDaoInstance<Company> {
   }
 
   @Override
-  public boolean deleteById(Long id) {
+  public boolean deleteById(Long id) throws DaoException {
     int lineAffected = 0;
+    Connection conn = null;
+    PreparedStatement stmt = null;
+    try {
+      conn = getConnection();
+      conn.setAutoCommit(false);
+      stmt = conn.prepareStatement(DELETE_ID);
 
-    try (PreparedStatement stmt = getConnection().prepareStatement(DELETE_ID);) {
       stmt.setLong(1, id);
       lineAffected = stmt.executeUpdate();
+      
+      conn.commit();
     } catch (SQLException sqlex) {
       log.error(sqlex.getMessage());
+    }finally {
+      try {
+        conn.rollback();
+      } catch (SQLException e) {
+        log.error(e.getMessage());
+        throw new DaoException("Couldn't rollback from delete transaction !");
+      }
     }
 
     return lineAffected > 0 ? true : false;
   }
 
   @Override
-  public boolean deleteByName(String name) {
+  public boolean deleteByName(String name) throws DaoException {
     int lineAffected = 0;
-
-    try (PreparedStatement stmt = getConnection().prepareStatement(DELETE_NAME);) {
+    Connection conn = null;
+    PreparedStatement stmt = null;
+    
+    try {
+      conn = getConnection();
+      conn.setAutoCommit(false);
+      stmt = conn.prepareStatement(DELETE_NAME);
       stmt.setString(1, name);
       lineAffected = stmt.executeUpdate();
+      
+      conn.commit();
     } catch (SQLException sqlex) {
       log.error(sqlex.getMessage());
+    }finally {
+      try {
+        stmt.close();
+        conn.rollback();
+      } catch (SQLException e) {
+        log.error(e.getMessage());
+        throw new DaoException("Couldn't rollback from delete transaction !");
+      }
     }
 
     return lineAffected > 0 ? true : false;

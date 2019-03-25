@@ -1,7 +1,11 @@
 package com.excilys.cdb.dto;
 
-public abstract class EntityDTO {
-	protected long id;
+import java.io.Serializable;
+
+public abstract class EntityDTO implements Serializable{
+
+  private static final long serialVersionUID = 6131697093554583309L;
+  protected long id;
 	protected String name;
 
 	public long getId() {

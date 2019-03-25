@@ -5,7 +5,8 @@ import java.time.LocalDateTime;
 
 public class ComputerDTO extends EntityDTO {
 
-	private String introduced;
+  private static final long serialVersionUID = -73180210575560484L;
+  private String introduced;
 	private String discontinued;
 	private long companyId;
 
