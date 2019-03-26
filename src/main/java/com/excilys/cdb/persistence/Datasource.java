@@ -16,8 +16,8 @@ import com.zaxxer.hikari.HikariDataSource;
 public class Datasource {
   private static Logger log;
 
-	private static HikariConfig hikariCfg = new HikariConfig("/home/excilys/eclipse-workspace/cdb/src/main/resource/datasource.properties");
-	private static HikariDataSource hikariDs = new HikariDataSource(hikariCfg);;
+	private static HikariConfig hikariCfg = new HikariConfig("/datasource.properties");
+	private static HikariDataSource hikariDs = new HikariDataSource(hikariCfg);
 
   /**
    * A private Constructor to never allow instantiation
@@ -37,9 +37,19 @@ public class Datasource {
       result = hikariDs.getConnection();
     } catch (SQLException e) {
       log.error(e.getMessage());
+    } finally {
+      try {
+        result.close();
+      } catch (SQLException e) {
+        log.error(e.getMessage());;
+      }
     }
     
     return Optional.ofNullable(result);
+  }
+  
+  public static void killConnections() {
+    hikariDs.close();
   }
 
 }

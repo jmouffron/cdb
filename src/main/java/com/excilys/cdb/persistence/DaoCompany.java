@@ -17,6 +17,8 @@ import com.excilys.cdb.mapper.CompanyMapper;
 import com.excilys.cdb.model.Company;
 
 /**
+ * Dao for company related entities fetching
+ * 
  * @author excilys
  *
  */
@@ -51,19 +53,22 @@ public class DaoCompany implements IDaoInstance<Company> {
   }
 
   private Connection getConnection() throws DaoException {
-    Connection optConnection = Datasource.getConnection().get();
-    if (optConnection == null) {
+    try (Connection optConnection = Datasource.getConnection().get();) {
+      return optConnection;
+    } catch (SQLException e) {
       log.error("Connection failure in DAO.");
       throw new DaoException("Connection failed and is null");
     }
-    return optConnection;
   }
 
   @Override
   public Optional<List<Company>> getAll() {
     List<Company> result = new ArrayList<>();
 
-    try (Statement stmt = getConnection().createStatement(); ResultSet rs = stmt.executeQuery(SELECT_ALL);) {
+    try (Connection conn = getConnection();
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(SELECT_ALL);) {
+      ;
       while (rs.next()) {
         result.add(CompanyMapper.map(rs));
       }
@@ -79,7 +84,10 @@ public class DaoCompany implements IDaoInstance<Company> {
     List<Company> result = new ArrayList<>();
     String QUERY = desc ? ORDER_BY + orderBy + DESC : ORDER_BY + orderBy;
 
-    try (Statement stmt = getConnection().createStatement(); ResultSet rs = stmt.executeQuery(QUERY);) {
+    try (Connection conn = getConnection();
+        Statement stmt = conn.createStatement();
+        ResultSet rs = stmt.executeQuery(QUERY);) {
+      ;
 
       while (rs.next()) {
         result.add(CompanyMapper.map(rs));
@@ -96,11 +104,9 @@ public class DaoCompany implements IDaoInstance<Company> {
   @Override
   public Optional<Company> getOneById(Long id) {
     Company result = null;
-    PreparedStatement stmt = null;
     ResultSet rs = null;
 
-    try {
-      stmt = getConnection().prepareStatement(SELECT_ID);
+    try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_ID);) {
       stmt.setLong(1, id);
       rs = stmt.executeQuery();
       result = CompanyMapper.map(rs);
@@ -109,7 +115,6 @@ public class DaoCompany implements IDaoInstance<Company> {
     } finally {
       try {
         rs.close();
-        stmt.close();
       } catch (SQLException e) {
         log.error(e.getMessage());
       }
@@ -121,11 +126,10 @@ public class DaoCompany implements IDaoInstance<Company> {
   @Override
   public Optional<Company> getOneByName(String name) {
     Company result = null;
-    PreparedStatement stmt = null;
+
     ResultSet rs = null;
 
-    try {
-      stmt = getConnection().prepareStatement(SELECT_NAME);
+    try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_NAME);) {
       stmt.setString(1, name);
       rs = stmt.executeQuery();
       rs.next();
@@ -135,7 +139,6 @@ public class DaoCompany implements IDaoInstance<Company> {
     } finally {
       try {
         rs.close();
-        stmt.close();
       } catch (SQLException e) {
         log.error(e.getMessage());
       }
@@ -159,7 +162,7 @@ public class DaoCompany implements IDaoInstance<Company> {
       stmt.setString(1, newEntity.getName());
       lineAffected = stmt.executeUpdate();
     } catch (SQLException sqlex) {
-      log.debug(sqlex.getMessage());
+      log.error(sqlex.getMessage());
     } finally {
       try {
         maxRs.close();
@@ -175,7 +178,7 @@ public class DaoCompany implements IDaoInstance<Company> {
   public boolean updateById(Company newEntity) {
     int lineAffected = 0;
 
-    try (PreparedStatement stmt = getConnection().prepareStatement(UPDATE);) {
+    try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(UPDATE);) {
       stmt.setString(1, newEntity.getName());
       stmt.setLong(2, newEntity.getId());
       lineAffected = stmt.executeUpdate();
@@ -189,26 +192,16 @@ public class DaoCompany implements IDaoInstance<Company> {
   @Override
   public boolean deleteById(Long id) throws DaoException {
     int lineAffected = 0;
-    Connection conn = null;
-    PreparedStatement stmt = null;
-    try {
-      conn = getConnection();
+
+    try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(DELETE_ID);) {
       conn.setAutoCommit(false);
-      stmt = conn.prepareStatement(DELETE_ID);
 
       stmt.setLong(1, id);
       lineAffected = stmt.executeUpdate();
-      
+
       conn.commit();
     } catch (SQLException sqlex) {
       log.error(sqlex.getMessage());
-    }finally {
-      try {
-        conn.rollback();
-      } catch (SQLException e) {
-        log.error(e.getMessage());
-        throw new DaoException("Couldn't rollback from delete transaction !");
-      }
     }
 
     return lineAffected > 0 ? true : false;
@@ -219,21 +212,22 @@ public class DaoCompany implements IDaoInstance<Company> {
     int lineAffected = 0;
     Connection conn = null;
     PreparedStatement stmt = null;
-    
+
     try {
       conn = getConnection();
       conn.setAutoCommit(false);
       stmt = conn.prepareStatement(DELETE_NAME);
       stmt.setString(1, name);
       lineAffected = stmt.executeUpdate();
-      
+
       conn.commit();
     } catch (SQLException sqlex) {
       log.error(sqlex.getMessage());
-    }finally {
+    } finally {
       try {
         stmt.close();
         conn.rollback();
+        conn.close();
       } catch (SQLException e) {
         log.error(e.getMessage());
         throw new DaoException("Couldn't rollback from delete transaction !");
@@ -244,14 +238,16 @@ public class DaoCompany implements IDaoInstance<Company> {
   }
 
   @Override
-  public boolean createDTO(Company newEntity) {
+  public boolean createDTO(Company newEntity) throws DaoException {
     int lineAffected = 0;
 
-    try (PreparedStatement stmt = getConnection().prepareStatement(INSERT);) {
+    try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(INSERT);) {
+      ;
       stmt.setString(1, newEntity.getName());
       lineAffected = stmt.executeUpdate();
     } catch (SQLException sqlex) {
       log.error(sqlex.getMessage());
+      throw new DaoException("Couldn't rollback from delete transaction !");
     }
 
     return lineAffected > 0 ? true : false;

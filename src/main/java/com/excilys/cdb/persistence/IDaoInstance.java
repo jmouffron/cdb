@@ -29,6 +29,6 @@ public interface IDaoInstance<Entity> {
 
 	abstract boolean deleteByName(String name) throws DaoException ;
 
-	abstract boolean createDTO(Entity newEntity);
+	abstract boolean createDTO(Entity newEntity) throws DaoException;
 
 }

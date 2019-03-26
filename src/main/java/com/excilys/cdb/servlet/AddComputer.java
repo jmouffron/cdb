@@ -71,6 +71,8 @@ public class AddComputer extends HttpServlet {
    */
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    HttpSession session = request.getSession(true);
+    
     String computerName = request.getParameter("computerName");
     String introduced = request.getParameter("introduced");
     String discontinued = request.getParameter("discontinued");
@@ -92,12 +94,13 @@ public class AddComputer extends HttpServlet {
       response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), e.getMessage());
     }
 
-    if (isCreated) {
-      HttpSession session = request.getSession(true);
-      session.setAttribute("success", "Computer " + computerDto.getName() + " successfully created!");
-
-      this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
+    if (isCreated) { 
+      session.setAttribute("success", "Computer " + computerDto.getName() + " successfully created!"); 
+    }else {
+      session.setAttribute("danger", "Computer " + computerDto.getName() + " couldn't be created!"); 
     }
+    
+    this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
   }
 
 }

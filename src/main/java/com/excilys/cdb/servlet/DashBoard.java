@@ -30,7 +30,8 @@ import com.excilys.cdb.view.Pagination;
 @WebServlet(description = "The main web entry point to the app, a dashboard about the database entities", urlPatterns = {
     "/DashBoard", "/dashBoard", "/", "/home", "/index.html", "/index" })
 public class DashBoard extends HttpServlet {
-  private static final long serialVersionUID = 1L;
+  
+  private static final long serialVersionUID = 3558156539176540043L;
   private static final Logger logger = LoggerFactory.getLogger(DashBoard.class);
   private Pagination pagination;
   private ComputerService computerService;
@@ -103,16 +104,16 @@ public class DashBoard extends HttpServlet {
         computers = this.computerService.orderBy(toOrder, isDesc).get();
       } catch (ServiceException e) {
         logger.error(e.getMessage());
-        session.setAttribute("stackTrace", e.getStackTrace());
-        response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getStackTrace().toString());
+        session.setAttribute("stackTrace",e.getMessage());
+        response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getMessage());
       }
     } else {
       try {
         computers = this.computerService.searchByName(searchName).get();
       } catch (ServiceException e) {
         logger.error(e.getMessage());
-        session.setAttribute("stackTrace", e.getStackTrace());
-        response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getStackTrace().toString());
+        session.setAttribute("stackTrace",e.getMessage());
+        response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getMessage());
       }
     }
    
@@ -125,8 +126,8 @@ public class DashBoard extends HttpServlet {
       pagination.setPerPage(entitiesPerPage);
     } catch (PageException e) {
       logger.error(e.getMessage());
-      session.setAttribute("stackTrace", e.getStackTrace());
-      response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getStackTrace().toString());
+      session.setAttribute("stackTrace", e.getMessage());
+      response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getMessage());
     }
 
     pagination.setElements(computers);
@@ -140,8 +141,8 @@ public class DashBoard extends HttpServlet {
       session.setAttribute("currentPage", pagination.getCurrentPage());
     } catch (PageException e) {
       logger.error(e.getMessage());
-      session.setAttribute("stackTrace", e.getStackTrace());
-      response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getStackTrace().toString());
+      session.setAttribute("stackTrace", e.getMessage());
+      response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getMessage());
     }
 
     logger.info(getServletName() + " has been called with URL: " + request.getRequestURI());

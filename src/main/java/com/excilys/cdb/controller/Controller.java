@@ -168,16 +168,15 @@ public class Controller<T extends Entity> {
 		Entity entity = null;
     try {
       entity = this.getEntityById(id);
-    } catch (ServiceException e1) {
-      // TODO Auto-generated catch block
-      e1.printStackTrace();
+    } catch (ServiceException e) {
+      logger.error(e.getMessage());
     }
 		Data<Entity> payload = new Data<Entity>(entity);
 
 		try {
 			this.setPage(new EntityPage(payload));
 		} catch (ServiceException e) {
-			e.printStackTrace();
+		  logger.error(e.getMessage());
 		}
 	}
 
@@ -330,10 +329,10 @@ public class Controller<T extends Entity> {
 	private void setService(String serviceType) throws ServiceException {
 		switch(serviceType) {
 		  case ServiceFactory.COMPUTER_SERVICE:
-		    this.service = (IService<T>) ServiceFactory.getComputerService();
+		    this.service = (IService) ServiceFactory.getComputerService();
 		    break;
 		  case ServiceFactory.COMPANY_SERVICE:
-        this.service = (IService<T>) ServiceFactory.getCompanyService();
+        this.service = (IService) ServiceFactory.getCompanyService();
         break;
       default:
         logger.error("Wrong type of services asked in controller.");

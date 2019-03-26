@@ -26,9 +26,10 @@ import com.excilys.cdb.service.ServiceFactory;
  * Servlet implementation class EditComputer
  */
 @WebServlet(description = "An Update endpoint for a CRUD API for computer entities", urlPatterns = {
-    "/EditComputer/${id}", "/editComputer/${id}" })
+    "/EditComputer/", "/editComputer" })
 public class EditComputer extends HttpServlet {
-  private static final long serialVersionUID = 1L;
+
+  private static final long serialVersionUID = -7908163785589368761L;
   private static final Logger logger = LoggerFactory.getLogger(AddComputer.class);
   private ComputerService computerService;
   private CompanyService companyService;
@@ -49,9 +50,10 @@ public class EditComputer extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     String computerName = request.getParameter("computerName");
-    if (computerName.isEmpty() || computerName == null) {
+    
+    if ( "".equals(computerName) ) {
       logger.debug("Empty or null name for computer to be searched.");
-      response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), "No Computer Name chosen for this request!");
+      response.sendRedirect("/dashboard");
     }
 
     ComputerDTO computer = null;
@@ -59,22 +61,21 @@ public class EditComputer extends HttpServlet {
       computer = this.computerService.getOneByName(computerName).get();
     } catch (BadInputException e) {
       logger.error(e.getMessage());
-      response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), e.getMessage());
+      response.sendRedirect("/dashboard");
     }
+    
     List<CompanyDTO> companies = null;
     try {
       companies = this.companyService.getAll().get();
     } catch (ServiceException e) {
       logger.error(e.getMessage());
-      response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), e.getMessage());
+      response.sendRedirect("/dashboard");
     }
 
     HttpSession session = request.getSession(true);
     session.setAttribute("companies", companies);
     session.setAttribute("computer", computer);
-
-    RequestDispatcher dispatcher = request.getRequestDispatcher("/dashboard");
-    dispatcher.forward(request, response);
+    
   }
 
   /**
@@ -83,7 +84,10 @@ public class EditComputer extends HttpServlet {
    */
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    HttpSession session = request.getSession(true);
+    
     String computerName = request.getParameter("computerName");
+    
     if (computerName == null) {
       logger.debug("Empty or null name for computer to be searched.");
       response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), "No Computer Name chosen for this request!");
@@ -101,17 +105,16 @@ public class EditComputer extends HttpServlet {
     try {
       isUpdated = this.computerService.updateById(computer);
     } catch ( ServiceException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+      logger.error(e.getMessage());
     }
 
     if (isUpdated) {
-      HttpSession session = request.getSession(true);
       session.setAttribute("success", "Computer " + computer.getName() + " successfully updated!");
-
-      RequestDispatcher dispatcher = request.getRequestDispatcher("/dashboard");
-      dispatcher.forward(request, response);
+    }else {
+      session.setAttribute("danger", "Computer " + computer.getName() + " not updated!");
     }
+    
+    this.getServletContext().getRequestDispatcher("/dashboard").forward(request, response);
   }
 
 }

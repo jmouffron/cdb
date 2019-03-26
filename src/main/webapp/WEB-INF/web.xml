@@ -6,10 +6,17 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 	http://java.sun.com/xml/ns/javaee/web-app_3_1.xsd"
 	version="3.1">
+	
   <display-name>cdb</display-name>
+  
   <welcome-file-list>
     <welcome-file>dashboard.jsp</welcome-file>
   </welcome-file-list>
+  
+  <listener>
+  	<listener-class>com.excilys.cdb.servlet.ServletContextManager</listener-class>
+  </listener>
+  
   <error-page>
     <error-code>403</error-code>
     <location>/views/403.jsp</location>
@@ -22,6 +29,7 @@
     <error-code>500</error-code>
     <location>/views/500.jsp</location>
   </error-page>
+  
   <servlet-mapping>
     <servlet-name>default</servlet-name>
     <url-pattern>*.css</url-pattern>

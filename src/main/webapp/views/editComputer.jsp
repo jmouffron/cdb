@@ -1,4 +1,4 @@
-<%@include file="/views/taglibs.jsp" %>
+<%@include file="/views/taglibs.jsp"%>
 <%@page info="Computer database | Edit Computer"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -7,12 +7,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <!-- Bootstrap -->
-<%@include file="/views/css.jsp" %>
-<%@include file="/views/favicons.jsp" %>
+<%@include file="/views/css.jsp"%>
+<%@include file="/views/favicons.jsp"%>
 </head>
 <body>
-	<%@include file="/views/header.jsp" %>
-	
+	<%@include file="/views/header.jsp"%>
+
 	<section id="main">
 		<div class="container">
 			<div class="row">
@@ -57,5 +57,8 @@
 			</div>
 		</div>
 	</section>
+
+	<script src="${ctx}/js/jquery.min.js"></script>
+	<script src="${ctx}/js/validation.js"></script>
 </body>
 </html>

@@ -186,7 +186,7 @@ public class CompanyService implements IService<CompanyDTO> {
    */
   @Override
   public void setDao(IDaoInstance dao) {
-    this.dao = (IDaoInstance<Company>) dao;
+    this.dao = dao;
   }
 
 }

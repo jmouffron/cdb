@@ -72,7 +72,7 @@
 								<!-- Table header for Discontinued Date -->
 								<th>Discontinued date <a href="${ctx}/?page=${currentPage}&search=${search}&toOrder=2"><i class="fa fa-arrow-down"></i></a></th>
 								<!-- Table header for Company -->
-								<th>Company <a href="${ctx}/?page=${currentPage}&search=${earch}&toOrder=4"><i class="fa fa-arrow-down"></i></a></th>
+								<th>Company <a href="${ctx}/?page=${currentPage}&search=${search}&toOrder=3"><i class="fa fa-arrow-down"></i></a></th>
 
 							</tr>
 						</thead>
