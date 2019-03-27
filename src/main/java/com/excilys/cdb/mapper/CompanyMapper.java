@@ -10,7 +10,7 @@ import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ServiceFactory;
 
 public class CompanyMapper {
-
+  private static ServiceFactory factory;
 	static public Company map(ResultSet rs) throws SQLException {
 
 		Long id = rs.getLong("id");
@@ -26,7 +26,7 @@ public class CompanyMapper {
 	  }
 
   public static Company mapToCompany(long newEntityId) throws BadInputException {
-    CompanyService service = ServiceFactory.getCompanyService();
+    CompanyService service = factory.getCompanyService();
     return new Company(newEntityId, service.getOneById(newEntityId).get().getName());
   }
 }

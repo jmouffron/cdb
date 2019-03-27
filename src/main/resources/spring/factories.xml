@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="computerServiceFactory"
+		class="com.excilys.cdb.service.ServiceFactory">
+		<constructor-arg name="service" ref="computerService" />
+	</bean>
+	<bean id="companyServiceFactory"
+		class="com.excilys.cdb.service.ServiceFactory">
+		<constructor-arg name="service" ref="companyService" />
+	</bean>
+	<bean id="doubleServiceFactory"
+		class="com.excilys.cdb.service.ServiceFactory">
+		<constructor-arg name="computerService"
+			ref="computerService" />
+		<constructor-arg name="companyService"
+			ref="companyService" />
+	</bean>
+
+	<bean id="daoComputerFactory"
+		class="com.excilys.cdb.persistence.DaoComputerFactory">
+		<constructor-arg name="dao" ref="daoComputer" />
+	</bean>
+
+	<bean id="daoCompanyFactory"
+		class="com.excilys.cdb.persistence.DaoCompanyFactory">
+		<constructor-arg name="dao" ref="daoCompany" />
+	</bean>
+</beans>

@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.exception.ServiceException;
+import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.ServiceFactory;
 import com.excilys.cdb.view.IndexPagination;
@@ -30,10 +31,11 @@ import com.excilys.cdb.view.Pagination;
 @WebServlet(description = "The main web entry point to the app, a dashboard about the database entities", urlPatterns = {
     "/DashBoard", "/dashBoard", "/", "/home", "/index.html", "/index" })
 public class DashBoard extends HttpServlet {
-  
+
   private static final long serialVersionUID = 3558156539176540043L;
   private static final Logger logger = LoggerFactory.getLogger(DashBoard.class);
   private Pagination pagination;
+  private ServiceFactory factory;
   private ComputerService computerService;
   private static Map<String, String> columns;
 
@@ -49,21 +51,17 @@ public class DashBoard extends HttpServlet {
   /**
    * Default constructor.
    */
-  public DashBoard() {
+  public DashBoard(ServiceFactory factory) {
     super();
-    this.computerService = ServiceFactory.getComputerService();
+    this.factory = factory;
+    this.computerService = this.factory.getComputerService();
   }
 
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
     logger.info("Initialisation de la servlet DashBoard.");
-    try {
-      pagination = new Pagination(this.computerService.getAll().get(), 0, IndexPagination.IDX_10);
-    } catch (ServiceException e) {
-      logger.error(e.getMessage());
-      System.exit(0);
-    }
+    pagination = new Pagination(this.computerService.getAll().get(), 0, IndexPagination.IDX_10);
   }
 
   /**
@@ -73,13 +71,13 @@ public class DashBoard extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     HttpSession session = request.getSession(true);
-    
+
     List<ComputerDTO> computers = null;
     IndexPagination entitiesPerPage;
     int startIndex;
     int page;
     boolean isDesc;
-    
+
     String success = request.getParameter("success");
     String danger = request.getParameter("danger");
 
@@ -104,19 +102,13 @@ public class DashBoard extends HttpServlet {
         computers = this.computerService.orderBy(toOrder, isDesc).get();
       } catch (ServiceException e) {
         logger.error(e.getMessage());
-        session.setAttribute("stackTrace",e.getMessage());
+        session.setAttribute("stackTrace", e.getMessage());
         response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getMessage());
       }
     } else {
-      try {
-        computers = this.computerService.searchByName(searchName).get();
-      } catch (ServiceException e) {
-        logger.error(e.getMessage());
-        session.setAttribute("stackTrace",e.getMessage());
-        response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getMessage());
-      }
+       computers = this.computerService.searchByName(searchName).get();
     }
-   
+
     session.setAttribute("search", searchName);
     session.setAttribute("index", startIndex);
     session.setAttribute("success", success);
@@ -157,5 +149,5 @@ public class DashBoard extends HttpServlet {
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     doGet(request, response);
   }
-  
+
 }

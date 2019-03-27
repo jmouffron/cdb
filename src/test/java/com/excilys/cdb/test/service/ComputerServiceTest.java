@@ -36,8 +36,8 @@ class ComputerServiceTest {
   String discontinued = DateUtils.getNowTimestamp().toString();
 
   @BeforeAll
-  static void setUp() {
-      service = ServiceFactory.getComputerService();
+  static void setUp(ServiceFactory factory) {
+      service = factory.getComputerService();
   }
 
   @AfterAll

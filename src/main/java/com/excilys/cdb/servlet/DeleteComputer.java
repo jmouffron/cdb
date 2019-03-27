@@ -31,9 +31,9 @@ public class DeleteComputer extends HttpServlet {
   /**
    * Default constructor.
    */
-  public DeleteComputer() {
+  public DeleteComputer(ServiceFactory factory) {
     super();
-    this.service = ServiceFactory.getComputerService();
+    this.service = factory.getComputerService();
   }
 
   /**

@@ -13,48 +13,46 @@ import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.persistence.DaoComputer;
 import com.excilys.cdb.persistence.DaoComputerFactory;
 import com.excilys.cdb.persistence.IDaoInstance;
 import com.excilys.cdb.validator.ServiceValidator;
 
 public class ComputerService implements IService<ComputerDTO> {
   private static ComputerService instance;
-	private IDaoInstance<Computer> dao;
-	private Logger log;
-
-	private ComputerService() {
-		this.dao = DaoComputerFactory.getComputerFactory().getDao();
-		this.log = LoggerFactory.getLogger(ComputerService.class);
+	private DaoComputer dao;
+	private static Logger log = LoggerFactory.getLogger(ComputerService.class);
+	
+	private ComputerService() { }
+	
+	private ComputerService(DaoComputer dao) {
+	  super();
+		this.dao = dao;
 	}
 	
-	public static ComputerService getService() {
-	  if ( instance == null ) {
-	    synchronized( ComputerService.class ) {
-	      if (instance == null ) {
-	        return new ComputerService();
-	      }
-	    }
-	  }
-	  return instance;
-	}
+//	public static ComputerService getService() {
+//	  if ( instance == null ) {
+//	    synchronized( ComputerService.class ) {
+//	      if (instance == null ) {
+//	        return new ComputerService();
+//	      }
+//	    }
+//	  }
+//	  return instance;
+//	}
 
 	/* (non-Javadoc)
 	 * @see com.excilys.cdb.service.IService#getAll()
 	 */
 	@Override
-	public Optional<List<ComputerDTO>> getAll() throws ServiceException {
+	public Optional<List<ComputerDTO>> getAll() {
 	  List<ComputerDTO> list = null;
-    try {
-      list = this.dao
-          .getAll()
-          .get().stream()
-          .map(ComputerMapper::mapToDTO)
-          .map(Optional::get)
-          .collect(Collectors.toList());
-    } catch (DaoException e) {
-      log.error(e.getMessage());
-      throw new ServiceException("Couldn't order by in computers !");
-    }
+    list = this.dao
+        .getAll()
+        .get().stream()
+        .map(ComputerMapper::mapToDTO)
+        .map(Optional::get)
+        .collect(Collectors.toList());
 
     return Optional.ofNullable(list);
 	}
@@ -84,20 +82,15 @@ public class ComputerService implements IService<ComputerDTO> {
 	 * @throws ServiceException 
 	 */
 	@Override
-	public Optional<List<ComputerDTO>> searchByName(String name) throws ServiceException {
+	public Optional<List<ComputerDTO>> searchByName(String name){
 	  String regex = "(?i)(.*)" + name + "(.*)";
 		List<ComputerDTO> filteredComputers = null;
-    try {
-      filteredComputers = this.dao.getAll().get()
-            .stream()
-        		.filter(computer -> computer.getName().matches(regex) || computer.getCompany().getName().matches(regex) )
-        		.map(ComputerMapper::mapToDTO)
-        		.map(Optional::get)
-        		.collect(Collectors.toList());
-    } catch (DaoException e) {
-      log.error(e.getMessage());
-      throw new ServiceException("Couldn't search in computers !");
-    }
+    filteredComputers = this.dao.getAll().get()
+          .stream()
+      		.filter(computer -> computer.getName().matches(regex) || computer.getCompany().getName().matches(regex) )
+      		.map(ComputerMapper::mapToDTO)
+      		.map(Optional::get)
+      		.collect(Collectors.toList());
 		
 		return Optional.ofNullable(filteredComputers);
 	}
@@ -129,12 +122,7 @@ public class ComputerService implements IService<ComputerDTO> {
 	public boolean create(ComputerDTO newEntity) throws ServiceException {
 		ServiceValidator.computerDTOValidator(newEntity, "Computer");
 		Computer computer = ComputerMapper.mapToComputer(newEntity).get();
-		try {
-      return this.dao.create(computer);
-    } catch (DaoException e) {
-      log.error(e.getMessage());
-      throw new ServiceException("Couldn't create Computer");
-    }
+		return this.dao.create(computer);
 	}
 
 	/*
@@ -142,31 +130,21 @@ public class ComputerService implements IService<ComputerDTO> {
 	 * com.excilys.cdb.service.IService#updateById(com.excilys.cdb.model.Entity)
 	 */
 	@Override
-	public boolean updateById(ComputerDTO newEntity) throws ServiceException {
+	public boolean updateById(ComputerDTO newEntity) throws BadInputException{
 		ServiceValidator.computerDTOValidator(newEntity, "Computer");
     Computer computer = ComputerMapper.mapToComputer(newEntity).get();
     
-		try {
-      return this.dao.updateById(computer);
-    } catch (DaoException e) {
-      log.error(e.getMessage());
-      throw new ServiceException("Couldn't update entity!");
-    }
+		return this.dao.updateById(computer);
 	}
 
 	/*
 	 * @see com.excilys.cdb.service.IService#deleteById(java.lang.Long)
 	 */
 	@Override
-	public boolean deleteById(Long id) throws ServiceException {
+	public boolean deleteById(Long id) throws BadInputException {
 		ServiceValidator.idValidator(id, "Computer");
 
-		try {
-      return this.dao.deleteById(id);
-    } catch (DaoException e) {
-      log.error(e.getMessage());
-      throw new ServiceException("Couldn't delete by id!");
-    }
+		return this.dao.deleteById(id);
 	}
 
 	/*
@@ -176,24 +154,14 @@ public class ComputerService implements IService<ComputerDTO> {
 	public boolean deleteByName(String name) throws ServiceException {
 		ServiceValidator.nameValidator(name, "Computer");
 
-		try {
-      return this.dao.deleteByName(name);
-    } catch (DaoException e) {
-      log.error(e.getMessage());
-      throw new ServiceException("Couldn't delete by id!");
-    }
+		return this.dao.deleteByName(name);
 	}
 
-	/*
-	 * @see com.excilys.cdb.service.IService#getDao()
-	 */
-	@Override
-	public IDaoInstance getDao() {
+	public DaoComputer getDao() {
 		return this.dao;
 	}
 
-  @Override
-  public void setDao(IDaoInstance dao) {
+  public void setDao(DaoComputer dao) {
     this.dao = dao;    
   }
 }

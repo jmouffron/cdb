@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.mapper.CompanyMapper;
 import com.excilys.cdb.model.Company;
+import com.excilys.cdb.service.ComputerService;
 
 /**
  * Dao for company related entities fetching
@@ -25,7 +26,9 @@ import com.excilys.cdb.model.Company;
 public class DaoCompany implements IDaoInstance<Company> {
 
   private final String DELETE_ID = "DELETE FROM company WHERE id=? ";
+  private final String COMPUTER_CASCADE_DELETE_ID = "DELETE FROM computers WHERE company_id=? ";
   private final String DELETE_NAME = "DELETE FROM company WHERE name=? ";
+  private final String COMPUTER_CASCADE_DELETE_NAME = "DELETE FROM computers LEFT JOIN company ON computer.company_id = company.id WHERE company.name = ? ";
   private final String DESC = " DESC;";
   private final String INSERT = "INSERT INTO company VALUES(?,?)";
   private final String MAX_ID = "SELECT MAX(id)+1 FROM company;";
@@ -36,29 +39,18 @@ public class DaoCompany implements IDaoInstance<Company> {
   private final String ORDER_BY = SELECT_ALL + "ORDER BY ";
 
   private final Logger log = LoggerFactory.getLogger(DaoCompany.class);
-  private static volatile IDaoInstance<Company> instance = null;
+  private Datasource datasource;
 
   private DaoCompany() {
   }
 
-  public static IDaoInstance<Company> getDao() {
-    if (instance == null) {
-      synchronized (DaoCompany.class) {
-        if (instance == null) {
-          instance = new DaoCompany();
-        }
-      }
-    }
-    return instance;
+  private DaoCompany(Datasource ds) {
+    super();
+    this.datasource = ds;
   }
 
   private Connection getConnection() throws DaoException {
-    try (Connection optConnection = Datasource.getConnection().get();) {
-      return optConnection;
-    } catch (SQLException e) {
-      log.error("Connection failure in DAO.");
-      throw new DaoException("Connection failed and is null");
-    }
+    return this.datasource.getConnection().get();
   }
 
   @Override
@@ -189,49 +181,55 @@ public class DaoCompany implements IDaoInstance<Company> {
     return lineAffected > 0 ? true : false;
   }
 
-  @Override
   public boolean deleteById(Long id) throws DaoException {
     int lineAffected = 0;
 
-    try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(DELETE_ID);) {
+    try (Connection conn = getConnection();
+        PreparedStatement stmt = conn.prepareStatement(DELETE_ID);
+        PreparedStatement computerStmt = conn.prepareStatement(COMPUTER_CASCADE_DELETE_ID);) {
       conn.setAutoCommit(false);
 
       stmt.setLong(1, id);
+
       lineAffected = stmt.executeUpdate();
+
+      if (lineAffected > 0) {
+        computerStmt.setLong(1, id);
+        lineAffected = computerStmt.executeUpdate();
+      } else {
+        throw new DaoException("Couldn't rollback from delete transaction !");
+      }
 
       conn.commit();
     } catch (SQLException sqlex) {
       log.error(sqlex.getMessage());
+      throw new DaoException("Couldn't rollback from delete transaction !");
     }
 
     return lineAffected > 0 ? true : false;
   }
 
-  @Override
-  public boolean deleteByName(String name) throws DaoException {
+  public boolean deleteByName(String name, ComputerService service) throws DaoException {
     int lineAffected = 0;
-    Connection conn = null;
-    PreparedStatement stmt = null;
 
-    try {
-      conn = getConnection();
-      conn.setAutoCommit(false);
-      stmt = conn.prepareStatement(DELETE_NAME);
+    try (Connection conn = getConnection();
+        PreparedStatement stmt = conn.prepareStatement(DELETE_NAME);
+        PreparedStatement computerStmt = conn.prepareStatement(COMPUTER_CASCADE_DELETE_NAME);) {
       stmt.setString(1, name);
+
       lineAffected = stmt.executeUpdate();
+
+      if (lineAffected > 0) {
+        computerStmt.setString(1, name);
+        lineAffected = computerStmt.executeUpdate();
+      } else {
+        throw new DaoException("Couldn't rollback from delete transaction !");
+      }
 
       conn.commit();
     } catch (SQLException sqlex) {
       log.error(sqlex.getMessage());
-    } finally {
-      try {
-        stmt.close();
-        conn.rollback();
-        conn.close();
-      } catch (SQLException e) {
-        log.error(e.getMessage());
-        throw new DaoException("Couldn't rollback from delete transaction !");
-      }
+      throw new DaoException("Couldn't rollback from delete transaction !");
     }
 
     return lineAffected > 0 ? true : false;

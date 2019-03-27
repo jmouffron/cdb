@@ -25,10 +25,6 @@ public interface IDaoInstance<Entity> {
 
 	abstract boolean updateById(Entity newEntity) throws DaoException;
 
-	abstract boolean deleteById(Long id) throws DaoException;
-
-	abstract boolean deleteByName(String name) throws DaoException ;
-
 	abstract boolean createDTO(Entity newEntity) throws DaoException;
 
 }

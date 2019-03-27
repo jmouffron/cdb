@@ -1,4 +1,4 @@
-<%@include file="/views/taglibs.jsp"%>
+<%@include file="/views/imports/taglibs.jsp"%>
 <%@page info="Computer database | Dashboard"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -8,12 +8,12 @@
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta charset="utf-8">
 <!-- Bootstrap -->
-<%@include file="/views/css.jsp"%>
-<%@include file="/views/favicons.jsp"%>
+<%@include file="/views/imports/css.jsp"%>
+<%@include file="/views/imports/favicons.jsp"%>
 </head>
 <body>
-	<%@include file="/views/header.jsp"%>
-	<%@include file="/views/feedback.jsp"%>	
+	<%@include file="/views/imports/header.jsp"%>
+	<%@include file="/views/imports/feedback.jsp"%>	
 	<section id="main">
 		<div class="container">
 			<c:choose>
@@ -138,6 +138,6 @@
 		</div>
 	</footer>
 
-	<%@include file="/views/js.jsp"%>
+	<%@include file="/views/imports/js.jsp"%>
 </body>
 </html>

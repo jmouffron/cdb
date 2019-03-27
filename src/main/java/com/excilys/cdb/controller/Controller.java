@@ -31,19 +31,21 @@ import com.excilys.cdb.view.Page;
 public class Controller<T extends Entity> {
 	private static final Logger logger = LoggerFactory.getLogger(Controller.class);
   private Page<T> page;
+  private ServiceFactory factory;
 	private MenuChoiceEnum request;
 	private IService<T> service;
 	private static volatile Controller<Entity> instance;
 
-	private Controller(Page<T> page) {
+	private Controller(Page<T> page, ServiceFactory factory) {
 		this.page = page;
+		this.factory = factory;
 	}
 
-	public static Controller<Entity> getController() {
+	public static Controller<Entity> getController(ServiceFactory factory) {
 		if (instance == null) {
 			synchronized (Controller.class) {
 				if (instance == null) {
-					instance = new Controller<>(new MenuPage());
+					instance = new Controller<>(new MenuPage(), factory);
 				}
 			}
 		}
@@ -128,13 +130,13 @@ public class Controller<T extends Entity> {
       logger.error("Bad service instantiation in controller");
     }
 
-		List<Entity> entities = null;
+		List<T> entities = null;
     try {
       entities = this.getAllEntities();
     } catch (ServiceException e) {
       logger.error(e.getMessage());
     }
-		Data<Entity> payload = new Data<Entity>(entities);
+		Data<Entity> payload = (Data<Entity>) new Data<T>(entities);
 
 		long totalDataSize = entities.size();
 
@@ -267,8 +269,8 @@ public class Controller<T extends Entity> {
 	 * @return List<Entity>
 	 * @throws ServiceException 
 	 */
-	private List<Entity> getAllEntities() throws ServiceException {
-		return (List<Entity>) this.service.getAll().get();
+	private List<T> getAllEntities() throws ServiceException {
+		return this.service.getAll().get();
 	}
 
 	/**
@@ -329,10 +331,10 @@ public class Controller<T extends Entity> {
 	private void setService(String serviceType) throws ServiceException {
 		switch(serviceType) {
 		  case ServiceFactory.COMPUTER_SERVICE:
-		    this.service = (IService) ServiceFactory.getComputerService();
+		    this.service = (IService) factory.getComputerService();
 		    break;
 		  case ServiceFactory.COMPANY_SERVICE:
-        this.service = (IService) ServiceFactory.getCompanyService();
+        this.service = (IService) factory.getCompanyService();
         break;
       default:
         logger.error("Wrong type of services asked in controller.");

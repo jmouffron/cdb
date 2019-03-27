@@ -21,7 +21,7 @@ public class DaoComputer implements IDaoInstance<Computer> {
 
   private final String DELETE_ID = "DELETE FROM computer WHERE id=? ";
   private final String DELETE_NAME = "DELETE FROM computer WHERE name=? ";
-  private final String DESC = "DESC";
+  private final String DESC = " DESC";
   private final String INSERT = "INSERT INTO computer VALUES(?,?,?,?,?)";
   private final String MAX_ID = "SELECT MAX(id)+1 from computer";
   private final String SELECT_ALL = "SELECT pc.id, pc.name as pc_name, pc.introduced, pc.discontinued, pc.company_id, c.name as cp_name FROM computer pc INNER JOIN company c ON pc.company_id=c.id";
@@ -31,29 +31,16 @@ public class DaoComputer implements IDaoInstance<Computer> {
   private final String ORDER_BY = SELECT_ALL + " ORDER BY ";
 
   private final Logger log = LoggerFactory.getLogger(DaoComputer.class);
-  private static volatile IDaoInstance<Computer> instance = null;
-
-  private DaoComputer() {
+  private Datasource datasource;
+  
+  private DaoComputer() { }
+  
+  private DaoComputer(Datasource ds) {
+    this.datasource = ds;
   }
-
-  public static IDaoInstance<Computer> getDao() {
-    if (instance == null) {
-      synchronized (DaoComputer.class) {
-        if (instance == null) {
-          instance = new DaoComputer();
-        }
-      }
-    }
-    return instance;
-  }
-
-  private Connection getConnection() throws DaoException {
-    try( Connection optConnection = Datasource.getConnection().get(); ){
-        return optConnection;
-    }catch( SQLException e) {
-      log.error(e.getMessage());
-      throw new DaoException(e.getMessage());
-    }
+  
+  private Connection getConnection() {
+    return this.datasource.getConnection().get();
   }
 
   @Override
@@ -196,7 +183,6 @@ public class DaoComputer implements IDaoInstance<Computer> {
     return lineAffected > 0 ? true : false;
   }
 
-  @Override
   public boolean deleteById(Long id) {
     int lineAffected = 0;
 
@@ -210,7 +196,6 @@ public class DaoComputer implements IDaoInstance<Computer> {
     return lineAffected > 0 ? true : false;
   }
 
-  @Override
   public boolean deleteByName(String name) {
     int lineAffected = 0;
 

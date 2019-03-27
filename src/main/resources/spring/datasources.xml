@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+	<bean id="hikariConfig" class="com.zaxxer.hikari.HikariConfig">
+		<property name="poolName" value="springHikariCP" />
+		<property name="driverClassName"
+			value="${driverClassName}" />
+		<property name="connectionTimeout"
+			value="${dataSource.connectionTimeout}" />
+		<property name="maximumPoolSize"
+			value="${dataSource.maximumPoolSize}" />
+		<property name="leakDetectionThreshold"
+			value="${dataSource.leakDetectionThreshold}" />
+		<property name="jdbcUrl" value ="${jdbcUrl}" />
+		<property name="username" value ="${username}" />
+		<property name="password" value ="${password}" />
+	</bean>
+
+	<bean id="hikariDatasource" class="com.zaxxer.hikari.HikariDataSource">
+	    <constructor-arg ref="hikariConfig" />
+	</bean>
+	
+	<bean id="datasource"
+		class="com.excilys.cdb.persistence.Datasource" destroy-method="close">
+		<constructor-arg ref="hikariDatasource" />
+	</bean>
+
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:datasource.properties</value>
+			</list>
+		</property>
+	</bean>
+
+</beans>

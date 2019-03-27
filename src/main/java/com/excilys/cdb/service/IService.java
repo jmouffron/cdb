@@ -92,19 +92,4 @@ public interface IService<EntityDTO> {
    */
   public abstract boolean deleteByName(String name) throws BadInputException, ServiceException;
 
-  /**
-   * Returns the dao used by the service
-   * 
-   * @return DaoInstance<T extends EntityDTO>
-   */
-  public abstract IDaoInstance getDao();
-
-  /**
-   * Sets a new Dao on the service
-   * 
-   * @param DaoInstance<T extends EntityDTO> dao
-   */
-  public abstract void setDao(IDaoInstance dao);
-
-
 }

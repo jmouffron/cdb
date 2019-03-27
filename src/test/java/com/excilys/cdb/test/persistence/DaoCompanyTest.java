@@ -7,7 +7,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.model.Company;
+import com.excilys.cdb.persistence.DaoCompany;
 import com.excilys.cdb.persistence.DaoCompanyFactory;
+import com.excilys.cdb.persistence.DaoComputerFactory;
 import com.excilys.cdb.persistence.IDaoInstance;
 
 import java.util.List;
@@ -20,11 +22,13 @@ import org.slf4j.LoggerFactory;
 class DaoCompanyTest {
 
   private static final Logger log = LoggerFactory.getLogger(DaoComputerTest.class);
-  private static IDaoInstance<Company> daoTested;
+  private static DaoCompany daoTested;
+  private static DaoCompanyFactory companyFactory;
   
   @BeforeAll
-  static void setUp() { 
-    daoTested = DaoCompanyFactory.getCompanyFactory().getDao();
+  static void setUp(DaoCompanyFactory factory) { 
+    companyFactory = factory;
+    daoTested = companyFactory.getDao();
   }
   
   @BeforeAll

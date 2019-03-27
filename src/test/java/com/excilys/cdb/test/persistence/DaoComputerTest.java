@@ -25,10 +25,12 @@ public class DaoComputerTest {
 
 	private static final Logger log = LoggerFactory.getLogger(DaoComputerTest.class);
 	private static IDaoInstance<Computer> daoTested;
+  private static DaoComputerFactory computerFactory;
 	
 	@BeforeAll
-	static void setUp() {	
-	  daoTested = DaoComputerFactory.getComputerFactory().getDao();
+	static void setUp(DaoComputerFactory factory) {	
+	  computerFactory = factory;
+	  daoTested = factory.getDao();
 	}
 	
 	@BeforeAll

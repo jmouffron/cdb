@@ -51,7 +51,7 @@ $(function() {
 	})
 	
 	$("div #companyId").on("focus blur", function(e) {
-		if ( $(this).val() == '' || !$("#companyId option").contains( $("#companyId").val()) ){
+		if ( $(this).val() == '' || !$("#companyId option").toArray().contains( $("#companyId").val() ) ){
 			invalidate($(this))
 		} else {
 			validate($(this))
