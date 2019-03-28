@@ -15,6 +15,8 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.PageException;
@@ -29,13 +31,12 @@ import com.excilys.cdb.view.Pagination;
  * Servlet implementation class DashBoard
  */
 @WebServlet(description = "The main web entry point to the app, a dashboard about the database entities", urlPatterns = {
-    "/DashBoard", "/dashBoard", "/", "/home", "/index.html", "/index" })
+    "/DashBoard", "/dashBoard", "/", "/home", "/index.html", "/index", "/dashboard", "/Dashboard" })
 public class DashBoard extends HttpServlet {
-
+  private ApplicationContext springCtx;
   private static final long serialVersionUID = 3558156539176540043L;
   private static final Logger logger = LoggerFactory.getLogger(DashBoard.class);
   private Pagination pagination;
-  private ServiceFactory factory;
   private ComputerService computerService;
   private static Map<String, String> columns;
 
@@ -45,23 +46,17 @@ public class DashBoard extends HttpServlet {
     columns.put("0", "pc_name");
     columns.put("1", "introduced");
     columns.put("2", "discontinued");
-    columns.put("3", "company_name");
-  }
-
-  /**
-   * Default constructor.
-   */
-  public DashBoard(ServiceFactory factory) {
-    super();
-    this.factory = factory;
-    this.computerService = this.factory.getComputerService();
+    columns.put("3", "cp_name");
   }
 
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
+    this.springCtx = new ClassPathXmlApplicationContext("/spring/beans.xml");
+    ServiceFactory factory = (ServiceFactory) springCtx.getBean("computerServiceFactory");
+    this.computerService = factory.getComputerService();
+    this.pagination = new Pagination(this.computerService.getAll().get(), 0, IndexPagination.IDX_10);
     logger.info("Initialisation de la servlet DashBoard.");
-    pagination = new Pagination(this.computerService.getAll().get(), 0, IndexPagination.IDX_10);
   }
 
   /**
@@ -88,16 +83,18 @@ public class DashBoard extends HttpServlet {
     String searchName = request.getParameter("search");
     String order = request.getParameter("order");
     String toOrder = request.getParameter("toOrder");
-
+    String selection = request.getParameter("selection");
+    String strCache = request.getParameter("cache");
+    
     isDesc = (order == null || order.equals("")) ? false : true;
     entitiesPerPage = (perPage == null) ? IndexPagination.IDX_10 : IndexPagination.valueOf(perPage);
     startIndex = (index == null) ? 0 : Integer.parseInt(index);
     page = (newPage == null || newPage.equals("0")) ? 1 : Integer.parseInt(newPage);
-
+    toOrder = (toOrder == null || toOrder.equals("") || !columns.containsKey(toOrder)) ? "pc_name"
+        : columns.get(toOrder);
+    
     if (searchName == null || searchName.isEmpty()) {
       searchName = "";
-      toOrder = (toOrder == null || toOrder.equals("") || !columns.containsKey(toOrder)) ? "pc_name"
-          : columns.get(toOrder);
       try {
         computers = this.computerService.orderBy(toOrder, isDesc).get();
       } catch (ServiceException e) {
@@ -106,13 +103,20 @@ public class DashBoard extends HttpServlet {
         response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getMessage());
       }
     } else {
-       computers = this.computerService.searchByName(searchName).get();
+       try {
+        computers = this.computerService.searchByNameOrdered(searchName, toOrder, isDesc).get();
+      } catch (ServiceException e) {
+        logger.error(e.getMessage());
+        session.setAttribute("stackTrace", e.getMessage());
+        response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getMessage());
+      }
     }
 
     session.setAttribute("search", searchName);
     session.setAttribute("index", startIndex);
     session.setAttribute("success", success);
     session.setAttribute("danger", danger);
+    session.setAttribute("sel", selection);
 
     try {
       pagination.setPerPage(entitiesPerPage);
@@ -131,6 +135,7 @@ public class DashBoard extends HttpServlet {
       session.setAttribute("pages", pagination.getPages());
       session.setAttribute("computers", pagination.list().get());
       session.setAttribute("currentPage", pagination.getCurrentPage());
+      
     } catch (PageException e) {
       logger.error(e.getMessage());
       session.setAttribute("stackTrace", e.getMessage());

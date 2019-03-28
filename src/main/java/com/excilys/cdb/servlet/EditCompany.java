@@ -28,13 +28,12 @@ import com.excilys.cdb.service.ServiceFactory;
 /**
  * Servlet implementation class EditComputer
  */
-@WebServlet(description = "An Update endpoint for a CRUD API for computer entities", urlPatterns = {
-    "/EditComputer/", "/editComputer/", "/editcomputer/", "/Editcomputer/" })
-public class EditComputer extends HttpServlet {
+@WebServlet(description = "An Update endpoint for a CRUD API for company entities", urlPatterns = {
+    "/EditCompany/", "/editCompany", "/editcompany", "/Editcompany" })
+public class EditCompany extends HttpServlet {
 
   private static final long serialVersionUID = -7908163785589368761L;
   private static final Logger logger = LoggerFactory.getLogger(AddComputer.class);
-  private ComputerService computerService;
   private CompanyService companyService;
   private ApplicationContext springCtx;
 
@@ -42,10 +41,8 @@ public class EditComputer extends HttpServlet {
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
     this.springCtx = new ClassPathXmlApplicationContext("/spring/beans.xml");
-    ServiceFactory factory = (ServiceFactory) springCtx.getBean("doubleServiceFactory");
-    this.computerService = factory.getComputerService();
+    ServiceFactory factory = (ServiceFactory) springCtx.getBean("companyServiceFactory");
     this.companyService = factory.getCompanyService();
-    logger.info("Initialization of EditComputer Servlet");
   }
 
   /**
@@ -55,34 +52,22 @@ public class EditComputer extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     HttpSession session = request.getSession(true);
+    String companyName = request.getParameter("companyName");
     
-    String computerId = request.getParameter("computerId");
-    
-    if ( "".equals(computerId) ) {
-      logger.debug("Empty or null id for computer to be searched.");
+    if ("".equals(companyName) ) {
+      logger.debug("Empty or null name for company to be searched.");
       response.sendRedirect("/dashboard");
     }
 
-    ComputerDTO computer = null;
+    CompanyDTO company = null;
     try {
-      computer = this.computerService.getOneById( Long.parseLong(computerId) ).get();
+      company = this.companyService.getOneByName(companyName).get();
     } catch (BadInputException e) {
       logger.error(e.getMessage());
       response.sendRedirect("/dashboard");
     }
-    
-    List<CompanyDTO> companies = null;
-    try {
-      companies = this.companyService.getAll().get();
-    } catch (ServiceException e) {
-      logger.error(e.getMessage());
-      response.sendRedirect("/dashboard");
-    }
-
-
-    session.setAttribute("companies", companies);
-    session.setAttribute("computer", computer);
-    this.getServletContext().getRequestDispatcher("/views/editComputer.jsp").forward(request, response);
+   
+    session.setAttribute("company", company);
   }
 
   /**
@@ -93,32 +78,32 @@ public class EditComputer extends HttpServlet {
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     HttpSession session = request.getSession(true);
     
-    String computerId = request.getParameter("computerId");
+    String companyName = request.getParameter("companyName");
     
-    if ( "".equals(computerId) ) {
-      logger.debug("Empty or null id for computer to be searched.");
-      response.sendRedirect("/dashboard");
+    if (companyName == null) {
+      logger.debug("Empty or null name for company to be searched.");
+      response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), "No Computer Name chosen for this request!");
     }
 
-    ComputerDTO computer = null;
+    CompanyDTO company = null;
     try {
-      computer = this.computerService.getOneById( Long.parseLong(computerId) ).get();
+      company = this.companyService.getOneByName(companyName).get();
     } catch (BadInputException e) {
-      logger.error(e.getMessage());
-      response.sendRedirect("/dashboard");
+      logger.debug(e.getMessage());
+      response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), e.getMessage());
     }
 
     boolean isUpdated = false;
     try {
-      isUpdated = this.computerService.updateById(computer);
-    } catch ( ServiceException e) {
+      isUpdated = this.companyService.updateById(company);
+    } catch ( ServiceException e ) {
       logger.error(e.getMessage());
     }
 
     if (isUpdated) {
-      session.setAttribute("success", "Computer " + computer.getName() + " successfully updated!");
+      session.setAttribute("success", "Company " + company.getName() + " successfully updated!");
     }else {
-      session.setAttribute("danger", "Computer " + computer.getName() + " not updated!");
+      session.setAttribute("danger", "Company " + company.getName() + " not updated!");
     }
     
     this.getServletContext().getRequestDispatcher("/dashboard").forward(request, response);

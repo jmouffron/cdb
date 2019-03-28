@@ -6,6 +6,7 @@
 <title>Computer Database | Edit Computer</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
+<meta charset="utf-8">
 <!-- Bootstrap -->
 <%@include file="/views/imports/css.jsp"%>
 <%@include file="/views/imports/favicons.jsp"%>
@@ -21,29 +22,31 @@
 					<h1>Edit Computer</h1>
 
 					<form action="/editComputer" method="POST">
-						<input type="hidden" value="0" id="${id}" />
-						<!-- TODO: Change this value with the computer id -->
+						<input type="hidden" value="${id}" id="${id}" />
+
 						<fieldset>
 							<div class="form-group">
 								<label for="computerName">Computer name</label> <input
 									type="text" class="form-control" id="computerName"
-									placeholder="Computer name" value="${name}">
+									placeholder="Computer name" value="${computer.name}">
 							</div>
 							<div class="form-group">
 								<label for="introduced">Introduced date</label> <input
 									type="date" class="form-control" id="introduced"
-									placeholder="Introduced date" value="${introduced}">
+									placeholder="Introduced date" value="${computer.introduced}">
 							</div>
 							<div class="form-group">
 								<label for="discontinued">Discontinued date</label> <input
 									type="date" class="form-control" id="discontinued"
-									placeholder="Discontinued date" value="${discontinued}">
+									placeholder="Discontinued date" value="${computer.discontinued}">
+									
 							</div>
 							<div class="form-group">
 								<label for="companyId">Company</label> <select
 									class="form-control" id="companyId">
+									<option value="${computer.companyId}">${computer.companyName}</option>
 									<c:forEach items="${companies}" var="company">
-										<option value="${company.getId()}">${company.getName()}</option>
+										<option value="${company.id}">${company.name}</option>
 									</c:forEach>
 								</select>
 							</div>

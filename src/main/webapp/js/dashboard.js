@@ -33,7 +33,7 @@ $(function() {
         var str = $('.' + checkboxFieldName + ':checked').map(function() {
             return this.value;
         }).get().join();
-        
+
         $(this).attr('value',str);
         
         return this;
@@ -90,4 +90,3 @@ $(document).keydown(function(e) {
             break;
     }
 });
-

@@ -36,15 +36,16 @@ public class ComputerMapper {
   static public Optional<ComputerDTO> mapToDTO(Computer computer) {
 
     ComputerDTO computerDTO = new ComputerDTO.ComputerDTOBuilder().setId(computer.getId()).setName(computer.getName())
-        .setIntroduced(computer.getIntroduced() == null ? null : computer.getIntroduced().toString())
-        .setDiscontinued(computer.getDiscontinued() == null ? null : computer.getDiscontinued().toString())
-        .setCompanyId(computer.getCompany().getId()).build();
+        .setIntroduced(computer.getIntroduced() == null ? null : DateUtils.stringToDateString( computer.getIntroduced() ) )
+        .setDiscontinued(computer.getDiscontinued() == null ? null : DateUtils.stringToDateString( computer.getDiscontinued() ) )
+        .setCompanyId(computer.getCompany().getId())
+        .setCompanyName(computer.getCompany().getName()).build();
 
     return Optional.ofNullable(computerDTO);
   }
 
   static public Optional<Computer> mapToComputer(ComputerDTO dto) throws BadInputException {
-    Company company = CompanyMapper.mapToCompany(dto.getCompanyId());
+    Company company = CompanyMapper.mapToCompany(dto);
     
     Computer computer = new Computer.ComputerBuilder()
         .setId( dto.getId())
@@ -62,7 +63,7 @@ public class ComputerMapper {
       ComputerDTO computerDTO = new ComputerDTO.ComputerDTOBuilder().setId(computer.getId()).setName(computer.getName())
           .setIntroduced(computer.getIntroduced() == null ? null : computer.getIntroduced().toString())
           .setDiscontinued(computer.getDiscontinued() == null ? null : computer.getDiscontinued().toString())
-          .setCompanyId(computer.getCompany().getId()).build();
+          .setCompanyName(computer.getCompany().getName()).build();
       return computerDTO;
     }).collect(Collectors.toList()));
   }

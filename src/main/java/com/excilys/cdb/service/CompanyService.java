@@ -95,7 +95,7 @@ public class CompanyService implements IService<CompanyDTO> {
   @Override
   public boolean create(CompanyDTO newEntity) throws ServiceException {
     ServiceValidator.companyDTOValidator(newEntity);
-    Company company = CompanyMapper.mapToCompany(newEntity.getId());
+    Company company = CompanyMapper.mapToCompany(newEntity);
     return this.dao.create(company);
   }
 
@@ -106,7 +106,7 @@ public class CompanyService implements IService<CompanyDTO> {
   @Override
   public boolean updateById(CompanyDTO newEntity) throws ServiceException {
     ServiceValidator.companyDTOValidator(newEntity);
-    Company company = CompanyMapper.mapToCompany(newEntity.getId());
+    Company company = CompanyMapper.mapToCompany(newEntity);
     return this.dao.updateById(company);
   }
 

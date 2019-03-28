@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+   http://www.springframework.org/schema/beans/spring-beans.xsd
+   http://www.springframework.org/schema/context
+   http://www.springframework.org/schema/context/spring-context.xsd">
+
+	<bean id="dashboard" class="com.excilys.cdb.servlet.DashBoard">
+	</bean>
+	<bean id="editComputer"
+		class="com.excilys.cdb.servlet.EditComputer">
+	</bean>
+	<bean id="editCompany" class="com.excilys.cdb.servlet.EditCompany">
+	</bean>
+	<bean id="addCompany" class="com.excilys.cdb.servlet.AddCompany">
+	</bean>
+	<bean id="addComputer" class="com.excilys.cdb.servlet.AddComputer">
+	</bean>
+	<bean id="deleteComputer"
+		class="com.excilys.cdb.servlet.DeleteComputer">
+	</bean>
+	<bean id="deleteCompany"
+		class="com.excilys.cdb.servlet.DeleteCompany">
+	</bean>
+</beans>

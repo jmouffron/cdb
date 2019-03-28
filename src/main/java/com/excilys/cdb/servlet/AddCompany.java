@@ -1,7 +1,7 @@
 package com.excilys.cdb.servlet;
 
 import com.excilys.cdb.dto.CompanyDTO;
-import com.excilys.cdb.dto.ComputerDTO;
+import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
@@ -26,12 +26,11 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 /**
  * Servlet implementation class AddComputer
  */
-@WebServlet(description = "A Create endpoint in a CRUD API for computer entities", urlPatterns = { "/AddComputer",
-    "/addComputer", "/addcomputer", "/Addcomputer" })
-public class AddComputer extends HttpServlet {
+@WebServlet(description = "A Create endpoint in a CRUD API for company entities", urlPatterns = { "/AddCompany",
+    "/addCompany", "/addcompany", "/Addcompany" })
+public class AddCompany extends HttpServlet {
   private static final long serialVersionUID = 1L;
-  private static final Logger logger = LoggerFactory.getLogger(AddComputer.class);
-  private ComputerService computerService;
+  private static final Logger logger = LoggerFactory.getLogger(AddCompany.class);
   private CompanyService companyService;
   private ApplicationContext springCtx;
 
@@ -39,8 +38,7 @@ public class AddComputer extends HttpServlet {
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
     this.springCtx = new ClassPathXmlApplicationContext("/spring/beans.xml");
-    ServiceFactory factory = (ServiceFactory) springCtx.getBean("doubleServiceFactory");
-    this.computerService = factory.getComputerService();
+    ServiceFactory factory = (ServiceFactory) springCtx.getBean("companyServiceFactory");
     this.companyService = factory.getCompanyService();
   }
 
@@ -52,21 +50,12 @@ public class AddComputer extends HttpServlet {
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     HttpSession session = request.getSession(true);
 
-    String computerName = request.getParameter("computerName");
-    computerName = (computerName == null || computerName.equals("")) ? "" : computerName.trim();
+    String companyName = request.getParameter("companyName");
+    companyName = (companyName == null || companyName.equals("")) ? "" : companyName.trim();
 
-    List<CompanyDTO> companies = null;
+    session.setAttribute("companyName",companyName);
 
-    try {
-      companies = this.companyService.orderBy("id", Boolean.TRUE).get();
-    } catch (ServiceException e) {
-      logger.error(e.getMessage());
-      response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), e.getMessage());
-    }
-
-    session.setAttribute("companies", companies);
-
-    this.getServletContext().getRequestDispatcher("/views/addComputer.jsp").forward(request, response);
+    this.getServletContext().getRequestDispatcher("/views/addCompany.jsp").forward(request, response);
   }
 
   /**
@@ -77,31 +66,28 @@ public class AddComputer extends HttpServlet {
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     HttpSession session = request.getSession(true);
     
-    String computerName = request.getParameter("computerName");
-    String introduced = request.getParameter("introduced");
-    String discontinued = request.getParameter("discontinued");
     String companyName = request.getParameter("companyName");
+    String companyId = request.getParameter("companyId");
 
-    if (computerName == null || computerName.equals("") ) {
-      logger.debug("Empty or null name for computer to be searched.");
-      response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), "No Computer Name chosen for this request!");
+    if (companyName == null || companyName.equals("") ) {
+      logger.debug("Empty or null name for company to be searched.");
+      response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), "No Company Name chosen for this request!");
     }
 
-    ComputerDTO computerDto = new ComputerDTO.ComputerDTOBuilder().setName(computerName).setIntroduced(introduced)
-        .setCompanyName(companyName).setDiscontinued(discontinued).build();
+    CompanyDTO companyDto = new CompanyDTO(Long.parseLong(companyId),companyName);
 
     boolean isCreated = false;
     try {
-      isCreated = this.computerService.create(computerDto);
+      isCreated = this.companyService.create(companyDto);
     } catch (ServiceException e) {
       logger.debug(e.getMessage());
       response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), e.getMessage());
     }
 
     if (isCreated) { 
-      session.setAttribute("success", "Computer " + computerDto.getName() + " successfully created!"); 
+      session.setAttribute("success", "Company " + companyDto.getName() + " successfully created!"); 
     }else {
-      session.setAttribute("danger", "Computer " + computerDto.getName() + " couldn't be created!"); 
+      session.setAttribute("danger", "Company " + companyDto.getName() + " couldn't be created!"); 
     }
     
     this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);

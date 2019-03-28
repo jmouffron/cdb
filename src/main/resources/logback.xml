@@ -2,20 +2,19 @@
 <configuration>
 	<appender name="STDOUT"
 		class="ch.qos.logback.core.ConsoleAppender">
-		<layout class="ch.qos.logback.classic.PatternLayout">
+		<encoder>
 			<Pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
 			</Pattern>
-		</layout>
+		</encoder>
 	</appender>
 	<appender name="minuteRollingFileAppender"
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<rollingPolicy
 			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<!-- rollover every minute -->
+
 			<FileNamePattern>cdb.%d{yyyy-MM-dd_HH-mm}.log
 			</FileNamePattern>
 
-			<!-- keep 30 minutes' worth of history -->
 			<maxHistory>30</maxHistory>
 		</rollingPolicy>
 

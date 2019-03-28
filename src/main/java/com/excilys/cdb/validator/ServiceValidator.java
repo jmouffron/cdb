@@ -110,7 +110,7 @@ public class ServiceValidator {
         throw new BadInputException();
       }
     }
-    if (newEntity.getCompanyId() <= 0L ) {
+    if (newEntity.getCompanyName() == null || newEntity.getCompanyName().equals("") ) {
       log.error("Null Company on NewEntity for " + entity);
       throw new BadInputException();
     }

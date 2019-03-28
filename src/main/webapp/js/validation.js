@@ -1,5 +1,5 @@
 $(function() {
-	let regexDate = /[0-9]{2}/[0-9]{2}/[0-9]{4}/
+	let regexDate = /[0-9]{2}\/[0-9]{2}\/[0-9]{4}/
 	let regexWord = /[\w-\d]+/
 			
 	$("form input[type='submit']").first().addClass('disabled')

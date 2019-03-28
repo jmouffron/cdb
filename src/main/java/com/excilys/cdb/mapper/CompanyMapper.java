@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import com.excilys.cdb.dto.CompanyDTO;
+import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.service.CompanyService;
@@ -25,8 +26,13 @@ public class CompanyMapper {
 	    return new CompanyDTO(company.getId(), company.getName());
 	  }
 
-  public static Company mapToCompany(long newEntityId) throws BadInputException {
+  public static Company mapToCompany(CompanyDTO dto) throws BadInputException {
     CompanyService service = factory.getCompanyService();
-    return new Company(newEntityId, service.getOneById(newEntityId).get().getName());
+    return new Company( dto.getId(), service.getOneByName(dto.getName()).get().getName());
+  }
+  
+  public static Company mapToCompany(ComputerDTO dto) throws BadInputException {
+    CompanyService service = factory.getCompanyService();
+    return new Company( dto.getCompanyId(), service.getOneByName(dto.getCompanyName()).get().getName());
   }
 }
