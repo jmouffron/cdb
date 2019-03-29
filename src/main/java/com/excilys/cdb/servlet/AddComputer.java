@@ -31,15 +31,18 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 public class AddComputer extends HttpServlet {
   private static final long serialVersionUID = 1L;
   private static final Logger logger = LoggerFactory.getLogger(AddComputer.class);
+  
   private ComputerService computerService;
   private CompanyService companyService;
-  private ApplicationContext springCtx;
+
+  static ApplicationContext springCtx;
+  private static ServiceFactory factory;
 
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
-    this.springCtx = new ClassPathXmlApplicationContext("/spring/beans.xml");
-    ServiceFactory factory = (ServiceFactory) springCtx.getBean("doubleServiceFactory");
+    springCtx = DashBoard.springCtx;
+    factory = (ServiceFactory) springCtx.getBean("doubleServiceFactory");
     this.computerService = factory.getComputerService();
     this.companyService = factory.getCompanyService();
   }

@@ -69,8 +69,6 @@ $(function() {
     };
 }( jQuery ));
 
-
-
 //Event handling
 //Onkeydown
 $(document).keydown(function(e) {
@@ -90,3 +88,5 @@ $(document).keydown(function(e) {
             break;
     }
 });
+	
+})

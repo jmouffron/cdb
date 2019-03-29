@@ -35,13 +35,14 @@ public class EditCompany extends HttpServlet {
   private static final long serialVersionUID = -7908163785589368761L;
   private static final Logger logger = LoggerFactory.getLogger(AddComputer.class);
   private CompanyService companyService;
-  private ApplicationContext springCtx;
+  static ApplicationContext springCtx;
+  private static ServiceFactory factory;
 
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
-    this.springCtx = new ClassPathXmlApplicationContext("/spring/beans.xml");
-    ServiceFactory factory = (ServiceFactory) springCtx.getBean("companyServiceFactory");
+    springCtx = DashBoard.springCtx;
+    factory = (ServiceFactory) springCtx.getBean("companyServiceFactory");
     this.companyService = factory.getCompanyService();
   }
 

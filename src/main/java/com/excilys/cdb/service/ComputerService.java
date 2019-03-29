@@ -22,10 +22,10 @@ public class ComputerService implements IService<ComputerDTO> {
   private DaoComputer dao;
   private static Logger log = LoggerFactory.getLogger(ComputerService.class);
 
-  private ComputerService() {
+  public ComputerService() {
   }
 
-  private ComputerService(DaoComputer dao) {
+  public ComputerService(DaoComputer dao) {
     super();
     this.dao = dao;
   }

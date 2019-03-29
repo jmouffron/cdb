@@ -1,5 +1,5 @@
 $(function() {
-	let regexDate = /[0-9]{2}\/[0-9]{2}\/[0-9]{4}/
+	let regexDate = /[0-9]{4}-[0-1]{1}[0-9]{1}-[0-2]{1}[0-9]{1}/
 	let regexWord = /[\w-\d]+/
 			
 	$("form input[type='submit']").first().addClass('disabled')
@@ -17,15 +17,18 @@ $(function() {
 	$("div #introduced").on("focus blur", function(e){
 		let intro = new Date($(this).val())
 		let disco = new Date($("#discontinued").val())
-		
+
 		if ( intro == "Invalid Date" ){
 			invalidate($(this))
 			$("#discontinued").attr('readonly', true)
+			console.log("invalid date")
 		} else if ( !$(this).val().match(regexDate) ) {
 			invalidate( $(this) )
-		} else if ( $(this).val() == '' || (  $("#discontinued").val() != "" || intro >= disco ) ){
+			console.log("invalid regexp")
+		} else if ( $(this).val() == '' || (  $("#discontinued").val() != "" && intro >= disco ) ){
 			invalidate($(this))
 			$("#discontinued").attr('readonly', true)
+			console.log("invalid value or invalid compared to disco")
 		} else {
 			validate($(this))
 			$("#discontinued").attr('readonly', false)
@@ -68,14 +71,14 @@ $(function() {
 	})
 	
 	function invalidate(obj){
-		obj.parent().addClass('has-error')
+		obj.parent().addClass('has-error').addClass('tootltip')
 		obj.parent().removeClass('has-success')
 		obj.prev().addClass('danger')
 		$("form input[type='submit']").first().addClass('disabled')
 	}
 	
 	function validate(obj){
-		obj.parent().removeClass('has-error')
+		obj.parent().removeClass('has-error').removeClass('tooltip')
 		obj.parent().addClass('has-success')
 		obj.prev().removeClass('danger')
 		$("form input[type='submit']").first().removeClass('disabled')

@@ -16,10 +16,9 @@
 	<%@include file="/views/imports/feedback.jsp"%>
 	<section id="main">
 		<div class="container">
-			<p>${sel}</p>
 			<c:choose>
 				<c:when test="${computerNumber>0}">
-					<h1 id="homeTitle">${computerNumber}computersfound</h1>
+					<h1 id="homeTitle">${computerNumber} computers found</h1>
 				</c:when>
 				<c:otherwise>
 					<h1 id="homeTitle">No computer found!</h1>
@@ -46,7 +45,7 @@
 			</div>
 		</div>
 
-		<form id="deleteForm" action="${ctx}/deleteComputer" method="POST">
+		<form id="deleteForm" action="#" method="POST">
 			<input type="hidden" name="selection" value="">
 		</form>
 
@@ -64,33 +63,33 @@
 
 								<th class="editMode" style="width: 60px; height: 22px;"><input
 									type="checkbox" id="selectall" /> <span
-									style="vertical-align: top;"> - <a href=""
+									style="vertical-align: top;"> - <a href="#"
 										id="deleteSelected" onclick="$.fn.deleteSelected();"> <i
 											class="fa fa-trash-o fa-lg"></i>
 									</a>
 								</span></th>
 								<th>Computer name <a
 									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=0&order=true"><i
-										class="fa fa-arrow-down"></i></a><a
+										class="fa fa-caret-down"></i></a><a
 									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=0"><i
-										class="fa fa-arrow-up"></i></a></th>
+										class="fa fa-caret-up"></i></a></th>
 								<th>Introduced date <a
 									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=1&order=true"><i
-										class="fa fa-arrow-down"></i></a><a
-									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=1&order=true"><i
-										class="fa fa-arrow-up"></i></a></th>
+										class="fa fa-caret-down"></i></a><a
+									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=1"><i
+										class="fa fa-caret-up"></i></a></th>
 								<!-- Table header for Discontinued Date -->
 								<th>Discontinued date <a
 									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=2&order=true"><i
-										class="fa fa-arrow-down"></i></a><a
+										class="fa fa-caret-down"></i></a><a
 									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=2"><i
-										class="fa fa-arrow-up"></i></a></th>
+										class="fa fa-caret-up"></i></a></th>
 								<!-- Table header for Company -->
 								<th>Company <a
 									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=3&order=true"><i
-										class="fa fa-arrow-down"></i></a><a
+										class="fa fa-caret-down"></i></a><a
 									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=3"><i
-										class="fa fa-arrow-up"></i></a></th>
+										class="fa fa-caret-up"></i></a></th>
 
 							</tr>
 						</thead>

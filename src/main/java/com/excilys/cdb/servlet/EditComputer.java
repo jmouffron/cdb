@@ -1,9 +1,11 @@
 package com.excilys.cdb.servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -34,15 +36,18 @@ public class EditComputer extends HttpServlet {
 
   private static final long serialVersionUID = -7908163785589368761L;
   private static final Logger logger = LoggerFactory.getLogger(AddComputer.class);
+  
   private ComputerService computerService;
   private CompanyService companyService;
-  private ApplicationContext springCtx;
+  
+  static ApplicationContext springCtx;
+  private static ServiceFactory factory;
 
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
-    this.springCtx = new ClassPathXmlApplicationContext("/spring/beans.xml");
-    ServiceFactory factory = (ServiceFactory) springCtx.getBean("doubleServiceFactory");
+    springCtx = DashBoard.springCtx;
+    factory = (ServiceFactory) springCtx.getBean("doubleServiceFactory");
     this.computerService = factory.getComputerService();
     this.companyService = factory.getCompanyService();
     logger.info("Initialization of EditComputer Servlet");
@@ -94,31 +99,62 @@ public class EditComputer extends HttpServlet {
     HttpSession session = request.getSession(true);
     
     String computerId = request.getParameter("computerId");
+    String computerName = request.getParameter("computerName");
+    String computerIntro = request.getParameter("computerIntro");
+    String computerDisco = request.getParameter("computerDisco");
+    String computerComp = request.getParameter("computerComp");
+    String companyId = request.getParameter("companyId");
     
-    if ( "".equals(computerId) ) {
-      logger.debug("Empty or null id for computer to be searched.");
-      response.sendRedirect("/dashboard");
-    }
+    List<String> computerData = new ArrayList<>(Arrays.asList(computerId, computerName, computerIntro, computerDisco, computerComp));
+    computerData.forEach( param -> {
+      if ( "".equals(param) ) {
+        logger.debug("Empty or null id for computer to be searched.");
+        
+        try {
+          response.sendRedirect("/dashboard");
+        } catch (IOException e) {
+          logger.debug(e.getMessage());
+          session.setAttribute("stackTrace", e.getMessage());
+        }
+      }
+    });
 
-    ComputerDTO computer = null;
+    ComputerDTO computerInDb = null;
     try {
-      computer = this.computerService.getOneById( Long.parseLong(computerId) ).get();
+      computerInDb = this.computerService.getOneById( Long.parseLong(computerId) ).get();
     } catch (BadInputException e) {
       logger.error(e.getMessage());
+      session.setAttribute("stackTrace", e.getMessage());
       response.sendRedirect("/dashboard");
     }
-
+    
+    ComputerDTO computerToSend = new ComputerDTO.ComputerDTOBuilder()
+        .setId(Long.parseLong(computerId))
+        .setCompanyId(Long.parseLong(companyId))
+        .setCompanyName(computerComp)
+        .setIntroduced(computerIntro)
+        .setDiscontinued(computerDisco)
+        .setName(computerName)
+        .build();
+    
+    if( computerToSend.getId() != computerInDb.getId() ) {
+      logger.error("Wrong edit and change of the id!");
+      session.setAttribute("stackTrace", "Wrong edit and change of the id!");
+      response.sendRedirect("/dashboard");
+    }
+    
     boolean isUpdated = false;
     try {
-      isUpdated = this.computerService.updateById(computer);
-    } catch ( ServiceException e) {
+      isUpdated = this.computerService.updateById(computerToSend);
+    } catch (ServiceException e) {
       logger.error(e.getMessage());
+      session.setAttribute("stackTrace", e.getMessage());
     }
 
     if (isUpdated) {
-      session.setAttribute("success", "Computer " + computer.getName() + " successfully updated!");
+      session.setAttribute("success", "Computer " + computerToSend.getName() + " successfully updated!");
     }else {
-      session.setAttribute("danger", "Computer " + computer.getName() + " not updated!");
+      session.setAttribute("danger", "Computer " + computerToSend.getName() + " not updated!");
     }
     
     this.getServletContext().getRequestDispatcher("/dashboard").forward(request, response);

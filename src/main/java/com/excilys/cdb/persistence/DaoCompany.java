@@ -41,10 +41,10 @@ public class DaoCompany implements IDaoInstance<Company> {
   private final Logger log = LoggerFactory.getLogger(DaoCompany.class);
   private Datasource datasource;
 
-  private DaoCompany() {
+  public DaoCompany() {
   }
 
-  private DaoCompany(Datasource ds) {
+  public DaoCompany(Datasource ds) {
     super();
     this.datasource = ds;
   }
@@ -211,10 +211,11 @@ public class DaoCompany implements IDaoInstance<Company> {
 
   public boolean deleteByName(String name, ComputerService service) throws DaoException {
     int lineAffected = 0;
-
-    try (Connection conn = getConnection();
-        PreparedStatement stmt = conn.prepareStatement(DELETE_NAME);
+    Connection conn = getConnection();
+    
+    try (PreparedStatement stmt = conn.prepareStatement(DELETE_NAME);
         PreparedStatement computerStmt = conn.prepareStatement(COMPUTER_CASCADE_DELETE_NAME);) {
+      conn.setAutoCommit(false);
       stmt.setString(1, name);
 
       lineAffected = stmt.executeUpdate();
@@ -223,13 +224,27 @@ public class DaoCompany implements IDaoInstance<Company> {
         computerStmt.setString(1, name);
         lineAffected = computerStmt.executeUpdate();
       } else {
+        conn.rollback();
         throw new DaoException("Couldn't rollback from delete transaction !");
       }
-
       conn.commit();
     } catch (SQLException sqlex) {
       log.error(sqlex.getMessage());
+      try {
+        conn.rollback();
+        conn.close();
+      } catch (SQLException e) {
+        log.error(e.getMessage());
+        throw new DaoException(e.getMessage());
+      }
       throw new DaoException("Couldn't rollback from delete transaction !");
+    }finally {
+      try {
+        conn.setAutoCommit(true);
+      } catch (SQLException e) {
+        log.error(e.getMessage());
+        throw new DaoException(e.getMessage());
+      }
     }
 
     return lineAffected > 0 ? true : false;
@@ -240,7 +255,6 @@ public class DaoCompany implements IDaoInstance<Company> {
     int lineAffected = 0;
 
     try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(INSERT);) {
-      ;
       stmt.setString(1, newEntity.getName());
       lineAffected = stmt.executeUpdate();
     } catch (SQLException sqlex) {

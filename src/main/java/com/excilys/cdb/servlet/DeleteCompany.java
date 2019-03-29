@@ -30,13 +30,15 @@ public class DeleteCompany extends HttpServlet {
   private static final long serialVersionUID = 1L;
   private static final Logger logger = LoggerFactory.getLogger(DeleteCompany.class);
   private CompanyService service;
-  private ApplicationContext springCtx;
+
+  static ApplicationContext springCtx;
+  private static ServiceFactory factory;
 
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
-    this.springCtx = new ClassPathXmlApplicationContext("/spring/beans.xml");
-    ServiceFactory factory = (ServiceFactory) springCtx.getBean("companyServiceFactory");
+    springCtx = DashBoard.springCtx;
+    factory = (ServiceFactory) springCtx.getBean("companyServiceFactory");
     this.service = factory.getCompanyService();
   }
 

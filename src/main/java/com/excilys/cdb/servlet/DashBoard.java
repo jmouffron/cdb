@@ -1,9 +1,12 @@
 package com.excilys.cdb.servlet;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -19,6 +22,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.excilys.cdb.dto.ComputerDTO;
+import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.model.Computer;
@@ -33,27 +37,32 @@ import com.excilys.cdb.view.Pagination;
 @WebServlet(description = "The main web entry point to the app, a dashboard about the database entities", urlPatterns = {
     "/DashBoard", "/dashBoard", "/", "/home", "/index.html", "/index", "/dashboard", "/Dashboard" })
 public class DashBoard extends HttpServlet {
-  private ApplicationContext springCtx;
+  
   private static final long serialVersionUID = 3558156539176540043L;
   private static final Logger logger = LoggerFactory.getLogger(DashBoard.class);
+  
   private Pagination pagination;
-  private ComputerService computerService;
   private static Map<String, String> columns;
+  
+  private ComputerService computerService;
 
+  static ApplicationContext springCtx;
+  private static ServiceFactory factory;
+  
   static {
     columns = new HashMap<>();
 
     columns.put("0", "pc_name");
     columns.put("1", "introduced");
     columns.put("2", "discontinued");
-    columns.put("3", "cp_name");
+    columns.put("3", "cp_name"); 
   }
 
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
-    this.springCtx = new ClassPathXmlApplicationContext("/spring/beans.xml");
-    ServiceFactory factory = (ServiceFactory) springCtx.getBean("computerServiceFactory");
+    springCtx = new ClassPathXmlApplicationContext("/spring/beans.xml");
+    factory = (ServiceFactory) springCtx.getBean("computerServiceFactory");
     this.computerService = factory.getComputerService();
     this.pagination = new Pagination(this.computerService.getAll().get(), 0, IndexPagination.IDX_10);
     logger.info("Initialisation de la servlet DashBoard.");
@@ -152,7 +161,67 @@ public class DashBoard extends HttpServlet {
    */
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-    doGet(request, response);
-  }
+    HttpSession session = request.getSession(true);
+    
+    String success = request.getParameter("success");
+    String danger = request.getParameter("danger");
+    String selection = request.getParameter("selection");
+    
+    logger.error(selection);
 
+    if ( "".equals(selection) ) {
+      logger.error("No correct computer name found!");
+      response.sendError(ErrorCode.FILE_NOT_FOUND.getErrorCode(), "No correct computer name found!");
+      this.getServletContext().getRequestDispatcher("/views/deleteComputer.jsp").forward(request, response);
+    }
+    List<Long> computerIdsToDelete = Arrays.asList(selection.split(",")).stream().map(Long::parseLong).collect(Collectors.toList());
+    
+    computerIdsToDelete.forEach( id -> {
+      ComputerDTO computer = null;
+      try {
+        computer = this.computerService.getOneById(id).get();
+      } catch (BadInputException e) {
+        try {
+          response.sendError(ErrorCode.FILE_NOT_FOUND.getErrorCode(), e.getMessage());
+        } catch (IOException e1) {
+          session.setAttribute("stackTrace", e.getMessage());
+        }
+      }
+  
+      if (computer == null) {
+        logger.error("Null computer found!");
+        try {
+          response.sendError(ErrorCode.FILE_NOT_FOUND.getErrorCode(), "Null computer found!");
+        } catch (IOException e) {
+          logger.error(e.getMessage());
+          session.setAttribute("stackTrace", e.getMessage());
+        }
+      }
+      
+      boolean isDeleted = false;
+      
+      try {
+        isDeleted = this.computerService.deleteById(computer.getId());
+      } catch (ServiceException e) {
+        logger.error(e.getMessage());
+        session.setAttribute("stackTrace", e.getMessage());
+        try {
+          response.sendRedirect("/dashBoard");
+        } catch (IOException e1) {
+          logger.error(e.getMessage());
+          session.setAttribute("stackTrace", e.getMessage());
+        }
+      }
+      
+      if (isDeleted) {
+        session.setAttribute("success", "The computer " + computer.getName() + " has been correctly deleted!");
+        session.setAttribute("danger", danger);
+      }else {
+        session.setAttribute("success", success);
+        session.setAttribute("danger", "The computer" + computer.getName() + "couldn't be deleted!");
+      }
+    });
+    
+    this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
+  }
 }

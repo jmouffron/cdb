@@ -33,9 +33,9 @@ public class DaoComputer implements IDaoInstance<Computer> {
   private final Logger log = LoggerFactory.getLogger(DaoComputer.class);
   private Datasource datasource;
   
-  private DaoComputer() { }
+  public DaoComputer() { }
   
-  private DaoComputer(Datasource ds) {
+  public DaoComputer(Datasource ds) {
     this.datasource = ds;
   }
   
