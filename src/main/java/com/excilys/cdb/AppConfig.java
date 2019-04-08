@@ -2,6 +2,7 @@ package com.excilys.cdb;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -13,41 +14,40 @@ import com.excilys.cdb.service.ComputerService;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
-//@Configuration
+@Configuration
+@ComponentScan({"com.excilys.cdb"})
 public class AppConfig {
-  static ApplicationContext springCtx = new ClassPathXmlApplicationContext("/spring/beans.xml");
+  public static ApplicationContext springCtx = new ClassPathXmlApplicationContext("/spring/beans.xml");
   
   @Bean
-  public HikariConfig getHikariConfig() {
+  public HikariConfig HikariConfig() {
     return new HikariConfig("/datasource.properties");
   }
-  
   @Bean
-  public HikariDataSource getHikariDataSource() {
-    return new HikariDataSource(getHikariConfig());
+  public HikariDataSource HikariDataSource() {
+    return new HikariDataSource(HikariConfig());
   }
-  
   @Bean(destroyMethod = "close")
-  public Datasource getDatasource() {
-    return new Datasource(getHikariDataSource());
+  public Datasource Datasource() {
+    return new Datasource(HikariDataSource());
   }
   
   @Bean
-  public DaoComputer getDaoComputer() {
-    return new DaoComputer();
+  public DaoComputer DaoComputer() {
+    return new DaoComputer(Datasource());
   }
   @Bean
-  public DaoCompany getDaoCompany() {
-    return new DaoCompany();
-  }
-  
-  @Bean
-  public ComputerService getComputerService() {
-    return new ComputerService(getDaoComputer());
+  public DaoCompany DaoCompany() {
+    return new DaoCompany(Datasource());
   }
   
   @Bean
-  public CompanyService getCompanyService() {
-    return new CompanyService(getDaoCompany());
+  public ComputerService ComputerService() {
+    return new ComputerService(DaoComputer());
+  }
+  
+  @Bean
+  public CompanyService CompanyService() {
+    return new CompanyService(DaoCompany());
   }
 }

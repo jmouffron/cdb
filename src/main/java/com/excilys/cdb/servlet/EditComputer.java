@@ -3,7 +3,6 @@ package com.excilys.cdb.servlet;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 
 import javax.servlet.ServletConfig;
@@ -17,8 +16,6 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.BadInputException;
@@ -87,6 +84,8 @@ public class EditComputer extends HttpServlet {
 
     session.setAttribute("companies", companies);
     session.setAttribute("computer", computer);
+    
+    logger.info(getServletName() + " has been called with URL: " + request.getRequestURI());
     this.getServletContext().getRequestDispatcher("/views/editComputer.jsp").forward(request, response);
   }
 
@@ -157,6 +156,7 @@ public class EditComputer extends HttpServlet {
       session.setAttribute("danger", "Computer " + computerToSend.getName() + " not updated!");
     }
     
+    logger.info(getServletName() + " has been called with URL: " + request.getRequestURI());
     this.getServletContext().getRequestDispatcher("/dashboard").forward(request, response);
   }
 

@@ -22,7 +22,5 @@
 		</div>
 	</section>
 
-	<%@include file="/views/imports/js.jsp" %>
-
 </body>
 </html>

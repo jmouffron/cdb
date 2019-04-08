@@ -14,8 +14,6 @@ import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.DaoComputer;
-import com.excilys.cdb.persistence.DaoComputerFactory;
-import com.excilys.cdb.persistence.IDaoInstance;
 import com.excilys.cdb.validator.ServiceValidator;
 
 public class ComputerService implements IService<ComputerDTO> {

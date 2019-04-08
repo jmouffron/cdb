@@ -1,5 +1,6 @@
 package com.excilys.cdb.servlet;
 
+import com.excilys.cdb.AppConfig;
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.ServiceException;
@@ -21,7 +22,6 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Servlet implementation class AddComputer
@@ -41,10 +41,11 @@ public class AddComputer extends HttpServlet {
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
-    springCtx = DashBoard.springCtx;
+    springCtx = AppConfig.springCtx;
     factory = (ServiceFactory) springCtx.getBean("doubleServiceFactory");
     this.computerService = factory.getComputerService();
     this.companyService = factory.getCompanyService();
+    logger.info("Initialisation de la servlet " + getServletName() );
   }
 
   /**
@@ -68,7 +69,8 @@ public class AddComputer extends HttpServlet {
     }
 
     session.setAttribute("companies", companies);
-
+    
+    logger.info(getServletName() + " has been called with URL: " + request.getRequestURI());
     this.getServletContext().getRequestDispatcher("/views/addComputer.jsp").forward(request, response);
   }
 
@@ -107,6 +109,7 @@ public class AddComputer extends HttpServlet {
       session.setAttribute("danger", "Computer " + computerDto.getName() + " couldn't be created!"); 
     }
     
+    logger.info(getServletName() + " has been called with URL: " + request.getRequestURI());
     this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
   }
 

@@ -1,7 +1,6 @@
 package com.excilys.cdb.servlet;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -19,13 +18,12 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.excilys.cdb.AppConfig;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.exception.ServiceException;
-import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.ServiceFactory;
 import com.excilys.cdb.view.IndexPagination;
@@ -34,8 +32,8 @@ import com.excilys.cdb.view.Pagination;
 /**
  * Servlet implementation class DashBoard
  */
-@WebServlet(description = "The main web entry point to the app, a dashboard about the database entities", urlPatterns = {
-    "/DashBoard", "/dashBoard", "/", "/home", "/index.html", "/index", "/dashboard", "/Dashboard" })
+//@WebServlet(description = "The main web entry point to the app, a dashboard about the database entities", urlPatterns = {
+  //  "/DashBoard", "/dashBoard", "/", "/home", "/index.html", "/index", "/dashboard", "/Dashboard" })
 public class DashBoard extends HttpServlet {
   
   private static final long serialVersionUID = 3558156539176540043L;
@@ -47,7 +45,6 @@ public class DashBoard extends HttpServlet {
   private ComputerService computerService;
 
   static ApplicationContext springCtx;
-  private static ServiceFactory factory;
   
   static {
     columns = new HashMap<>();
@@ -61,11 +58,10 @@ public class DashBoard extends HttpServlet {
   @Override
   public void init(ServletConfig config) throws ServletException {
     super.init(config);
-    springCtx = new ClassPathXmlApplicationContext("/spring/beans.xml");
-    factory = (ServiceFactory) springCtx.getBean("computerServiceFactory");
-    this.computerService = factory.getComputerService();
+    springCtx = AppConfig.springCtx;
+    this.computerService = springCtx.getBean(ComputerService.class);
     this.pagination = new Pagination(this.computerService.getAll().get(), 0, IndexPagination.IDX_10);
-    logger.info("Initialisation de la servlet DashBoard.");
+    logger.info("Initialisation de la servlet " + getServletName() );
   }
 
   /**
@@ -93,7 +89,6 @@ public class DashBoard extends HttpServlet {
     String order = request.getParameter("order");
     String toOrder = request.getParameter("toOrder");
     String selection = request.getParameter("selection");
-    String strCache = request.getParameter("cache");
     
     isDesc = (order == null || order.equals("")) ? false : true;
     entitiesPerPage = (perPage == null) ? IndexPagination.IDX_10 : IndexPagination.valueOf(perPage);
@@ -222,6 +217,7 @@ public class DashBoard extends HttpServlet {
       }
     });
     
+    logger.info(getServletName() + " has been called with URL: " + request.getRequestURI());
     this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
   }
 }

@@ -13,8 +13,6 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.exception.ServiceException;

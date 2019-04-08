@@ -1,15 +1,11 @@
 package com.excilys.cdb.servlet;
 
 import com.excilys.cdb.dto.CompanyDTO;
-import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.service.CompanyService;
-import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.ServiceFactory;
 
 import java.io.IOException;
-import java.util.List;
-
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,7 +17,6 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * Servlet implementation class AddComputer
@@ -58,6 +53,7 @@ public class AddCompany extends HttpServlet {
 
     session.setAttribute("companyName",companyName);
 
+    logger.info(getServletName() + " has been called with URL: " + request.getRequestURI());
     this.getServletContext().getRequestDispatcher("/views/addCompany.jsp").forward(request, response);
   }
 
@@ -93,6 +89,7 @@ public class AddCompany extends HttpServlet {
       session.setAttribute("danger", "Company " + companyDto.getName() + " couldn't be created!"); 
     }
     
+    logger.info(getServletName() + " has been called with URL: " + request.getRequestURI());
     this.getServletContext().getRequestDispatcher("/views/dashboard.jsp").forward(request, response);
   }
 

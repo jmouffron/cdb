@@ -9,9 +9,6 @@ import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.persistence.DaoCompany;
 import com.excilys.cdb.persistence.DaoCompanyFactory;
-import com.excilys.cdb.persistence.DaoComputerFactory;
-import com.excilys.cdb.persistence.IDaoInstance;
-
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;

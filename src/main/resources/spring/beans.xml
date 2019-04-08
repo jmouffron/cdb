@@ -13,6 +13,7 @@
 	<import resource="factories.xml" />
 	<import resource="daos.xml" />
 	<import resource="services.xml" />
-	<import resource="servlet.xml" />
+	<import resource="controllers.xml" />
+	<!--  <import resource="servlet.xml" /> -->
 
 </beans>

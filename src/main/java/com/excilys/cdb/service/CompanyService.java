@@ -14,8 +14,6 @@ import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.mapper.CompanyMapper;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.persistence.DaoCompany;
-import com.excilys.cdb.persistence.DaoCompanyFactory;
-import com.excilys.cdb.persistence.IDaoInstance;
 import com.excilys.cdb.validator.ServiceValidator;
 
 public class CompanyService implements IService<CompanyDTO> {

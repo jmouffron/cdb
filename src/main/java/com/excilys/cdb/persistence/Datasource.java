@@ -17,9 +17,7 @@ public class Datasource {
 
   private HikariDataSource hikariDs;
   private Connection conn;
-  /**
-   * A private Constructor to never allow instantiation
-   */
+  
   public Datasource(HikariDataSource ds) {
     this.hikariDs = ds;
   }

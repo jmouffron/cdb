@@ -18,7 +18,7 @@
 		<div class="container">
 			<c:choose>
 				<c:when test="${computerNumber>0}">
-					<h1 id="homeTitle">${computerNumber} computers found</h1>
+					<h1 id="homeTitle">${computerNumber}<spring:message code="dashboard.number_computer" /></h1>
 				</c:when>
 				<c:otherwise>
 					<h1 id="homeTitle">No computer found!</h1>
@@ -145,9 +145,9 @@
 			</ul>
 
 			<div class="btn-group btn-group-sm pull-right" role="group">
-				<button type="button" class="btn btn-default" onClick="">10</button>
-				<button type="button" class="btn btn-default" onClick="">50</button>
-				<button type="button" class="btn btn-default" onClick="">100</button>
+				<a class="btn btn-default" href="${ctx}?page=${ currentPage }&search=${search}&toOrder=${toOrder}&perPage=IDX_10">10</a>
+				<a class="btn btn-default" href="${ctx}?page=${ currentPage }&search=${search}&toOrder=${toOrder}&perPage=IDX_50">50</a>
+				<a class="btn btn-default" href="${ctx}?page=${ currentPage }&search=${search}&toOrder=${toOrder}&perPage=IDX_100">100</a>
 			</div>
 		</div>
 	</footer>
