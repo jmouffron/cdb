@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.BadInputException;
@@ -48,15 +49,10 @@ public class ComputerService implements IService<ComputerDTO> {
    * @see com.excilys.cdb.service.IService#orderBy(java.lang.String, boolean)
    */
   @Override
-  public Optional<List<ComputerDTO>> orderBy(String name, boolean isDesc) throws ServiceException {
+  public Optional<List<ComputerDTO>> orderBy(String name, boolean isDesc) throws ServiceException, DaoException {
     List<ComputerDTO> list = null;
-    try {
-      list = this.dao.getAllOrderedBy(name, isDesc).get().stream().map(ComputerMapper::mapToDTO).map(Optional::get)
-          .collect(Collectors.toList());
-    } catch (DaoException e) {
-      log.error(e.getMessage());
-      throw new ServiceException(e.getMessage());
-    }
+    list = this.dao.getAllOrderedBy(name, isDesc).get().stream().map(ComputerMapper::mapToDTO).map(Optional::get)
+        .collect(Collectors.toList());
     return Optional.ofNullable(list);
   }
 
@@ -77,17 +73,12 @@ public class ComputerService implements IService<ComputerDTO> {
     return Optional.ofNullable(filteredComputers);
   }
 
-  public Optional<List<ComputerDTO>> searchByNameOrdered(String name, String order, boolean isDesc) throws ServiceException {
+  public Optional<List<ComputerDTO>> searchByNameOrdered(String name, String order, boolean isDesc) throws ServiceException, DaoException {
     String regex = "(?i)(.*)" + name + "(.*)";
     List<ComputerDTO> filteredComputers = null;
-    try {
-      filteredComputers = this.dao.getAllOrderedBy(order, isDesc).get().stream()
-          .filter(computer -> computer.getName().matches(regex) || computer.getCompany().getName().matches(regex))
-          .map(ComputerMapper::mapToDTO).map(Optional::get).collect(Collectors.toList());
-    } catch (DaoException e) {
-      log.error(e.getMessage());
-      throw new ServiceException(e.getMessage());
-    }
+    filteredComputers = this.dao.getAllOrderedBy(order, isDesc).get().stream()
+        .filter(computer -> computer.getName().matches(regex) || computer.getCompany().getName().matches(regex))
+        .map(ComputerMapper::mapToDTO).map(Optional::get).collect(Collectors.toList());
 
     return Optional.ofNullable(filteredComputers);
   }
@@ -116,7 +107,7 @@ public class ComputerService implements IService<ComputerDTO> {
    * @see com.excilys.cdb.service.IService#create(com.excilys.cdb.model.Entity)
    */
   @Override
-  public boolean create(ComputerDTO newEntity) throws ServiceException {
+  public boolean create(ComputerDTO newEntity) throws ServiceException, DaoException {
     ServiceValidator.computerDTOValidator(newEntity, "Computer");
     Computer computer = ComputerMapper.mapToComputer(newEntity).get();
     return this.dao.create(computer);
@@ -127,7 +118,7 @@ public class ComputerService implements IService<ComputerDTO> {
    * com.excilys.cdb.service.IService#updateById(com.excilys.cdb.model.Entity)
    */
   @Override
-  public boolean updateById(ComputerDTO newEntity) throws BadInputException {
+  public boolean updateById(ComputerDTO newEntity) throws BadInputException, DaoException {
     ServiceValidator.computerDTOValidator(newEntity, "Computer");
     Computer computer = ComputerMapper.mapToComputer(newEntity).get();
 
@@ -138,7 +129,7 @@ public class ComputerService implements IService<ComputerDTO> {
    * @see com.excilys.cdb.service.IService#deleteById(java.lang.Long)
    */
   @Override
-  public boolean deleteById(Long id) throws BadInputException {
+  public boolean deleteById(Long id) throws BadInputException, DaoException {
     ServiceValidator.idValidator(id, "Computer");
 
     return this.dao.deleteById(id);
@@ -148,7 +139,7 @@ public class ComputerService implements IService<ComputerDTO> {
    * @see com.excilys.cdb.service.IService#deleteByName(java.lang.String)
    */
   @Override
-  public boolean deleteByName(String name) throws ServiceException {
+  public boolean deleteByName(String name) throws ServiceException, DaoException {
     ServiceValidator.nameValidator(name, "Computer");
 
     return this.dao.deleteByName(name);

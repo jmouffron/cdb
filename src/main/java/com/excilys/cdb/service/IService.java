@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import com.excilys.cdb.dto.EntityDTO;
 import com.excilys.cdb.exception.BadInputException;
+import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.persistence.IDaoInstance;
 
@@ -22,8 +23,9 @@ public interface IService<EntityDTO> {
    * database ordered By a String name and a boolean isDesc
    * 
    * @return List<T extends EntityDTO>
+   * @throws DaoException 
    */
-  public abstract Optional<List<EntityDTO>> orderBy(String name, boolean isDesc) throws ServiceException;
+  public abstract Optional<List<EntityDTO>> orderBy(String name, boolean isDesc) throws ServiceException, DaoException;
 
   /**
    * Returns all the entities T that match the name in parameter
@@ -59,8 +61,9 @@ public interface IService<EntityDTO> {
    * @return boolean
    * @throws BadInputException
    * @throws ServiceException
+   * @throws DaoException 
    */
-  public abstract boolean create(EntityDTO newEntity) throws ServiceException;
+  public abstract boolean create(EntityDTO newEntity) throws ServiceException, DaoException;
 
   /**
    * Commands the Dao related to the service to update an EntityDTO based on id and
@@ -70,8 +73,9 @@ public interface IService<EntityDTO> {
    * @return boolean
    * @throws BadInputException
    * @throws ServiceException
+   * @throws DaoException 
    */
-  public abstract boolean updateById(EntityDTO newEntity) throws ServiceException;
+  public abstract boolean updateById(EntityDTO newEntity) throws ServiceException, DaoException;
 
   /**
    * Commands the Dao related to the service to delete an EntityDTO based on id
@@ -80,8 +84,9 @@ public interface IService<EntityDTO> {
    * @return boolean
    * @throws BadInputException
    * @throws ServiceException
+   * @throws DaoException 
    */
-  public abstract boolean deleteById(Long id) throws BadInputException, ServiceException;
+  public abstract boolean deleteById(Long id) throws BadInputException, ServiceException, DaoException;
 
   /**
    * Commands the Dao related to the service to delete an EntityDTO based on name
@@ -89,7 +94,8 @@ public interface IService<EntityDTO> {
    * @param String name
    * @return boolean
    * @throws BadInputException
+   * @throws DaoException 
    */
-  public abstract boolean deleteByName(String name) throws BadInputException, ServiceException;
+  public abstract boolean deleteByName(String name) throws BadInputException, ServiceException, DaoException;
 
 }

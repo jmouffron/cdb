@@ -17,6 +17,7 @@ import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.service.CompanyService;
+import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.ServiceFactory;
 
 /**
@@ -29,15 +30,11 @@ public class DeleteCompany extends HttpServlet {
   private static final Logger logger = LoggerFactory.getLogger(DeleteCompany.class);
   private CompanyService service;
 
-  static ApplicationContext springCtx;
-  private static ServiceFactory factory;
-
-  @Override
-  public void init(ServletConfig config) throws ServletException {
-    super.init(config);
-    springCtx = DashBoard.springCtx;
-    factory = (ServiceFactory) springCtx.getBean("companyServiceFactory");
-    this.service = factory.getCompanyService();
+  public DeleteCompany() {}
+  
+  public DeleteCompany(CompanyService compService) {
+    this.service = compService;
+    logger.info("Initialisation de la servlet " + getServletName() );
   }
 
   /**

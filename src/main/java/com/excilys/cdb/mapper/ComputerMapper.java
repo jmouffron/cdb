@@ -7,13 +7,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.springframework.jdbc.core.RowMapper;
+
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.utils.DateUtils;
 
-public class ComputerMapper {
+public class ComputerMapper implements RowMapper<Computer>{
 
   static public Computer map(ResultSet rs) throws SQLException {
 
@@ -66,6 +68,11 @@ public class ComputerMapper {
           .setCompanyName(computer.getCompany().getName()).build();
       return computerDTO;
     }).collect(Collectors.toList()));
+  }
+
+  @Override
+  public Computer mapRow(ResultSet rs, int rowNum) throws SQLException {
+    return map(rs);
   }
 
 }

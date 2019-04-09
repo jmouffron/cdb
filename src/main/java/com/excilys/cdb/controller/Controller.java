@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.exception.BadInputException;
+import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
@@ -298,7 +299,7 @@ public class Controller<T extends Entity> {
 	private boolean addEntity(Entity newEntity) {
 		try {
 			return this.service.create((T) newEntity);
-		} catch (ServiceException e) {
+		} catch (ServiceException | DaoException e) {
 			e.printStackTrace();
 		}
 		return false;

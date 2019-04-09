@@ -19,6 +19,7 @@ import org.springframework.context.ApplicationContext;
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.BadInputException;
+import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
@@ -37,17 +38,12 @@ public class EditComputer extends HttpServlet {
   private ComputerService computerService;
   private CompanyService companyService;
   
-  static ApplicationContext springCtx;
-  private static ServiceFactory factory;
-
-  @Override
-  public void init(ServletConfig config) throws ServletException {
-    super.init(config);
-    springCtx = DashBoard.springCtx;
-    factory = (ServiceFactory) springCtx.getBean("doubleServiceFactory");
-    this.computerService = factory.getComputerService();
-    this.companyService = factory.getCompanyService();
-    logger.info("Initialization of EditComputer Servlet");
+  public EditComputer() {}
+  
+  public EditComputer(ComputerService pcService, CompanyService compService) {
+    this.computerService = pcService;
+    this.companyService = compService;
+    logger.info("Initialisation de la servlet " + getServletName() );
   }
 
   /**
@@ -145,7 +141,7 @@ public class EditComputer extends HttpServlet {
     boolean isUpdated = false;
     try {
       isUpdated = this.computerService.updateById(computerToSend);
-    } catch (ServiceException e) {
+    } catch (ServiceException | DaoException e) {
       logger.error(e.getMessage());
       session.setAttribute("stackTrace", e.getMessage());
     }

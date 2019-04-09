@@ -1,7 +1,7 @@
 <%@include file="/views/imports/taglibs.jsp"%>
 <%@page info="Computer database | Dashboard"%>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="${lang}">
 <head>
 <title><spring:message code="dashboard.title" /></title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">

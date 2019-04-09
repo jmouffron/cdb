@@ -1,8 +1,10 @@
 package com.excilys.cdb.servlet;
 
 import com.excilys.cdb.dto.CompanyDTO;
+import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.service.CompanyService;
+import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.ServiceFactory;
 
 import java.io.IOException;
@@ -29,15 +31,11 @@ public class AddCompany extends HttpServlet {
   
   private CompanyService companyService;
   
-  private static ApplicationContext springCtx;
-  private static ServiceFactory factory;
+  public AddCompany() {}
   
-  @Override
-  public void init(ServletConfig config) throws ServletException {
-    super.init(config);
-    springCtx = DashBoard.springCtx;
-    factory = (ServiceFactory) springCtx.getBean("companyServiceFactory");
-    this.companyService = factory.getCompanyService();
+  public AddCompany(CompanyService compService) {
+    this.companyService = compService;
+    logger.info("Initialisation de la servlet " + getServletName() );
   }
 
   /**
@@ -78,7 +76,7 @@ public class AddCompany extends HttpServlet {
     boolean isCreated = false;
     try {
       isCreated = this.companyService.create(companyDto);
-    } catch (ServiceException e) {
+    } catch (ServiceException | DaoException e) {
       logger.debug(e.getMessage());
       response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), e.getMessage());
     }

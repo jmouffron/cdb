@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.exception.BadInputException;
@@ -30,39 +31,33 @@ public class CompanyService implements IService<CompanyDTO> {
   @Override
   public Optional<List<CompanyDTO>> getAll() throws ServiceException {
     List<CompanyDTO> list = null;
-    list = this.dao.getAll().get().stream()
-        .map(CompanyMapper::mapToDTO)
-        .collect(Collectors.toList());
+    list = this.dao.getAll().get().stream().map(CompanyMapper::mapToDTO).collect(Collectors.toList());
 
     return Optional.ofNullable(list);
   }
   
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see com.excilys.cdb.service.IService#orderBy(java.lang.String, boolean)
    */
   @Override
-  public Optional<List<CompanyDTO>> orderBy(String name, boolean isDesc) throws ServiceException {
+  public Optional<List<CompanyDTO>> orderBy(String name, boolean isDesc) throws ServiceException, DaoException {
     List<CompanyDTO> list;
-    try {
-      list = this.dao
-          .getAllOrderedBy(name, isDesc)
-          .get().stream()
-          .map(CompanyMapper::mapToDTO).collect(Collectors.toList());
-    } catch (DaoException e) {
-      log.error(e.getMessage());
-      throw new ServiceException(e.getMessage());
-    }
+    list = this.dao.getAllOrderedBy(name, isDesc).get().stream().map(CompanyMapper::mapToDTO)
+        .collect(Collectors.toList());
 
     return Optional.ofNullable(list);
   }
+
   /*
    * @see com.excilys.cdb.service.IService#searchByName(java.lang.String)
    */
   @Override
   public Optional<List<CompanyDTO>> searchByName(String name) throws ServiceException {
     List<CompanyDTO> filteredCompanies = null;
-      filteredCompanies = this.dao.getAll().get().stream()
-          .filter(company -> company.getName().matches(name)).map(CompanyMapper::mapToDTO).collect(Collectors.toList());
+    filteredCompanies = this.dao.getAll().get().stream().filter(company -> company.getName().matches(name))
+        .map(CompanyMapper::mapToDTO).collect(Collectors.toList());
 
     return Optional.ofNullable(filteredCompanies);
   }
@@ -73,8 +68,8 @@ public class CompanyService implements IService<CompanyDTO> {
   @Override
   public Optional<CompanyDTO> getOneById(Long id) throws BadInputException {
     ServiceValidator.idValidator(id, "company");
-    
-    return Optional.ofNullable( CompanyMapper.mapToDTO( dao.getOneById(id).get() ) );
+
+    return Optional.ofNullable(CompanyMapper.mapToDTO(dao.getOneById(id).get()));
   }
 
   /*
@@ -83,26 +78,26 @@ public class CompanyService implements IService<CompanyDTO> {
   @Override
   public Optional<CompanyDTO> getOneByName(String name) throws BadInputException {
     ServiceValidator.nameValidator(name, "company");
-    
-    return Optional.ofNullable( CompanyMapper.mapToDTO( dao.getOneByName(name).get() ) );
+
+    return Optional.ofNullable(CompanyMapper.mapToDTO(dao.getOneByName(name).get()));
   }
 
   /*
    * @see com.excilys.cdb.service.IService#create(com.excilys.cdb.model.Entity)
    */
   @Override
-  public boolean create(CompanyDTO newEntity) throws ServiceException {
+  public boolean create(CompanyDTO newEntity) throws ServiceException, DaoException {
     ServiceValidator.companyDTOValidator(newEntity);
     Company company = CompanyMapper.mapToCompany(newEntity);
     return this.dao.create(company);
   }
-
+  
   /*
    * @see com.excilys.cdb.service.IService#updateById(java.lang.Long,
    * com.excilys.cdb.model.Entity)
    */
   @Override
-  public boolean updateById(CompanyDTO newEntity) throws ServiceException {
+  public boolean updateById(CompanyDTO newEntity) throws ServiceException, DaoException {
     ServiceValidator.companyDTOValidator(newEntity);
     Company company = CompanyMapper.mapToCompany(newEntity);
     return this.dao.updateById(company);
@@ -142,7 +137,8 @@ public class CompanyService implements IService<CompanyDTO> {
     this.dao = dao;
   }
 
-  @Override @Deprecated
+  @Override
+  @Deprecated
   public boolean deleteByName(String name) throws BadInputException, ServiceException {
     return false;
   }

@@ -25,6 +25,4 @@ public interface IDaoInstance<Entity> {
 
 	abstract boolean updateById(Entity newEntity) throws DaoException;
 
-	abstract boolean createDTO(Entity newEntity) throws DaoException;
-
 }

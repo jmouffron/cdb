@@ -1,7 +1,5 @@
 package com.excilys.cdb.test.persistence;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -10,6 +8,7 @@ import org.dbunit.DBTestCase;
 import org.dbunit.PropertiesBasedJdbcDatabaseTester;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
+
 import com.excilys.cdb.exception.PropertyFileIOException;
 
 class DbUnitTest extends DBTestCase {

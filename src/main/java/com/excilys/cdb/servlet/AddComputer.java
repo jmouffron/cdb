@@ -3,6 +3,7 @@ package com.excilys.cdb.servlet;
 import com.excilys.cdb.AppConfig;
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.dto.ComputerDTO;
+import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
@@ -35,19 +36,14 @@ public class AddComputer extends HttpServlet {
   private ComputerService computerService;
   private CompanyService companyService;
 
-  static ApplicationContext springCtx;
-  private static ServiceFactory factory;
-
-  @Override
-  public void init(ServletConfig config) throws ServletException {
-    super.init(config);
-    springCtx = AppConfig.springCtx;
-    factory = (ServiceFactory) springCtx.getBean("doubleServiceFactory");
-    this.computerService = factory.getComputerService();
-    this.companyService = factory.getCompanyService();
+  public AddComputer() {}
+  
+  public AddComputer(ComputerService pcService, CompanyService compService) {
+    this.computerService = pcService;
+    this.companyService = compService;
     logger.info("Initialisation de la servlet " + getServletName() );
   }
-
+  
   /**
    * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
    *      response)
@@ -63,7 +59,7 @@ public class AddComputer extends HttpServlet {
 
     try {
       companies = this.companyService.orderBy("id", Boolean.TRUE).get();
-    } catch (ServiceException e) {
+    } catch (ServiceException | DaoException e) {
       logger.error(e.getMessage());
       response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), e.getMessage());
     }
@@ -98,7 +94,7 @@ public class AddComputer extends HttpServlet {
     boolean isCreated = false;
     try {
       isCreated = this.computerService.create(computerDto);
-    } catch (ServiceException e) {
+    } catch (ServiceException | DaoException e) {
       logger.debug(e.getMessage());
       response.sendError(ErrorCode.FORBIDDEN_REQUEST.getErrorCode(), e.getMessage());
     }

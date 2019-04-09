@@ -14,8 +14,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.exception.BadInputException;
+import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.service.CompanyService;
+import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.ServiceFactory;
 
 /**
@@ -31,12 +33,11 @@ public class EditCompany extends HttpServlet {
   static ApplicationContext springCtx;
   private static ServiceFactory factory;
 
-  @Override
-  public void init(ServletConfig config) throws ServletException {
-    super.init(config);
-    springCtx = DashBoard.springCtx;
-    factory = (ServiceFactory) springCtx.getBean("companyServiceFactory");
-    this.companyService = factory.getCompanyService();
+  public EditCompany() {}
+  
+  public EditCompany(CompanyService compService) {
+    this.companyService = compService;
+    logger.info("Initialisation de la servlet " + getServletName() );
   }
 
   /**
@@ -90,7 +91,7 @@ public class EditCompany extends HttpServlet {
     boolean isUpdated = false;
     try {
       isUpdated = this.companyService.updateById(company);
-    } catch ( ServiceException e ) {
+    } catch ( ServiceException | DaoException e ) {
       logger.error(e.getMessage());
     }
 

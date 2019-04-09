@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -22,10 +21,11 @@ import org.springframework.context.ApplicationContext;
 import com.excilys.cdb.AppConfig;
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.BadInputException;
+import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.exception.ServiceException;
+import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
-import com.excilys.cdb.service.ServiceFactory;
 import com.excilys.cdb.view.IndexPagination;
 import com.excilys.cdb.view.Pagination;
 
@@ -43,8 +43,6 @@ public class DashBoard extends HttpServlet {
   private static Map<String, String> columns;
   
   private ComputerService computerService;
-
-  static ApplicationContext springCtx;
   
   static {
     columns = new HashMap<>();
@@ -55,15 +53,13 @@ public class DashBoard extends HttpServlet {
     columns.put("3", "cp_name"); 
   }
 
-  @Override
-  public void init(ServletConfig config) throws ServletException {
-    super.init(config);
-    springCtx = AppConfig.springCtx;
-    this.computerService = springCtx.getBean(ComputerService.class);
-    this.pagination = new Pagination(this.computerService.getAll().get(), 0, IndexPagination.IDX_10);
+  public DashBoard() {}
+  
+  public DashBoard(ComputerService pcService) {
+    this.computerService = pcService;
     logger.info("Initialisation de la servlet " + getServletName() );
   }
-
+  
   /**
    * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse
    *      response)
@@ -101,7 +97,7 @@ public class DashBoard extends HttpServlet {
       searchName = "";
       try {
         computers = this.computerService.orderBy(toOrder, isDesc).get();
-      } catch (ServiceException e) {
+      } catch (ServiceException | DaoException e) {
         logger.error(e.getMessage());
         session.setAttribute("stackTrace", e.getMessage());
         response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getMessage());
@@ -109,7 +105,7 @@ public class DashBoard extends HttpServlet {
     } else {
        try {
         computers = this.computerService.searchByNameOrdered(searchName, toOrder, isDesc).get();
-      } catch (ServiceException e) {
+      } catch (ServiceException | DaoException e) {
         logger.error(e.getMessage());
         session.setAttribute("stackTrace", e.getMessage());
         response.sendError(ErrorCode.SERVER_ERROR.getErrorCode(), e.getMessage());
@@ -197,7 +193,7 @@ public class DashBoard extends HttpServlet {
       
       try {
         isDeleted = this.computerService.deleteById(computer.getId());
-      } catch (ServiceException e) {
+      } catch (ServiceException | DaoException e) {
         logger.error(e.getMessage());
         session.setAttribute("stackTrace", e.getMessage());
         try {

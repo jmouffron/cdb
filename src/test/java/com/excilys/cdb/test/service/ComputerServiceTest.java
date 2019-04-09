@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.exception.BadInputException;
+import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.dto.ComputerDTO;
@@ -54,7 +55,7 @@ class ComputerServiceTest {
 
     try {
       assertTrue(service.create(computerDummy));
-    } catch (BadInputException e) {
+    } catch (BadInputException | DaoException e) {
       log.error("Create Failure, BadInputException launched!");
       fail("BadInputException thrown with good inputs.");
     }
@@ -70,7 +71,7 @@ class ComputerServiceTest {
     try {
       assertFalse(service.create(badComputerDTODummy));
       fail("BadInputException non thrown with bad inputs.");
-    } catch (BadInputException e) {
+    } catch (BadInputException | DaoException e) {
       log.debug("BadInput Success, Create Exception launched!");
     }
   }
@@ -91,7 +92,7 @@ class ComputerServiceTest {
     try {
       assertTrue(service.create(computerDummy));
       assertTrue(service.updateById(computerUpdated));
-    } catch (BadInputException e) {
+    } catch (BadInputException | DaoException e) {
       log.error("Update Failure, BadInputException launched!");
       fail("BadInputException thrown with good inputs.");
     }
@@ -107,7 +108,7 @@ class ComputerServiceTest {
     try {
       assertFalse(service.updateById(badComputerDTODummy));
       fail("BadInputException non thrown with bad inputs.");
-    } catch (BadInputException e) {
+    } catch (BadInputException | DaoException e) {
       log.debug("BadInput Success, Update Exception launched!");
     }
   }
@@ -122,7 +123,7 @@ class ComputerServiceTest {
     try {
       assertTrue(service.create(computerDummy));
       assertTrue(service.deleteById(computerDummy.getId()));
-    } catch (BadInputException e) {
+    } catch (BadInputException | DaoException e) {
       log.error("Delete Failure, BadInputException launched!");
       fail("BadInputException thrown with good inputs.");
     }
@@ -139,7 +140,7 @@ class ComputerServiceTest {
       assertFalse(service.create(badComputerDTODummy));
       assertFalse(service.deleteById(badComputerDTODummy.getId()));
       fail("BadInputException non thrown with bad inputs.");
-    } catch (BadInputException e) {
+    } catch (BadInputException | DaoException e) {
       log.debug("BadInput Success, Delete Exception launched!");
     }
   }

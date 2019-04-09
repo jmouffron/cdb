@@ -11,10 +11,14 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.mapper.CompanyMapper;
+import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Company;
+import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.service.ComputerService;
 
 /**
@@ -40,145 +44,63 @@ public class DaoCompany implements IDaoInstance<Company> {
 
   private final Logger log = LoggerFactory.getLogger(DaoCompany.class);
   private Datasource datasource;
-
+  
+  @Autowired
+  JdbcTemplate jdbcTemplate;
+  
   public DaoCompany() {
   }
 
-  public DaoCompany(Datasource ds) {
+  public DaoCompany(JdbcTemplate jdbc) {
     super();
-    this.datasource = ds;
+    this.jdbcTemplate = jdbc;
   }
 
   private Connection getConnection() throws DaoException {
     return this.datasource.getConnection().get();
   }
-
+  
   @Override
-  public Optional<List<Company>> getAll() {
-    List<Company> result = new ArrayList<>();
-
-    try (Connection conn = getConnection();
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(SELECT_ALL);) {
-      ;
-      while (rs.next()) {
-        result.add(CompanyMapper.map(rs));
-      }
-    } catch (SQLException sqlex) {
-      log.error(sqlex.getMessage());
-    }
-
-    return Optional.ofNullable(result);
+  public Optional<List<Company>> getAll(){
+    List<Company> companyFetched = jdbcTemplate.query(SELECT_ALL, new CompanyMapper());
+    return Optional.ofNullable(companyFetched);
   }
-
+  
   @Override
-  public Optional<List<Company>> getAllOrderedBy(String orderBy, boolean desc) throws DaoException {
-    List<Company> result = new ArrayList<>();
+  public Optional<List<Company>> getAllOrderedBy(String orderBy, boolean desc){
     String QUERY = desc ? ORDER_BY + orderBy + DESC : ORDER_BY + orderBy;
-
-    try (Connection conn = getConnection();
-        Statement stmt = conn.createStatement();
-        ResultSet rs = stmt.executeQuery(QUERY);) {
-      ;
-
-      while (rs.next()) {
-        result.add(CompanyMapper.map(rs));
-      }
-
-    } catch (SQLException sqlex) {
-      log.error(QUERY + sqlex.getMessage());
-      throw new DaoException(sqlex.getMessage());
-    }
-
-    return Optional.ofNullable(result);
+    List<Company> companyFetched = jdbcTemplate.query(QUERY, new CompanyMapper());
+    return Optional.ofNullable(companyFetched);
   }
-
+  
   @Override
   public Optional<Company> getOneById(Long id) {
-    Company result = null;
-    ResultSet rs = null;
-
-    try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_ID);) {
-      stmt.setLong(1, id);
-      rs = stmt.executeQuery();
-      result = CompanyMapper.map(rs);
-    } catch (SQLException sqlex) {
-      log.error(sqlex.getMessage());
-    } finally {
-      try {
-        rs.close();
-      } catch (SQLException e) {
-        log.error(e.getMessage());
-      }
-    }
-
-    return Optional.ofNullable(result);
+    Company companyFetched = jdbcTemplate.queryForObject(SELECT_ID, new Object[]{id} ,new CompanyMapper());
+    return Optional.ofNullable(companyFetched);
   }
 
   @Override
   public Optional<Company> getOneByName(String name) {
-    Company result = null;
-
-    ResultSet rs = null;
-
-    try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_NAME);) {
-      stmt.setString(1, name);
-      rs = stmt.executeQuery();
-      rs.next();
-      result = CompanyMapper.map(rs);
-    } catch (SQLException sqlex) {
-      log.error(sqlex.getMessage());
-    } finally {
-      try {
-        rs.close();
-      } catch (SQLException e) {
-        log.error(e.getMessage());
-      }
-    }
-
-    return Optional.ofNullable(result);
+    Company companyFetched = jdbcTemplate.queryForObject(SELECT_NAME, new Object[]{name} ,new CompanyMapper());
+    return Optional.ofNullable(companyFetched);
   }
 
   @Override
-  public boolean create(Company newEntity) {
-    int lineAffected = 0;
-    ResultSet maxRs = null;
-
-    try (Connection conn = getConnection();
-        PreparedStatement maxStmt = conn.prepareStatement(MAX_ID);
-        PreparedStatement stmt = conn.prepareStatement(INSERT);) {
-      maxRs = maxStmt.executeQuery();
-      maxRs.next();
-      long maxId = maxRs.getLong(1);
-      stmt.setLong(1, maxId);
-      stmt.setString(1, newEntity.getName());
-      lineAffected = stmt.executeUpdate();
-    } catch (SQLException sqlex) {
-      log.error(sqlex.getMessage());
-    } finally {
-      try {
-        maxRs.close();
-      } catch (SQLException e) {
-        log.error(e.getMessage());
-      }
+  public boolean create(Company newEntity) throws DaoException {
+    int affected = jdbcTemplate.update(INSERT, new Object[] {newEntity});
+    if( affected > 0 ) {
+      throw new DaoException("Couldn't insert "+ newEntity.getName() );
     }
-
-    return lineAffected > 0 ? true : false;
+    return affected > 0 ? true : false;
   }
-
+  
   @Override
-  public boolean updateById(Company newEntity) {
-    int lineAffected = 0;
-
-    try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(UPDATE);) {
-      stmt.setString(1, newEntity.getName());
-      stmt.setLong(2, newEntity.getId());
-      lineAffected = stmt.executeUpdate();
-    } catch (SQLException sqlex) {
-      log.error(sqlex.getMessage());
+  public boolean updateById(Company newEntity) throws DaoException {
+    int affected = jdbcTemplate.update(UPDATE, new Object[] {newEntity});
+    if( affected > 0 ) {
+      throw new DaoException("Couldn't update "+ newEntity.getName() );
     }
-
-    return lineAffected > 0 ? true : false;
+    return affected > 0 ? true : false;
   }
 
   public boolean deleteById(Long id) throws DaoException {
@@ -245,21 +167,6 @@ public class DaoCompany implements IDaoInstance<Company> {
         log.error(e.getMessage());
         throw new DaoException(e.getMessage());
       }
-    }
-
-    return lineAffected > 0 ? true : false;
-  }
-
-  @Override
-  public boolean createDTO(Company newEntity) throws DaoException {
-    int lineAffected = 0;
-
-    try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(INSERT);) {
-      stmt.setString(1, newEntity.getName());
-      lineAffected = stmt.executeUpdate();
-    } catch (SQLException sqlex) {
-      log.error(sqlex.getMessage());
-      throw new DaoException("Couldn't rollback from delete transaction !");
     }
 
     return lineAffected > 0 ? true : false;

@@ -2,9 +2,13 @@ package com.excilys.cdb;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.excilys.cdb.model.Entity;
+import com.excilys.cdb.persistence.DaoComputer;
 import com.excilys.cdb.service.ServiceFactory;
 import com.excilys.cdb.controller.Controller;
 
@@ -14,10 +18,13 @@ import com.excilys.cdb.controller.Controller;
  * @author excilys
  * 
  */
+@ComponentScan("com.excilys.cdb")
 public class App {
   
   public static void main(String[] args) {
-    ApplicationContext cliCtx = new ClassPathXmlApplicationContext("beans.xml");
+    AnnotationConfigApplicationContext cliCtx = new AnnotationConfigApplicationContext();
+    cliCtx.register(App.class);
+    cliCtx.refresh();
     
     ServiceFactory factory = cliCtx.getBean(ServiceFactory.class);
     

@@ -21,6 +21,13 @@ $(function() {
             $("#deleteSelected").removeClass("disabled");
         }
     });
+    
+    $("#locales").change(function () {
+        var selectedOption = $('#locales').val();
+        if (selectedOption != ''){
+            window.location.replace('?lang=' + selectedOption);
+        }
+    });
 
 });
 

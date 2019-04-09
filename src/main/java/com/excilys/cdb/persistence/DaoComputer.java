@@ -6,11 +6,16 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.mapper.ComputerMapper;
@@ -31,211 +36,73 @@ public class DaoComputer implements IDaoInstance<Computer> {
   private final String ORDER_BY = SELECT_ALL + " ORDER BY ";
 
   private final Logger log = LoggerFactory.getLogger(DaoComputer.class);
-  private Datasource datasource;
+  
+  @Autowired
+  private JdbcTemplate jdbcTemplate;
   
   public DaoComputer() { }
   
-  public DaoComputer(Datasource ds) {
-    this.datasource = ds;
-  }
-  
-  private Connection getConnection() {
-    return this.datasource.getConnection().get();
+  public DaoComputer(JdbcTemplate jdbc) {
+    this.jdbcTemplate = jdbc;
   }
 
   @Override
-  public Optional<List<Computer>> getAll() {
-    List<Computer> result = new ArrayList<>();
-
-    try (Connection conn = getConnection();Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(SELECT_ALL);) {
-
-      while (rs.next()) {
-        result.add(ComputerMapper.map(rs));
-      }
-
-    } catch (SQLException sqlex) {
-      log.error(sqlex.getMessage());
-    }
-
-    return Optional.ofNullable(result);
+  public Optional<List<Computer>> getAll(){
+    List<Computer> computerFetched = jdbcTemplate.query(SELECT_ALL, new ComputerMapper());
+    return Optional.ofNullable(computerFetched);
   }
 
   @Override
-  public Optional<List<Computer>> getAllOrderedBy(String orderBy, boolean desc) throws DaoException {
-    List<Computer> result = new ArrayList<>();
+  public Optional<List<Computer>> getAllOrderedBy(String orderBy, boolean desc){
     String QUERY = desc ? ORDER_BY + orderBy + DESC : ORDER_BY + orderBy;
-
-    try (Connection conn = getConnection();Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(QUERY);) {
-
-      while (rs.next()) {
-        result.add(ComputerMapper.map(rs));
-      }
-
-    } catch (SQLException sqlex) {
-      log.error(sqlex.getMessage());
-
-      throw new DaoException(sqlex.getMessage());
-    }
-
-    return Optional.ofNullable(result);
+    List<Computer> computerFetched = jdbcTemplate.query(QUERY, new ComputerMapper());
+    return Optional.ofNullable(computerFetched);
   }
 
   @Override
   public Optional<Computer> getOneById(Long id) {
-    Computer result = null;
-    ResultSet rs = null;
-
-    try(Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_ID);){
-      stmt.setLong(1, id);
-      rs = stmt.executeQuery();
-      rs.next();
-      result = ComputerMapper.map(rs);
-    } catch (SQLException sqlex) {
-      log.debug(sqlex.getMessage());
-      try {
-        rs.close();
-      } catch (SQLException e) {
-        log.error(e.getMessage());
-      }
-    } finally {
-      try {
-        rs.close();
-      } catch (SQLException e) {
-        log.error(e.getMessage());
-      }
-    }
-
-    return Optional.ofNullable(result);
+    Computer computerFetched = jdbcTemplate.queryForObject(SELECT_ID, new Object[]{id} ,new ComputerMapper());
+    return Optional.ofNullable(computerFetched);
   }
 
   @Override
   public Optional<Computer> getOneByName(String name) {
-    Computer result = null;
-    ResultSet rs = null;
-
-    try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_NAME);){
-      stmt.setString(1, name);
-      rs = stmt.executeQuery();
-      rs.next();
-      result = ComputerMapper.map(rs);
-    } catch (SQLException sqlex) {
-      log.debug(sqlex.getMessage());
-      try {
-        rs.close();
-      } catch (SQLException e) {
-        log.error(e.getMessage());
-      }
-    }finally{
-      try {
-        rs.close();
-      } catch (SQLException e) {
-        log.error(e.getMessage());
-      }
+    Computer computerFetched = jdbcTemplate.queryForObject(SELECT_NAME, new Object[]{name} ,new ComputerMapper());
+    return Optional.ofNullable(computerFetched);
+  }
+  
+  @Override
+  public boolean create(Computer newEntity) throws DaoException {
+    int affected = jdbcTemplate.update(INSERT, new Object[] {newEntity});
+    if( affected > 0 ) {
+      throw new DaoException("Couldn't insert "+ newEntity.getName() );
     }
-
-    return Optional.ofNullable(result);
+    return affected > 0 ? true : false;
   }
 
   @Override
-  public boolean create(Computer newEntity) {
-    int linesAffected = 0;
-
-    Long maxId = 0L;
-
-    try (Connection conn = getConnection();
-        PreparedStatement maxStmt = conn.prepareStatement(MAX_ID);
-        PreparedStatement stmt = conn.prepareStatement(INSERT);) {
-      ResultSet maxIdRs = maxStmt.executeQuery();
-
-      while (maxIdRs.next()) {
-        maxId = maxIdRs.getLong(1);
-      }
-
-      stmt.setLong(1, maxId);
-      stmt.setString(2, newEntity.getName());
-      stmt.setTimestamp(3, newEntity.getIntroduced());
-      stmt.setTimestamp(4, newEntity.getDiscontinued());
-      stmt.setLong(5, newEntity.getCompany().getId());
-
-      linesAffected = stmt.executeUpdate();
-    } catch (SQLException sqlex) {
-      log.debug(sqlex.getMessage());
+  public boolean updateById(Computer newEntity) throws DaoException {
+    int affected = jdbcTemplate.update(UPDATE, new Object[] {newEntity});
+    if( affected > 0 ) {
+      throw new DaoException("Couldn't update "+ newEntity.getName() );
     }
-
-    return linesAffected > 0 ? true : false;
+    return affected > 0 ? true : false;
   }
 
-  @Override
-  public boolean updateById(Computer newEntity) {
-    int lineAffected = 0;
-
-    try (Connection conn = getConnection();PreparedStatement stmt = conn.prepareStatement(UPDATE);) {
-      stmt.setString(1, newEntity.getName());
-      stmt.setTimestamp(2, newEntity.getIntroduced());
-      stmt.setTimestamp(3, newEntity.getDiscontinued());
-      stmt.setLong(4, newEntity.getCompany().getId());
-      stmt.setLong(5, newEntity.getId());
-      lineAffected = stmt.executeUpdate();
-    } catch (SQLException sqlex) {
-      log.error(sqlex.getMessage());
+  public boolean deleteById(Long id) throws DaoException {
+    int affected = jdbcTemplate.update( DELETE_ID , new Object[] {id});
+    if( affected > 0 ) {
+      throw new DaoException( "Couldn't delete entity" );
     }
-
-    return lineAffected > 0 ? true : false;
+    return affected > 0 ? true : false;
   }
 
-  public boolean deleteById(Long id) {
-    int lineAffected = 0;
-
-    try (Connection conn = getConnection();PreparedStatement stmt = conn.prepareStatement(DELETE_ID);) {
-      stmt.setLong(1, id);
-      lineAffected = stmt.executeUpdate();
-    } catch (SQLException sqlex) {
-      log.error(sqlex.getMessage());
+  public boolean deleteByName(String name) throws DaoException {
+    int affected = jdbcTemplate.update( DELETE_NAME , new Object[] {name});
+    if( affected > 0 ) {
+      throw new DaoException( "Couldn't delete entity" );
     }
-
-    return lineAffected > 0 ? true : false;
-  }
-
-  public boolean deleteByName(String name) {
-    int lineAffected = 0;
-
-    try (Connection conn = getConnection();PreparedStatement stmt = conn.prepareStatement(DELETE_NAME);) {
-      stmt.setString(1, name);
-      lineAffected = stmt.executeUpdate();
-    } catch (SQLException sqlex) {
-      log.error(sqlex.getMessage());
-    }
-
-    return lineAffected > 0 ? true : false;
-  }
-
-  @Override
-  public boolean createDTO(Computer newEntity) {
-    int linesAffected = 0;
-
-    Long maxId = 0L;
-
-    try (Connection conn = getConnection();
-        PreparedStatement maxStmt = conn.prepareStatement(MAX_ID);
-        PreparedStatement stmt = conn.prepareStatement(INSERT);
-        ResultSet maxIdRs = maxStmt.executeQuery();) {
-
-      while (maxIdRs.next()) {
-        maxId = maxIdRs.getLong(1);
-      }
-
-      stmt.setLong(1, maxId);
-      stmt.setString(2, newEntity.getName());
-      stmt.setTimestamp(3, newEntity.getIntroduced());
-      stmt.setTimestamp(4, newEntity.getDiscontinued());
-      stmt.setLong(5, newEntity.getCompany().getId());
-
-      linesAffected = stmt.executeUpdate();
-    } catch (SQLException sqlex) {
-      log.error(sqlex.getMessage());
-    }
-
-    return linesAffected > 0 ? true : false;
+    return affected > 0 ? true : false;
   }
 
 }
