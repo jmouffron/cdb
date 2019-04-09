@@ -16,9 +16,9 @@ $(function() {
             $("#selectall").prop("checked", false);
         }
         if ($(".cb:checked").length != 0) {
-            $("#deleteSelected").enable();
+            $("#deleteSelected").addClass("disabled");
         } else {
-            $("#deleteSelected").disable();
+            $("#deleteSelected").removeClass("disabled");
         }
     });
 
@@ -33,7 +33,7 @@ $(function() {
         var str = $('.' + checkboxFieldName + ':checked').map(function() {
             return this.value;
         }).get().join();
-        
+
         $(this).attr('value',str);
         
         return this;
@@ -59,7 +59,8 @@ $(function() {
 }( jQuery ));
 
 
-// Function delete selected: Asks for confirmation to delete selected computers, then submits it to the deleteForm
+// Function delete selected: Asks for confirmation to delete selected computers,
+// then submits it to the deleteForm
 (function ( $ ) {
     $.fn.deleteSelected = function() {
         if (confirm("Are you sure you want to delete the selected computers?")) { 
@@ -69,20 +70,18 @@ $(function() {
     };
 }( jQuery ));
 
-
-
-//Event handling
-//Onkeydown
+// Event handling
+// Onkeydown
 $(document).keydown(function(e) {
 
     switch (e.keyCode) {
-        //DEL key
+        // DEL key
         case 46:
             if($(".editMode").is(":visible") && $(".cb:checked").length != 0) {
                 $.fn.deleteSelected();
             }   
             break;
-        //E key (CTRL+E will switch to edit mode)
+        // E key (CTRL+E will switch to edit mode)
         case 69:
             if(e.ctrlKey) {
                 $.fn.toggleEditMode();
@@ -90,4 +89,3 @@ $(document).keydown(function(e) {
             break;
     }
 });
-

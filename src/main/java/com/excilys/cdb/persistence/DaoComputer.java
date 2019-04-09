@@ -21,96 +21,87 @@ public class DaoComputer implements IDaoInstance<Computer> {
 
   private final String DELETE_ID = "DELETE FROM computer WHERE id=? ";
   private final String DELETE_NAME = "DELETE FROM computer WHERE name=? ";
-  private final String DESC = "DESC";
+  private final String DESC = " DESC";
   private final String INSERT = "INSERT INTO computer VALUES(?,?,?,?,?)";
   private final String MAX_ID = "SELECT MAX(id)+1 from computer";
-  private final String SELECT_ALL = "SELECT pc.*, c.name FROM computer pc INNER JOIN company c ON pc.company_id=c.id";
+  private final String SELECT_ALL = "SELECT pc.id, pc.name as pc_name, pc.introduced, pc.discontinued, pc.company_id, c.name as cp_name FROM computer pc INNER JOIN company c ON pc.company_id=c.id";
   private final String SELECT_ID = SELECT_ALL + " where pc.id=? ";
   private final String SELECT_NAME = SELECT_ALL + " where pc.name=? ";
   private final String UPDATE = "UPDATE computer SET name=?,introduced=?,discontinued=?,company_id=? WHERE id=? ";
-  private final String ORDER_BY = SELECT_ALL + "ORDER BY ?";
+  private final String ORDER_BY = SELECT_ALL + " ORDER BY ";
 
   private final Logger log = LoggerFactory.getLogger(DaoComputer.class);
-  private static volatile IDaoInstance<Computer> instance = null;
+  private Datasource datasource;
   
-  private DaoComputer() {
+  public DaoComputer() { }
+  
+  public DaoComputer(Datasource ds) {
+    this.datasource = ds;
   }
-
-  public static IDaoInstance<Computer> getDao() {
-    if (instance == null) {
-      synchronized (DaoComputer.class) {
-        if (instance == null) {
-          instance = new DaoComputer();
-        }
-      }
-    }
-    return instance;
-  }
-
-  private Connection getConnection() throws DaoException {
-    Connection optConnection = Datasource.getConnection().get();
-    if (optConnection == null) {
-      log.error("Connection failure in DAO.");
-      throw new DaoException("Connection failed and is null");
-    }
-    return optConnection;
+  
+  private Connection getConnection() {
+    return this.datasource.getConnection().get();
   }
 
   @Override
   public Optional<List<Computer>> getAll() {
     List<Computer> result = new ArrayList<>();
 
-    try (Statement stmt = getConnection().createStatement(); ResultSet rs = stmt.executeQuery(SELECT_ALL);) {
+    try (Connection conn = getConnection();Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(SELECT_ALL);) {
 
       while (rs.next()) {
         result.add(ComputerMapper.map(rs));
       }
 
     } catch (SQLException sqlex) {
-      log.debug(sqlex.getMessage());
+      log.error(sqlex.getMessage());
     }
 
     return Optional.ofNullable(result);
   }
-  
+
   @Override
-  public Optional<List<Computer>> getAllOrderedBy(String orderBy, boolean desc) {
+  public Optional<List<Computer>> getAllOrderedBy(String orderBy, boolean desc) throws DaoException {
     List<Computer> result = new ArrayList<>();
-    String QUERY = desc ? ORDER_BY+ DESC: ORDER_BY;
-    
-    try (Statement stmt = getConnection().createStatement(); ResultSet rs = stmt.executeQuery(QUERY);) {
+    String QUERY = desc ? ORDER_BY + orderBy + DESC : ORDER_BY + orderBy;
+
+    try (Connection conn = getConnection();Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(QUERY);) {
 
       while (rs.next()) {
         result.add(ComputerMapper.map(rs));
       }
 
     } catch (SQLException sqlex) {
-      log.debug(sqlex.getMessage());
+      log.error(sqlex.getMessage());
+
+      throw new DaoException(sqlex.getMessage());
     }
 
     return Optional.ofNullable(result);
   }
-  
+
   @Override
   public Optional<Computer> getOneById(Long id) {
     Computer result = null;
-    PreparedStatement stmt = null;
     ResultSet rs = null;
 
-    try {
-      stmt = getConnection().prepareStatement(SELECT_ID);
+    try(Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_ID);){
       stmt.setLong(1, id);
       rs = stmt.executeQuery();
       rs.next();
       result = ComputerMapper.map(rs);
     } catch (SQLException sqlex) {
       log.debug(sqlex.getMessage());
+      try {
+        rs.close();
+      } catch (SQLException e) {
+        log.error(e.getMessage());
+      }
     } finally {
       try {
         rs.close();
-        stmt.close();
       } catch (SQLException e) {
-        log.debug(e.getMessage());
+        log.error(e.getMessage());
       }
     }
 
@@ -120,11 +111,9 @@ public class DaoComputer implements IDaoInstance<Computer> {
   @Override
   public Optional<Computer> getOneByName(String name) {
     Computer result = null;
-    PreparedStatement stmt = null;
     ResultSet rs = null;
 
-    try {
-      stmt = getConnection().prepareStatement(SELECT_NAME);
+    try (Connection conn = getConnection(); PreparedStatement stmt = conn.prepareStatement(SELECT_NAME);){
       stmt.setString(1, name);
       rs = stmt.executeQuery();
       rs.next();
@@ -133,9 +122,14 @@ public class DaoComputer implements IDaoInstance<Computer> {
       log.debug(sqlex.getMessage());
       try {
         rs.close();
-        stmt.close();
       } catch (SQLException e) {
-        log.debug(e.getMessage());
+        log.error(e.getMessage());
+      }
+    }finally{
+      try {
+        rs.close();
+      } catch (SQLException e) {
+        log.error(e.getMessage());
       }
     }
 
@@ -175,7 +169,7 @@ public class DaoComputer implements IDaoInstance<Computer> {
   public boolean updateById(Computer newEntity) {
     int lineAffected = 0;
 
-    try (PreparedStatement stmt = getConnection().prepareStatement(UPDATE);) {
+    try (Connection conn = getConnection();PreparedStatement stmt = conn.prepareStatement(UPDATE);) {
       stmt.setString(1, newEntity.getName());
       stmt.setTimestamp(2, newEntity.getIntroduced());
       stmt.setTimestamp(3, newEntity.getDiscontinued());
@@ -183,35 +177,33 @@ public class DaoComputer implements IDaoInstance<Computer> {
       stmt.setLong(5, newEntity.getId());
       lineAffected = stmt.executeUpdate();
     } catch (SQLException sqlex) {
-      log.debug(sqlex.getMessage());
+      log.error(sqlex.getMessage());
     }
 
     return lineAffected > 0 ? true : false;
   }
 
-  @Override
   public boolean deleteById(Long id) {
     int lineAffected = 0;
 
-    try (PreparedStatement stmt = getConnection().prepareStatement(DELETE_ID);) {
+    try (Connection conn = getConnection();PreparedStatement stmt = conn.prepareStatement(DELETE_ID);) {
       stmt.setLong(1, id);
       lineAffected = stmt.executeUpdate();
     } catch (SQLException sqlex) {
-      log.debug(sqlex.getMessage());
+      log.error(sqlex.getMessage());
     }
 
     return lineAffected > 0 ? true : false;
   }
 
-  @Override
   public boolean deleteByName(String name) {
     int lineAffected = 0;
 
-    try (PreparedStatement stmt = getConnection().prepareStatement(DELETE_NAME);) {
+    try (Connection conn = getConnection();PreparedStatement stmt = conn.prepareStatement(DELETE_NAME);) {
       stmt.setString(1, name);
       lineAffected = stmt.executeUpdate();
     } catch (SQLException sqlex) {
-      log.debug(sqlex.getMessage());
+      log.error(sqlex.getMessage());
     }
 
     return lineAffected > 0 ? true : false;
@@ -240,7 +232,7 @@ public class DaoComputer implements IDaoInstance<Computer> {
 
       linesAffected = stmt.executeUpdate();
     } catch (SQLException sqlex) {
-      log.debug(sqlex.getMessage());
+      log.error(sqlex.getMessage());
     }
 
     return linesAffected > 0 ? true : false;

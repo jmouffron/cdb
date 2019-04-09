@@ -3,31 +3,16 @@ package com.excilys.cdb.persistence;
 import com.excilys.cdb.model.Computer;
 
 public class DaoComputerFactory implements IDaoFactory<Computer> {
-	private static volatile IDaoFactory<Computer> instance;
-	private static IDaoInstance<Computer> daoComputer;
+	private DaoComputer daoComputer;
 	
-	private DaoComputerFactory() {	}
+	private DaoComputerFactory() {}
 	
-	public static IDaoFactory<Computer> getComputerFactory() {
-	  if (instance == null) {
-      synchronized (DaoComputerFactory.class) {
-        if (instance == null) {
-          instance = new DaoComputerFactory();
-        }
-      }
-    }
-    return instance;
+	private DaoComputerFactory(DaoComputer dao) {
+	  super();
+	  this.daoComputer = dao;
 	}
-	
-	@Override
-	public IDaoInstance<Computer> getDao() {
-		if (daoComputer == null) {
-			synchronized (DaoComputerFactory.class) {
-				if (daoComputer == null) {
-					daoComputer = DaoComputer.getDao();
-				}
-			}
-		}
-		return daoComputer;
+
+	public DaoComputer getDao() {
+		return this.daoComputer;
 	}
 }

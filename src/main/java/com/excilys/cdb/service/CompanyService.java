@@ -7,48 +7,62 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.exception.BadInputException;
+import com.excilys.cdb.exception.DaoException;
+import com.excilys.cdb.exception.ServiceException;
+import com.excilys.cdb.mapper.CompanyMapper;
 import com.excilys.cdb.model.Company;
-import com.excilys.cdb.persistence.DaoCompanyFactory;
-import com.excilys.cdb.persistence.IDaoInstance;
+import com.excilys.cdb.persistence.DaoCompany;
 import com.excilys.cdb.validator.ServiceValidator;
 
-public class CompanyService implements IService<Company> {
-  private static CompanyService instance;
-  private IDaoInstance<Company> dao;
-  private Logger log;
+public class CompanyService implements IService<CompanyDTO> {
+  private DaoCompany dao;
+  private static Logger log = LoggerFactory.getLogger(CompanyService.class);
 
-  public CompanyService() {
-    this.dao = DaoCompanyFactory.getCompanyFactory().getDao();
-    this.log = LoggerFactory.getLogger(CompanyService.class);
-  }
-
-  public static CompanyService getService() {
-    if (instance == null) {
-      synchronized (ComputerService.class) {
-        if (instance == null) {
-          return new CompanyService();
-        }
-      }
-    }
-    return instance;
+  public CompanyService(DaoCompany dao) {
+    this.dao = dao;
   }
 
   /*
    * @see com.excilys.cdb.service.IService#getAll()
    */
   @Override
-  public Optional<List<Company>> getAll() {
-    return this.dao.getAll();
-  }
+  public Optional<List<CompanyDTO>> getAll() throws ServiceException {
+    List<CompanyDTO> list = null;
+    list = this.dao.getAll().get().stream()
+        .map(CompanyMapper::mapToDTO)
+        .collect(Collectors.toList());
 
+    return Optional.ofNullable(list);
+  }
+  
+  /* (non-Javadoc)
+   * @see com.excilys.cdb.service.IService#orderBy(java.lang.String, boolean)
+   */
+  @Override
+  public Optional<List<CompanyDTO>> orderBy(String name, boolean isDesc) throws ServiceException {
+    List<CompanyDTO> list;
+    try {
+      list = this.dao
+          .getAllOrderedBy(name, isDesc)
+          .get().stream()
+          .map(CompanyMapper::mapToDTO).collect(Collectors.toList());
+    } catch (DaoException e) {
+      log.error(e.getMessage());
+      throw new ServiceException(e.getMessage());
+    }
+
+    return Optional.ofNullable(list);
+  }
   /*
    * @see com.excilys.cdb.service.IService#searchByName(java.lang.String)
    */
   @Override
-  public Optional<List<Company>> searchByName(String name) {
-    List<Company> filteredCompanies = this.dao.getAll().get().stream()
-        .filter(company -> company.getName().matches(name)).collect(Collectors.toList());
+  public Optional<List<CompanyDTO>> searchByName(String name) throws ServiceException {
+    List<CompanyDTO> filteredCompanies = null;
+      filteredCompanies = this.dao.getAll().get().stream()
+          .filter(company -> company.getName().matches(name)).map(CompanyMapper::mapToDTO).collect(Collectors.toList());
 
     return Optional.ofNullable(filteredCompanies);
   }
@@ -57,51 +71,30 @@ public class CompanyService implements IService<Company> {
    * @see com.excilys.cdb.service.IService#getOneById(java.lang.Long)
    */
   @Override
-  public Optional<Company> getOneById(Long id) throws BadInputException {
-    if (id <= 0) {
-      log.debug("Bad Input of id for fetching of Company");
-      throw new BadInputException("Non strictly positive id inputted!");
-    } else if (id > Long.MAX_VALUE) {
-      log.debug("Bad Input of id for fetching of Company");
-      throw new BadInputException("Id too big inputted!");
-    }
-
-    return dao.getOneById(id);
+  public Optional<CompanyDTO> getOneById(Long id) throws BadInputException {
+    ServiceValidator.idValidator(id, "company");
+    
+    return Optional.ofNullable( CompanyMapper.mapToDTO( dao.getOneById(id).get() ) );
   }
 
   /*
    * @see com.excilys.cdb.service.IService#getOneByName(java.lang.String)
    */
   @Override
-  public Optional<Company> getOneByName(String name) throws BadInputException {
-    if (name == null || name.equals("")) {
-      log.debug("Bad Input of id for fetching of Company");
-      throw new BadInputException("Bad name inputted!");
-    }
-
-    return this.dao.getOneByName(name);
+  public Optional<CompanyDTO> getOneByName(String name) throws BadInputException {
+    ServiceValidator.nameValidator(name, "company");
+    
+    return Optional.ofNullable( CompanyMapper.mapToDTO( dao.getOneByName(name).get() ) );
   }
 
   /*
    * @see com.excilys.cdb.service.IService#create(com.excilys.cdb.model.Entity)
    */
   @Override
-  public boolean create(Company newEntity) throws BadInputException {
-    if (newEntity == null) {
-      log.debug("Null NewEntity for update of Company");
-      throw new BadInputException();
-    } else if (newEntity.getId() < 0) {
-      log.debug("Bad Id for update of Company");
-      throw new BadInputException();
-    } else if (newEntity.getName() == null || newEntity.getName().equals("")) {
-      log.debug("Null Name on NewEntity for update of Company");
-      throw new BadInputException();
-    } else if (newEntity.getId() < 0) {
-      log.debug("Bad Id on NewEntity for update of Company");
-      throw new BadInputException();
-    }
-
-    return this.dao.create(newEntity);
+  public boolean create(CompanyDTO newEntity) throws ServiceException {
+    ServiceValidator.companyDTOValidator(newEntity);
+    Company company = CompanyMapper.mapToCompany(newEntity);
+    return this.dao.create(company);
   }
 
   /*
@@ -109,47 +102,49 @@ public class CompanyService implements IService<Company> {
    * com.excilys.cdb.model.Entity)
    */
   @Override
-  public boolean updateById(Company newEntity) throws BadInputException {
-    ServiceValidator.companyValidator(newEntity, "Company");
-
-    return this.dao.updateById(newEntity);
+  public boolean updateById(CompanyDTO newEntity) throws ServiceException {
+    ServiceValidator.companyDTOValidator(newEntity);
+    Company company = CompanyMapper.mapToCompany(newEntity);
+    return this.dao.updateById(company);
   }
 
   /*
    * @see com.excilys.cdb.service.IService#deleteById(java.lang.Long)
    */
   @Override
-  public boolean deleteById(Long id) throws BadInputException {
+  public boolean deleteById(Long id) throws ServiceException {
     ServiceValidator.idValidator(id, "Company");
 
-    return this.dao.deleteById(id);
+    try {
+      return this.dao.deleteById(id);
+    } catch (DaoException e) {
+      log.error(e.getMessage());
+      throw new ServiceException("Couldn't delete by id!");
+    }
   }
 
-  /*
-   * @see com.excilys.cdb.service.IService#deleteByName(java.lang.String)
-   */
-  @Override
-  public boolean deleteByName(String name) throws BadInputException {
+  public boolean deleteByName(String name, ComputerService service) throws ServiceException {
     ServiceValidator.nameValidator(name, "Company");
 
-    return this.dao.deleteByName(name);
+    try {
+      return this.dao.deleteByName(name, service);
+    } catch (DaoException e) {
+      log.error(e.getMessage());
+      throw new ServiceException("Couldn't delete by name!");
+    }
   }
 
-  /*
-   * @see com.excilys.cdb.service.IService#getDao()
-   */
-  @Override
-  public IDaoInstance<Company> getDao() {
-    return getDao();
+  public DaoCompany getDao() {
+    return this.dao;
   }
 
-  /*
-   * @see com.excilys.cdb.service.IService#setDao(com.excilys.cdb.persistence.
-   * DaoInstance)
-   */
-  @Override
-  public void setDao(IDaoInstance<Company> dao) {
+  public void setDao(DaoCompany dao) {
     this.dao = dao;
+  }
+
+  @Override @Deprecated
+  public boolean deleteByName(String name) throws BadInputException, ServiceException {
+    return false;
   }
 
 }

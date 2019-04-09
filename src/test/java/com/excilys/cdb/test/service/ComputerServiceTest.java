@@ -15,29 +15,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.exception.BadInputException;
+import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.model.Company;
-import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.persistence.IDaoInstance;
-import com.excilys.cdb.service.IService;
+import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.ServiceFactory;
 import com.excilys.cdb.utils.DateUtils;
 
 class ComputerServiceTest {
   private static Logger log = LoggerFactory.getLogger(ComputerServiceTest.class);
-
-  static IService<Computer> service;
-  static IDaoInstance<Computer> daoComputer;
+  static ComputerService service;
+  static IDaoInstance<ComputerDTO> daoComputerDTO;
 
   static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-mm-dd hh:mm:ss");
 
-  Timestamp badIntroduced = DateUtils.getNowTimestamp();
-  Timestamp badDiscontinued = DateUtils.getBeforeNowTimestamp(Period.ofYears(3));
-  Timestamp introduced = DateUtils.getBeforeNowTimestamp(Period.ofYears(3));
-  Timestamp discontinued = DateUtils.getNowTimestamp();
+  String badIntroduced = DateUtils.getNowTimestamp().toString();
+  String badDiscontinued = DateUtils.getBeforeNowTimestamp(Period.ofYears(3)).toString();
+  String introduced = DateUtils.getBeforeNowTimestamp(Period.ofYears(3)).toString();
+  String discontinued = DateUtils.getNowTimestamp().toString();
 
   @BeforeAll
-  static void setUp() {
-      service = ServiceFactory.getComputerService();
+  static void setUp(ServiceFactory factory) {
+      service = factory.getComputerService();
   }
 
   @AfterAll
@@ -46,11 +46,11 @@ class ComputerServiceTest {
   }
 
   @Test
-  void givenGoodInput_whenCreateUser_thenSuceed() {
+  void givenGoodInput_whenCreateUser_thenSuceed() throws ServiceException {
     Company companyDummy = new Company(600L, "company");
 
-    Computer computerDummy = new Computer.ComputerBuilder().setId(600L).setIntroduced(introduced)
-        .setDiscontinued(discontinued).setName("New computer").setCompany(companyDummy).build();
+    ComputerDTO computerDummy = new ComputerDTO.ComputerDTOBuilder().setId(600L).setIntroduced(introduced)
+        .setDiscontinued(discontinued).setName("New computer").setCompanyId(companyDummy.getId()).build();
 
     try {
       assertTrue(service.create(computerDummy));
@@ -61,14 +61,14 @@ class ComputerServiceTest {
   }
 
   @Test
-  void givenBadInput_whenCreateUser_thenFail() {
+  void givenBadInput_whenCreateUser_thenFail() throws ServiceException {
     Company badCompanyDummy = new Company(-1L, null);
 
-    Computer badComputerDummy = new Computer.ComputerBuilder().setId(-1L).setName(null).setIntroduced(badIntroduced)
-        .setDiscontinued(badDiscontinued).setCompany(badCompanyDummy).build();
+    ComputerDTO badComputerDTODummy = new ComputerDTO.ComputerDTOBuilder().setId(-1L).setName(null).setIntroduced(badIntroduced)
+        .setDiscontinued(badDiscontinued).setCompanyId(badCompanyDummy.getId()).build();
 
     try {
-      assertFalse(service.create(badComputerDummy));
+      assertFalse(service.create(badComputerDTODummy));
       fail("BadInputException non thrown with bad inputs.");
     } catch (BadInputException e) {
       log.debug("BadInput Success, Create Exception launched!");
@@ -76,17 +76,17 @@ class ComputerServiceTest {
   }
 
   @Test
-  void givenGoodInput_whenUpdateUser_thenSuceed() {
+  void givenGoodInput_whenUpdateUser_thenSuceed() throws ServiceException {
     Company companyDummy = new Company(600L, "company");
     Company updatedcompany = new Company(700L, "new company");
-    Timestamp updatedIntroduced = Timestamp.valueOf( introduced.toLocalDateTime().minusDays(4) );
-    Timestamp updatedDiscontinued = null ;
+    String updatedIntroduced = Timestamp.valueOf( introduced ).toString();
+    String updatedDiscontinued = null ;
     
-    Computer computerDummy = new Computer.ComputerBuilder().setId(600L).setIntroduced(introduced)
-        .setDiscontinued(discontinued).setName("New computer").setCompany(companyDummy).build();
+    ComputerDTO computerDummy = new ComputerDTO.ComputerDTOBuilder().setId(600L).setIntroduced(introduced)
+        .setDiscontinued(discontinued).setName("New computer").setCompanyId(companyDummy.getId()).build();
 
-    Computer computerUpdated = new Computer.ComputerBuilder().setId(600L).setIntroduced( updatedIntroduced )
-        .setDiscontinued( updatedDiscontinued ).setName("New name").setCompany(updatedcompany).build();
+    ComputerDTO computerUpdated = new ComputerDTO.ComputerDTOBuilder().setId(600L).setIntroduced( updatedIntroduced )
+        .setDiscontinued( updatedDiscontinued ).setName("New name").setCompanyId(updatedcompany.getId()).build();
 
     try {
       assertTrue(service.create(computerDummy));
@@ -98,14 +98,14 @@ class ComputerServiceTest {
   }
 
   @Test
-  void givenBadInput_whenUpdateUser_thenFail() {
+  void givenBadInput_whenUpdateUser_thenFail() throws ServiceException {
     Company badCompanyDummy = new Company(-1L, null);
 
-    Computer badComputerDummy = new Computer.ComputerBuilder().setId(-1L).setName(null).setIntroduced(badIntroduced)
-        .setDiscontinued(badDiscontinued).setCompany(badCompanyDummy).build();
+    ComputerDTO badComputerDTODummy = new ComputerDTO.ComputerDTOBuilder().setId(-1L).setName(null).setIntroduced(badIntroduced)
+        .setDiscontinued(badDiscontinued).setCompanyId(badCompanyDummy.getId()).build();
 
     try {
-      assertFalse(service.updateById(badComputerDummy));
+      assertFalse(service.updateById(badComputerDTODummy));
       fail("BadInputException non thrown with bad inputs.");
     } catch (BadInputException e) {
       log.debug("BadInput Success, Update Exception launched!");
@@ -113,11 +113,11 @@ class ComputerServiceTest {
   }
 
   @Test
-  void givenGoodInput_whenDeleteUser_thenSuceed() {
+  void givenGoodInput_whenDeleteUser_thenSuceed() throws ServiceException {
 
     Company companyDummy = new Company(600L, "company");
-    Computer computerDummy = new Computer.ComputerBuilder().setId(600L).setDiscontinued(discontinued)
-        .setIntroduced(introduced).setName("New computer").setCompany(companyDummy).build();
+    ComputerDTO computerDummy = new ComputerDTO.ComputerDTOBuilder().setId(600L).setDiscontinued(discontinued.toString())
+        .setIntroduced(introduced.toString()).setName("New computer").setCompanyId(companyDummy.getId()).build();
 
     try {
       assertTrue(service.create(computerDummy));
@@ -129,15 +129,15 @@ class ComputerServiceTest {
   }
 
   @Test
-  void givenBadInput_whenDeleteUser_thenFail() {
+  void givenBadInput_whenDeleteUser_thenFail() throws ServiceException {
     Company badCompanyDummy = new Company(-1L, null);
 
-    Computer badComputerDummy = new Computer.ComputerBuilder().setId(-1L).setName(null).setIntroduced(badIntroduced)
-        .setDiscontinued(badDiscontinued).setCompany(badCompanyDummy).build();
+    ComputerDTO badComputerDTODummy = new ComputerDTO.ComputerDTOBuilder().setId(-1L).setName(null).setIntroduced(badIntroduced)
+        .setDiscontinued(badDiscontinued).setCompanyId(badCompanyDummy.getId()).build();
 
     try {
-      assertFalse(service.create(badComputerDummy));
-      assertFalse(service.deleteById(badComputerDummy.getId()));
+      assertFalse(service.create(badComputerDTODummy));
+      assertFalse(service.deleteById(badComputerDTODummy.getId()));
       fail("BadInputException non thrown with bad inputs.");
     } catch (BadInputException e) {
       log.debug("BadInput Success, Delete Exception launched!");

@@ -5,10 +5,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.model.Company;
+import com.excilys.cdb.persistence.DaoCompany;
 import com.excilys.cdb.persistence.DaoCompanyFactory;
-import com.excilys.cdb.persistence.IDaoInstance;
-
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -19,18 +19,20 @@ import org.slf4j.LoggerFactory;
 class DaoCompanyTest {
 
   private static final Logger log = LoggerFactory.getLogger(DaoComputerTest.class);
-  private static IDaoInstance<Company> daoTested;
+  private static DaoCompany daoTested;
+  private static DaoCompanyFactory companyFactory;
   
   @BeforeAll
-  static void setUp() { 
-    daoTested = DaoCompanyFactory.getCompanyFactory().getDao();
+  static void setUp(DaoCompanyFactory factory) { 
+    companyFactory = factory;
+    daoTested = companyFactory.getDao();
   }
   
   @BeforeAll
   static void tearDown() { }
   
   @Test
-  void givenGoodInput_whenCreateUser_thenSuceed() {
+  void givenGoodInput_whenCreateUser_thenSuceed() throws DaoException {
     Company companyDummy = new Company(600L, "company");
     
     assertTrue( daoTested.create(companyDummy) );
@@ -42,7 +44,7 @@ class DaoCompanyTest {
   }
   
   @Test
-  void givenBadInput_whenCreateUser_thenFail() {
+  void givenBadInput_whenCreateUser_thenFail() throws DaoException {
     Long id = -100L;
     
     Company companyDummy = new Company(id, "");   

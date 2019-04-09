@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.persistence.DaoComputerFactory;
@@ -24,17 +25,19 @@ public class DaoComputerTest {
 
 	private static final Logger log = LoggerFactory.getLogger(DaoComputerTest.class);
 	private static IDaoInstance<Computer> daoTested;
+  private static DaoComputerFactory computerFactory;
 	
 	@BeforeAll
-	static void setUp() {	
-	  daoTested = DaoComputerFactory.getComputerFactory().getDao();
+	static void setUp(DaoComputerFactory factory) {	
+	  computerFactory = factory;
+	  daoTested = factory.getDao();
 	}
 	
 	@BeforeAll
 	static void tearDown() { }
 	
 	@Test
-	void givenGoodInput_whenCreateUser_thenSuceed() {
+	void givenGoodInput_whenCreateUser_thenSuceed() throws DaoException {
 		Company companyDummy = new Company(600L, "company");
 		Computer computerDummy = new Computer.ComputerBuilder()
 				.setId(600L)
@@ -51,7 +54,7 @@ public class DaoComputerTest {
 	}
 	
 	@Test
-	void givenBadInput_whenCreateUser_thenFail() {
+	void givenBadInput_whenCreateUser_thenFail() throws DaoException {
 		Long id = -100L;
 		String name = null;
 		Timestamp introduced = DateUtils.getBeforeNowTimestamp(Period.ofYears(1000));

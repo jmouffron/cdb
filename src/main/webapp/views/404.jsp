@@ -1,4 +1,4 @@
-<%@include file="/views/taglibs.jsp" %>
+<%@include file="/views/imports/taglibs.jsp" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,23 +6,20 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <!-- Bootstrap -->
-<%@include file="/views/css.jsp" %>
-<%@include file="/views/favicons.jsp" %>
+<%@include file="/views/imports/css.jsp" %>
+<%@include file="/views/imports/favicons.jsp" %>
 </head>
 <body>
-	<%@include file="/views/header.jsp" %>
+	<%@include file="/views/imports/header.jsp" %>
 
 	<section id="main">
 		<div class="container">
 			<div class="alert alert-danger">
-				Error 404: Page not found. Too bad bitch! <br />
-				<!-- stacktrace -->
+				Error 404: Page not found ! <br />
 				${ stackTrace }
 			</div>
 		</div>
 	</section>
-
-	<%@include file="/views/js.jsp" %>
 
 </body>
 </html>

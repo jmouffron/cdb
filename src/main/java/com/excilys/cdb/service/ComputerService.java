@@ -7,127 +7,158 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.BadInputException;
+import com.excilys.cdb.exception.DaoException;
+import com.excilys.cdb.exception.ServiceException;
+import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.persistence.DaoComputerFactory;
-import com.excilys.cdb.persistence.IDaoInstance;
+import com.excilys.cdb.persistence.DaoComputer;
 import com.excilys.cdb.validator.ServiceValidator;
 
-public class ComputerService implements IService<Computer> {
-  private static ComputerService instance;
-	private IDaoInstance<Computer> dao;
-	private Logger log;
+public class ComputerService implements IService<ComputerDTO> {
+  private DaoComputer dao;
+  private static Logger log = LoggerFactory.getLogger(ComputerService.class);
 
-	private ComputerService() {
-		this.dao = DaoComputerFactory.getComputerFactory().getDao();
-		this.log = LoggerFactory.getLogger(ComputerService.class);
-	}
-	
-	public static ComputerService getService() {
-	  if ( instance == null ) {
-	    synchronized( ComputerService.class ) {
-	      if (instance == null ) {
-	        return new ComputerService();
-	      }
-	    }
-	  }
-	  return instance;
-	}
+  public ComputerService() {
+  }
 
-	@Override
-	public Optional<List<Computer>> getAll() {
-		return this.dao.getAll();
-	}
+  public ComputerService(DaoComputer dao) {
+    super();
+    this.dao = dao;
+  }
 
-	/**
-	 * @param name
-	 * @return
-	 */
-	@Override
-	public Optional<List<Computer>> searchByName(String name) {
-	  String regex = "(.*)" + name + "(.*)";
-		List<Computer> filteredComputers = this.dao.getAll().get()
-		    .stream()
-				.filter(computer -> computer.getName().matches(regex) || computer.getCompany().getName().matches(regex) )
-				.collect(Collectors.toList());
-		return Optional.ofNullable(filteredComputers);
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see com.excilys.cdb.service.IService#getAll()
+   */
+  @Override
+  public Optional<List<ComputerDTO>> getAll() {
+    List<ComputerDTO> list = null;
+    list = this.dao.getAll().get().stream().map(ComputerMapper::mapToDTO).map(Optional::get)
+        .collect(Collectors.toList());
 
-	/*
-	 * @see com.excilys.cdb.service.IService#getOneById(java.lang.Long)
-	 */
-	@Override
-	public Optional<Computer> getOneById(Long id) throws BadInputException {
-		ServiceValidator.idValidator(id, "Computer");
+    return Optional.ofNullable(list);
+  }
 
-		return this.dao.getOneById(id);
-	}
+  /*
+   * (non-Javadoc)
+   * 
+   * @see com.excilys.cdb.service.IService#orderBy(java.lang.String, boolean)
+   */
+  @Override
+  public Optional<List<ComputerDTO>> orderBy(String name, boolean isDesc) throws ServiceException {
+    List<ComputerDTO> list = null;
+    try {
+      list = this.dao.getAllOrderedBy(name, isDesc).get().stream().map(ComputerMapper::mapToDTO).map(Optional::get)
+          .collect(Collectors.toList());
+    } catch (DaoException e) {
+      log.error(e.getMessage());
+      throw new ServiceException(e.getMessage());
+    }
+    return Optional.ofNullable(list);
+  }
 
-	/*
-	 * @see com.excilys.cdb.service.IService#getOneByName(java.lang.String)
-	 */
-	@Override
-	public Optional<Computer> getOneByName(String name) throws BadInputException {
-		ServiceValidator.nameValidator(name, "Computer");
+  /**
+   * @param name
+   * @return
+   * @throws DaoException
+   * @throws ServiceException
+   */
+  @Override
+  public Optional<List<ComputerDTO>> searchByName(String name) {
+    String regex = "(?i)(.*)" + name + "(.*)";
+    List<ComputerDTO> filteredComputers = null;
+    filteredComputers = this.dao.getAll().get().stream()
+        .filter(computer -> computer.getName().matches(regex) || computer.getCompany().getName().matches(regex))
+        .map(ComputerMapper::mapToDTO).map(Optional::get).collect(Collectors.toList());
 
-		return this.dao.getOneByName(name);
-	}
+    return Optional.ofNullable(filteredComputers);
+  }
 
-	/*
-	 * @see com.excilys.cdb.service.IService#create(com.excilys.cdb.model.Entity)
-	 */
-	@Override
-	public boolean create(Computer newEntity) throws BadInputException {
-		ServiceValidator.computerValidator(newEntity, "Computer");
+  public Optional<List<ComputerDTO>> searchByNameOrdered(String name, String order, boolean isDesc) throws ServiceException {
+    String regex = "(?i)(.*)" + name + "(.*)";
+    List<ComputerDTO> filteredComputers = null;
+    try {
+      filteredComputers = this.dao.getAllOrderedBy(order, isDesc).get().stream()
+          .filter(computer -> computer.getName().matches(regex) || computer.getCompany().getName().matches(regex))
+          .map(ComputerMapper::mapToDTO).map(Optional::get).collect(Collectors.toList());
+    } catch (DaoException e) {
+      log.error(e.getMessage());
+      throw new ServiceException(e.getMessage());
+    }
 
-		return this.dao.create(newEntity);
-	}
+    return Optional.ofNullable(filteredComputers);
+  }
 
-	/*
-	 * @see
-	 * com.excilys.cdb.service.IService#updateById(com.excilys.cdb.model.Entity)
-	 */
-	@Override
-	public boolean updateById(Computer newEntity) throws BadInputException {
-		ServiceValidator.computerValidator(newEntity, "Computer");
+  /*
+   * @see com.excilys.cdb.service.IService#getOneById(java.lang.Long)
+   */
+  @Override
+  public Optional<ComputerDTO> getOneById(Long id) throws BadInputException {
+    ServiceValidator.idValidator(id, "Computer");
 
-		return this.dao.updateById(newEntity);
-	}
+    return ComputerMapper.mapToDTO(this.dao.getOneById(id).get());
+  }
 
-	/*
-	 * @see com.excilys.cdb.service.IService#deleteById(java.lang.Long)
-	 */
-	@Override
-	public boolean deleteById(Long id) throws BadInputException {
-		ServiceValidator.idValidator(id, "Computer");
+  /*
+   * @see com.excilys.cdb.service.IService#getOneByName(java.lang.String)
+   */
+  @Override
+  public Optional<ComputerDTO> getOneByName(String name) throws BadInputException {
+    ServiceValidator.nameValidator(name, "Computer");
 
-		return this.dao.deleteById(id);
-	}
+    return ComputerMapper.mapToDTO(this.dao.getOneByName(name).get());
+  }
 
-	/*
-	 * @see com.excilys.cdb.service.IService#deleteByName(java.lang.String)
-	 */
-	@Override
-	public boolean deleteByName(String name) throws BadInputException {
-		ServiceValidator.nameValidator(name, "Computer");
+  /*
+   * @see com.excilys.cdb.service.IService#create(com.excilys.cdb.model.Entity)
+   */
+  @Override
+  public boolean create(ComputerDTO newEntity) throws ServiceException {
+    ServiceValidator.computerDTOValidator(newEntity, "Computer");
+    Computer computer = ComputerMapper.mapToComputer(newEntity).get();
+    return this.dao.create(computer);
+  }
 
-		return this.dao.deleteByName(name);
-	}
+  /*
+   * @see
+   * com.excilys.cdb.service.IService#updateById(com.excilys.cdb.model.Entity)
+   */
+  @Override
+  public boolean updateById(ComputerDTO newEntity) throws BadInputException {
+    ServiceValidator.computerDTOValidator(newEntity, "Computer");
+    Computer computer = ComputerMapper.mapToComputer(newEntity).get();
 
-	/*
-	 * @see com.excilys.cdb.service.IService#getDao()
-	 */
-	@Override
-	public IDaoInstance<Computer> getDao() {
-		return this.dao;
-	}
+    return this.dao.updateById(computer);
+  }
 
-	/*
-	 * @see com.excilys.cdb.service.IService#setDao(com.excilys.cdb.persistence.
-	 * DaoInstance)
-	 */
-	@Override
-	public void setDao(IDaoInstance<Computer> dao) {
-		this.dao = dao;
-	}
+  /*
+   * @see com.excilys.cdb.service.IService#deleteById(java.lang.Long)
+   */
+  @Override
+  public boolean deleteById(Long id) throws BadInputException {
+    ServiceValidator.idValidator(id, "Computer");
+
+    return this.dao.deleteById(id);
+  }
+
+  /*
+   * @see com.excilys.cdb.service.IService#deleteByName(java.lang.String)
+   */
+  @Override
+  public boolean deleteByName(String name) throws ServiceException {
+    ServiceValidator.nameValidator(name, "Computer");
+
+    return this.dao.deleteByName(name);
+  }
+
+  public DaoComputer getDao() {
+    return this.dao;
+  }
+
+  public void setDao(DaoComputer dao) {
+    this.dao = dao;
+  }
 }

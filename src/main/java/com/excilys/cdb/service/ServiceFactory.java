@@ -1,19 +1,36 @@
 package com.excilys.cdb.service;
 
-import com.excilys.cdb.model.Entity;
+public class ServiceFactory{
 
-public class ServiceFactory<T extends Entity> {
-
-	public static final String COMPUTER_SERVICE = "computer";
-	public static final String COMPANY_SERVICE = "company";
-	
-	private ServiceFactory() { }
-	
-  public static ComputerService getComputerService(){
-		return ComputerService.getService();
-	}
+  public static final String COMPUTER_SERVICE = "computer";
+  public static final String COMPANY_SERVICE = "company";
+  private ComputerService computerService;
+  private CompanyService companyService;
   
-  public static CompanyService getCompanyService(){
-    return CompanyService.getService();
+  private ServiceFactory() {}
+  
+  private ServiceFactory(ComputerService service) {
+    super();
+    this.computerService = service;
   }
+
+  private ServiceFactory(CompanyService service) {
+    super();
+    this.companyService = service;
+  }
+  
+  private ServiceFactory(ComputerService computerService, CompanyService companyService) {
+    super();
+    this.computerService = computerService;
+    this.companyService = companyService;
+  }
+  
+  public ComputerService getComputerService(){
+    return this.computerService;
+  }
+  
+  public CompanyService getCompanyService(){
+    return this.companyService;
+  }
+
 }

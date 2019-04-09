@@ -6,7 +6,6 @@ import java.util.Optional;
 
 import org.slf4j.Logger;
 
-import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 
 /**
@@ -16,13 +15,11 @@ import com.zaxxer.hikari.HikariDataSource;
 public class Datasource {
   private static Logger log;
 
-	private static HikariConfig hikariCfg = new HikariConfig("/home/excilys/eclipse-workspace/cdb/src/main/resource/datasource.properties");
-	private static HikariDataSource hikariDs = new HikariDataSource(hikariCfg);;
-
-  /**
-   * A private Constructor to never allow instantiation
-   */
-  private Datasource() {
+  private HikariDataSource hikariDs;
+  private Connection conn;
+  
+  public Datasource(HikariDataSource ds) {
+    this.hikariDs = ds;
   }
 
   /**
@@ -30,16 +27,20 @@ public class Datasource {
    * 
    * @return Connection
    */
-  public static Optional<Connection> getConnection() {
-    Connection result = null;
+  public Optional<Connection> getConnection() {
+    this.conn = null;
     
     try {
-      result = hikariDs.getConnection();
+      this.conn = hikariDs.getConnection();
     } catch (SQLException e) {
       log.error(e.getMessage());
     }
-    
-    return Optional.ofNullable(result);
+
+    return Optional.ofNullable(this.conn);
+  }
+
+  public void close() {
+      this.hikariDs.close();
   }
 
 }

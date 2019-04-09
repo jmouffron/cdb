@@ -5,9 +5,11 @@ import java.time.LocalDateTime;
 
 public class ComputerDTO extends EntityDTO {
 
-	private String introduced;
+  private static final long serialVersionUID = -73180210575560484L;
+  private String introduced;
 	private String discontinued;
-	private long companyId;
+	private String companyName;
+  private long companyId;
 
 	public String getIntroduced() {
 		return introduced;
@@ -25,14 +27,22 @@ public class ComputerDTO extends EntityDTO {
 		this.discontinued = discontinued;
 	}
 
-	public long getCompanyId() {
-		return companyId;
+	public String getCompanyName() {
+		return companyName;
 	}
 
-	public void setCompany(long company_id) {
-		this.companyId = company_id;
+	public void setCompanyName(String companyName) {
+		this.companyName = companyName;
 	}
 
+  public long getCompanyId() {
+    return companyId;
+  }
+
+  public void setCompanyId(long companyId) {
+    this.companyId = companyId;
+  }
+  
 	/**
 	 * General constructor with all params
 	 * 
@@ -41,18 +51,19 @@ public class ComputerDTO extends EntityDTO {
 	 * @param discontinued
 	 * @param company
 	 */
-	public ComputerDTO(long id, String name, String introduced, String discontinued, long company_id) {
+	public ComputerDTO(long id, String name, String introduced, String discontinued, String companyName, long companyId) {
 		this.id = id;
 		this.name = name;
 		this.introduced = introduced;
 		this.discontinued = discontinued;
-		this.companyId = company_id;
+		this.companyName = companyName;
+		this.companyId = companyId;
 	}
 
 	@Override
 	public String toString() {
 		return "Computer of id " + this.id + ", of name " + this.name + ", introduced in " + this.introduced
-				+ ", discontinued in " + this.discontinued + " manufacturé par " + this.companyId;
+				+ ", discontinued in " + this.discontinued + " manufacturé par " + this.companyName;
 	}
 
 	/**
@@ -66,12 +77,13 @@ public class ComputerDTO extends EntityDTO {
 		private String name;
 		private String introduced = Timestamp.valueOf(LocalDateTime.now()).toString();
 		private String discontinued = null;
-		private long company_id;
-
+		private String companyName;
+		private long companyId;
+		
 		public ComputerDTOBuilder() {
 		}
 
-		public ComputerDTOBuilder setId(Long id) {
+		public ComputerDTOBuilder setId(long id) {
 			this.id = id;
 			return this;
 		}
@@ -91,13 +103,18 @@ public class ComputerDTO extends EntityDTO {
 			return this;
 		}
 
-		public ComputerDTOBuilder setCompanyId(long company_id) {
-			this.company_id = company_id;
+		public ComputerDTOBuilder setCompanyName(String companyName) {
+			this.companyName = companyName;
 			return this;
 		}
+		
+    public ComputerDTOBuilder setCompanyId(long companyId) {
+      this.companyId = companyId;
+      return this;
+    }
 
 		public ComputerDTO build() {
-			return new ComputerDTO(id, name, introduced, discontinued, company_id);
+			return new ComputerDTO(id, name, introduced, discontinued, companyName, companyId);
 		}
 	}
 
@@ -105,7 +122,7 @@ public class ComputerDTO extends EntityDTO {
   public int hashCode() {
     final int prime = 31;
     int result = super.hashCode();
-    result = prime * result + (int) (companyId ^ (companyId >>> 32));
+    result = prime * result + ((companyName == null) ? 0 : companyName.hashCode());
     result = prime * result + ((discontinued == null) ? 0 : discontinued.hashCode());
     result = prime * result + ((introduced == null) ? 0 : introduced.hashCode());
     return result;
@@ -120,7 +137,10 @@ public class ComputerDTO extends EntityDTO {
     if (getClass() != obj.getClass())
       return false;
     ComputerDTO other = (ComputerDTO) obj;
-    if (companyId != other.companyId)
+    if (companyName == null) {
+      if (other.companyName != null)
+        return false;
+    } else if (!companyName.equals(other.companyName))
       return false;
     if (discontinued == null) {
       if (other.discontinued != null)

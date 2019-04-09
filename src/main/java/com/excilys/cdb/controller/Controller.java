@@ -31,19 +31,21 @@ import com.excilys.cdb.view.Page;
 public class Controller<T extends Entity> {
 	private static final Logger logger = LoggerFactory.getLogger(Controller.class);
   private Page<T> page;
+  private ServiceFactory factory;
 	private MenuChoiceEnum request;
 	private IService<T> service;
 	private static volatile Controller<Entity> instance;
 
-	private Controller(Page<T> page) {
+	private Controller(Page<T> page, ServiceFactory factory) {
 		this.page = page;
+		this.factory = factory;
 	}
 
-	public static Controller<Entity> getController() {
+	public static Controller<Entity> getController(ServiceFactory factory) {
 		if (instance == null) {
 			synchronized (Controller.class) {
 				if (instance == null) {
-					instance = new Controller<>(new MenuPage());
+					instance = new Controller<>(new MenuPage(), factory);
 				}
 			}
 		}
@@ -128,8 +130,13 @@ public class Controller<T extends Entity> {
       logger.error("Bad service instantiation in controller");
     }
 
-		List<Entity> entities = this.getAllEntities();
-		Data<Entity> payload = new Data<Entity>(entities);
+		List<T> entities = null;
+    try {
+      entities = this.getAllEntities();
+    } catch (ServiceException e) {
+      logger.error(e.getMessage());
+    }
+		Data<Entity> payload = (Data<Entity>) new Data<T>(entities);
 
 		long totalDataSize = entities.size();
 
@@ -160,13 +167,18 @@ public class Controller<T extends Entity> {
 		id = ControllerUtils.getLongInput("Choisissez un id d'entité supérieur à 0:",
 				ControllerUtils.isStrictlyPositive);
 
-		Entity entity = this.getEntityById(id);
+		Entity entity = null;
+    try {
+      entity = this.getEntityById(id);
+    } catch (ServiceException e) {
+      logger.error(e.getMessage());
+    }
 		Data<Entity> payload = new Data<Entity>(entity);
 
 		try {
 			this.setPage(new EntityPage(payload));
 		} catch (ServiceException e) {
-			e.printStackTrace();
+		  logger.error(e.getMessage());
 		}
 	}
 
@@ -198,7 +210,12 @@ public class Controller<T extends Entity> {
 					.getTimestampInput("Veuillez entrer la date de fin de fonction de l'ordinateur");
 		} while (introduced.after(discontinued));
 
-		Company company = (Company) getEntityById(companyId);
+		Company company = null;
+    try {
+      company = (Company) getEntityById(companyId);
+    } catch (ServiceException e) {
+      logger.error(e.getMessage());
+    }
 		Computer newEntity = new Computer.ComputerBuilder().setName(name).setIntroduced(introduced)
 				.setDiscontinued(discontinued).setCompany(company).build();
 
@@ -250,9 +267,10 @@ public class Controller<T extends Entity> {
 	 * Fetches all instance of a certain type of entity from the database
 	 * 
 	 * @return List<Entity>
+	 * @throws ServiceException 
 	 */
-	private List<Entity> getAllEntities() {
-		return (List<Entity>) this.service.getAll().get();
+	private List<T> getAllEntities() throws ServiceException {
+		return this.service.getAll().get();
 	}
 
 	/**
@@ -260,8 +278,9 @@ public class Controller<T extends Entity> {
 	 * 
 	 * @param id
 	 * @return An entity mapped from the database
+	 * @throws ServiceException 
 	 */
-	private Entity getEntityById(Long id) {
+	private Entity getEntityById(Long id) throws ServiceException {
 		try {
 			return this.service.getOneById(id).get();
 		} catch (BadInputException e) {
@@ -279,7 +298,7 @@ public class Controller<T extends Entity> {
 	private boolean addEntity(Entity newEntity) {
 		try {
 			return this.service.create((T) newEntity);
-		} catch (BadInputException e) {
+		} catch (ServiceException e) {
 			e.printStackTrace();
 		}
 		return false;
@@ -312,10 +331,10 @@ public class Controller<T extends Entity> {
 	private void setService(String serviceType) throws ServiceException {
 		switch(serviceType) {
 		  case ServiceFactory.COMPUTER_SERVICE:
-		    this.service = (IService<T>) ServiceFactory.getComputerService();
+		    this.service = (IService) factory.getComputerService();
 		    break;
 		  case ServiceFactory.COMPANY_SERVICE:
-        this.service = (IService<T>) ServiceFactory.getCompanyService();
+        this.service = (IService) factory.getCompanyService();
         break;
       default:
         logger.error("Wrong type of services asked in controller.");
