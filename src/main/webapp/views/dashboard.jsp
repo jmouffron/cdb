@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title>Computer Database | Dashboard</title>
+<title><spring:message code="dashboard.title" /></title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta charset="utf-8">
@@ -18,10 +18,10 @@
 		<div class="container">
 			<c:choose>
 				<c:when test="${computerNumber>0}">
-					<h1 id="homeTitle">${computerNumber}<spring:message code="dashboard.number_computer" /></h1>
+					<h1 id="homeTitle">${computerNumber} <spring:message code="dashboard.number_computer" /></h1>
 				</c:when>
 				<c:otherwise>
-					<h1 id="homeTitle">No computer found!</h1>
+					<h1 id="homeTitle"><spring:message code="dashboard.no_number_computer" /></h1>
 				</c:otherwise>
 			</c:choose>
 			<div id="actions" class="form-horizontal">
@@ -31,16 +31,16 @@
 						class="form-inline">
 
 						<input type="search" id="searchbox" name="search"
-							class="form-control" placeholder="Search name" value="${search}" />
-						<input type="submit" id="searchsubmit" value="Filter by name"
+							class="form-control" placeholder="<spring:message code='dashboard.filter_placeholder' />" value="${search}" />
+						<input type="submit" id="searchsubmit" value="<spring:message code='dashboard.filter' />"
 							class="btn btn-primary" />
 					</form>
 				</div>
 				<div class="pull-right">
 					<a class="btn btn-success" id="addComputer"
-						href="${ctx}/addComputer">Add Computer</a> <a
+						href="${ctx}/addComputer"><spring:message code="dashboard.add_computer" /></a> <a
 						class="btn btn-default" id="editComputer" href="#"
-						onclick="$.fn.toggleEditMode();">Edit</a>
+						onclick="$.fn.toggleEditMode();"><spring:message code="dashboard.edit" /></a>
 				</div>
 			</div>
 		</div>
@@ -52,7 +52,7 @@
 		<div class="container" style="margin-top: 10px;">
 			<c:choose>
 				<c:when test="${computerNumber == 0}">
-					<p>No match of computers.</p>
+					<p><spring:message code="dashboard.no_filter" /></p>
 				</c:when>
 				<c:otherwise>
 					<table class="table table-striped table-bordered">
@@ -68,24 +68,24 @@
 											class="fa fa-trash-o fa-lg"></i>
 									</a>
 								</span></th>
-								<th>Computer name <a
+								<th><spring:message code="dashboard.computer_name" /> <a
 									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=0&order=true"><i
 										class="fa fa-caret-down"></i></a><a
 									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=0"><i
 										class="fa fa-caret-up"></i></a></th>
-								<th>Introduced date <a
+								<th><spring:message code="dashboard.introduced_date" /> <a
 									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=1&order=true"><i
 										class="fa fa-caret-down"></i></a><a
 									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=1"><i
 										class="fa fa-caret-up"></i></a></th>
 								<!-- Table header for Discontinued Date -->
-								<th>Discontinued date <a
+								<th><spring:message code="dashboard.discontinued_date" /> <a
 									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=2&order=true"><i
 										class="fa fa-caret-down"></i></a><a
 									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=2"><i
 										class="fa fa-caret-up"></i></a></th>
 								<!-- Table header for Company -->
-								<th>Company <a
+								<th><spring:message code="dashboard.company" /> <a
 									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=3&order=true"><i
 										class="fa fa-caret-down"></i></a><a
 									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=3"><i

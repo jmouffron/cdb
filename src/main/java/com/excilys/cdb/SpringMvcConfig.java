@@ -30,7 +30,7 @@ public class SpringMvcConfig implements WebMvcConfigurer {
   public MessageSource messageSource() {
       ReloadableResourceBundleMessageSource msgSrc = new ReloadableResourceBundleMessageSource();
 
-      msgSrc.setBasename("classpath:locale");
+      msgSrc.setBasename("classpath:locale/messages");
       msgSrc.setCacheSeconds(1);
       msgSrc.setUseCodeAsDefaultMessage(true);
       msgSrc.setDefaultEncoding("UTF-8");
