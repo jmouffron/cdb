@@ -39,12 +39,21 @@ public class ComputerController {
 
   @Autowired
   ComputerService computerService;
-  
+
   @Autowired
   CompanyService companyService;
 
   @Autowired
   MessageSource msgSrc;
+  
+  @Autowired
+  Pagination pagination;
+
+  public ComputerController(ComputerService computerService, CompanyService companyService, Pagination pagination) {
+    this.computerService = computerService;
+    this.companyService = companyService;
+    this.pagination = pagination;
+  }
 
   private static Map<String, String> columns;
 
@@ -60,7 +69,6 @@ public class ComputerController {
   @GetMapping({ "/", "/dashboard", "/dashBoard" })
   public String getDashBoard(@RequestParam(required = false) Map<String, String> paths, Model model) {
     logger.info(getClass().getName() + " has been called");
-    Pagination pagination = new Pagination(computerService.getAll().get(), 0, IndexPagination.IDX_10);
 
     List<ComputerDTO> computers = null;
     IndexPagination entitiesPerPage;
@@ -74,14 +82,14 @@ public class ComputerController {
     String index = paths.get("startIndex");
     String perPage = paths.get("perPage");
     String newPage = paths.get("page");
-
+    
     String searchName = paths.get("search");
     String order = paths.get("order");
     String toOrder = paths.get("toOrder");
     String selection = paths.get("selection");
 
     isDesc = (order == null || order.equals("")) ? false : true;
-    entitiesPerPage = (perPage == null) ? IndexPagination.IDX_10 : IndexPagination.valueOf(perPage);
+    entitiesPerPage = (perPage == null || perPage.equals("")) ? IndexPagination.IDX_10 : IndexPagination.valueOf(perPage);
     startIndex = (index == null) ? 0 : Integer.parseInt(index);
     page = (newPage == null || newPage.equals("0")) ? 1 : Integer.parseInt(newPage);
     toOrder = (toOrder == null || toOrder.equals("") || !columns.containsKey(toOrder)) ? "pc_name"
@@ -92,6 +100,7 @@ public class ComputerController {
       try {
         computers = this.computerService.orderBy(toOrder, isDesc).get();
       } catch (ServiceException | DaoException e) {
+        logger.error(e.getMessage());
         model.addAttribute("stackTrace", e.getMessage());
         return ERROR;
       }
@@ -99,6 +108,7 @@ public class ComputerController {
       try {
         computers = this.computerService.searchByNameOrdered(searchName, toOrder, isDesc).get();
       } catch (ServiceException | DaoException e) {
+        logger.error(e.getMessage());
         model.addAttribute("stackTrace", e.getMessage());
         return ERROR;
       }
@@ -113,13 +123,15 @@ public class ComputerController {
     try {
       pagination.setPerPage(entitiesPerPage);
     } catch (PageException e) {
+      logger.error("Hey");
       model.addAttribute("stackTrace", e.getMessage());
       return ERROR;
     }
-
+    
     pagination.setElements(computers);
     pagination.navigate(page);
-
+    logger.error(pagination.toString());
+    
     try {
       model.addAttribute("computerNumber", pagination.getSize());
       model.addAttribute("totalPages", pagination.getTotalPages());
@@ -127,9 +139,11 @@ public class ComputerController {
       model.addAttribute("computers", pagination.list().get());
       model.addAttribute("currentPage", pagination.getCurrentPage());
     } catch (PageException e) {
+      logger.error(e.getMessage());
       model.addAttribute("stackTrace", e.getMessage());
       return ERROR;
     }
+    model.addAttribute("perPage", perPage);
 
     return DASHBOARD;
   }
@@ -141,8 +155,6 @@ public class ComputerController {
     String success = paths.get("success");
     String danger = paths.get("danger");
     String selection = paths.get("selection");
-
-    logger.error(selection);
 
     if ("".equals(selection)) {
       logger.error("No correct computer name found!");
@@ -157,6 +169,7 @@ public class ComputerController {
       try {
         computer = this.computerService.getOneById(id).get();
       } catch (BadInputException e) {
+        logger.error(e.getMessage());
         model.addAttribute("stackTrace", e.getMessage());
       }
 
@@ -186,7 +199,7 @@ public class ComputerController {
     return getDashBoard(paths, model);
   }
 
-  @GetMapping({ "/addComputer", "/addcomputer", "/AddComputer", "/Addcomputer" })
+  @GetMapping({ "addComputer", "/addcomputer", "/AddComputer", "/Addcomputer" })
   public String getAddComputer(@RequestParam(required = false) Map<String, String> paths, Model model) {
     logger.info(getClass().getName() + " has been called");
 
@@ -204,7 +217,6 @@ public class ComputerController {
     }
 
     model.addAttribute("companies", companies);
-
 
     return ADD_COMPUTER;
   }
@@ -242,7 +254,7 @@ public class ComputerController {
       model.addAttribute("danger", "Computer " + computerDto.getName() + " couldn't be created!");
     }
 
-    return getAddComputer(paths,model);
+    return getAddComputer(paths, model);
   }
 
   @GetMapping({ "/editComputer", "/editcomputer", "/EditComputer", "/Editcomputer" })
@@ -335,6 +347,6 @@ public class ComputerController {
       model.addAttribute("danger", "Computer " + computerToSend.getName() + " not updated!");
     }
 
-    return getEditComputer(paths,model);
+    return getEditComputer(paths, model);
   }
 }

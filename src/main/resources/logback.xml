@@ -11,10 +11,10 @@
 		class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<rollingPolicy
 			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-
+			 <prudent>true</prudent>
 			<FileNamePattern>cdb.%d{yyyy-MM-dd_HH-mm}.log
 			</FileNamePattern>
-
+			<maxFileSize>100MB</maxFileSize>
 			<maxHistory>30</maxHistory>
 		</rollingPolicy>
 
@@ -27,5 +27,6 @@
 
 	<root level="debug">
 		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
 	</root>
 </configuration>

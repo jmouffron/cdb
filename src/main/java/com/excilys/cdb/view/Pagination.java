@@ -5,8 +5,11 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import org.springframework.beans.factory.annotation.Autowired;
+
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.PageException;
+import com.excilys.cdb.service.ComputerService;
 
 /**
  * Une classe pour gérer la pagination
@@ -21,9 +24,12 @@ public class Pagination {
   private IndexPagination perPage;
   private int totalPages;
   private int currentPage;
-
-  public Pagination(List<ComputerDTO> elements, int startIndex, IndexPagination perPage) {
-    this.elements = elements;
+  
+  @Autowired 
+  ComputerService service;
+  
+  public Pagination(ComputerService service, int startIndex, IndexPagination perPage) {
+    this.elements = service.getAll().get();
     this.startIndex = startIndex;
     this.perPage = perPage;
     this.totalPages = elements.size() / this.perPage.getIndex();
@@ -44,6 +50,8 @@ public class Pagination {
       case IDX_50:
       case IDX_100:
         this.perPage = entitiesPerPage;
+        this.startIndex = 0;
+        this.currentPage = 1;
         break;
       default:
         throw new PageException("Bad value for enitiesPerpage in pagination!"); 
@@ -105,9 +113,12 @@ public class Pagination {
    * @throws PageException
    */
   public Optional<List<ComputerDTO>> list() throws PageException {
-    if (this.startIndex < 0 || this.perPage.getIndex() < 0) {
-      throw new PageException("Non positive numbers inputted.");
+    if (this.startIndex < 0 ) {
+      throw new PageException("Non positive numbers inputted for startIndex.");
+    }else if (this.perPage.getIndex() < 0) {
+      throw new PageException("Non positive numbers inputted for PerPage.");
     }
+    
     
     List<ComputerDTO> filteredElements = this.elements.stream().skip(startIndex).limit(perPage.getIndex())
         .collect(Collectors.toList());
@@ -128,4 +139,12 @@ public class Pagination {
   public Object getSize() {
     return this.elements.size();
   }
+
+  @Override
+  public String toString() {
+    return "Pagination [startIndex=" + startIndex + ", perPage=" + perPage + ", totalPages="
+        + totalPages + ", currentPage=" + currentPage + "]";
+  }
+  
+  
 }

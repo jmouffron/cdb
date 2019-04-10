@@ -13,7 +13,8 @@ import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ServiceFactory;
 
 public class CompanyMapper implements RowMapper<Company> {
-  private static ServiceFactory factory;
+  private static CompanyService companyService;
+  
 	static public Company map(ResultSet rs) throws SQLException {
 
 		Long id = rs.getLong("id");
@@ -29,12 +30,12 @@ public class CompanyMapper implements RowMapper<Company> {
 	  }
 
   public static Company mapToCompany(CompanyDTO dto) throws BadInputException {
-    CompanyService service = factory.getCompanyService();
+    CompanyService service = companyService;
     return new Company( dto.getId(), service.getOneByName(dto.getName()).get().getName());
   }
   
   public static Company mapToCompany(ComputerDTO dto) throws BadInputException {
-    CompanyService service = factory.getCompanyService();
+    CompanyService service = companyService;
     return new Company( dto.getCompanyId(), service.getOneByName(dto.getCompanyName()).get().getName());
   }
 

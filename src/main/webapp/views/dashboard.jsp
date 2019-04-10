@@ -119,7 +119,7 @@
 			<ul class="pagination">
 				<c:if test = "${ currentPage != 1}"> 
 					<li><a
-						href="${ctx}?page=${ currentPage - 1 > 0 ? currentPage -1: 1}&search=${search}&toOrder=${toOrder}"
+						href="${ctx}?page=${ currentPage - 1 > 0 ? currentPage -1: 1}&search=${search}&toOrder=${toOrder}&perPage=${perPage}"
 						aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
 					</a></li>
 				</c:if>
@@ -128,30 +128,31 @@
 					<c:choose>
 						<c:when test="${i == currentPage}">
 							<li class="active"><a
-								href="${ctx}?page=${i}&search=${search}&toOrder=${toOrder}">${i}</a></li>
+								href="${ctx}?page=${i}&search=${search}&toOrder=${toOrder}&perPage=${perPage}">${i}</a></li>
 						</c:when>
 						<c:otherwise>
 							<li><a
-								href="${ctx}?page=${i}&search=${search}&toOrder=${toOrder}">${i}</a></li>
+								href="${ctx}?page=${i}&search=${search}&toOrder=${toOrder}&perPage=${perPage}">${i}</a></li>
 						</c:otherwise>
 					</c:choose>
 
 				</c:forEach>
-				<c:if test = "${ currentPage + 1 < totalPages}">
-					<li><a href="${ctx}?page=${ currentPage + 1 }&search=${search}"
+				<c:if test = "${ currentPage + 1 <= totalPages}">
+					<li><a href="${ctx}?page=${ currentPage + 1 }&search=${search}&perPage=${perPage}"
 						aria-label="Next"> <span aria-hidden="true">&raquo;</span>
 					</a></li>
 				</c:if> 
 			</ul>
 
 			<div class="btn-group btn-group-sm pull-right" role="group">
-				<a class="btn btn-default" href="${ctx}?page=${ currentPage }&search=${search}&toOrder=${toOrder}&perPage=IDX_10">10</a>
-				<a class="btn btn-default" href="${ctx}?page=${ currentPage }&search=${search}&toOrder=${toOrder}&perPage=IDX_50">50</a>
-				<a class="btn btn-default" href="${ctx}?page=${ currentPage }&search=${search}&toOrder=${toOrder}&perPage=IDX_100">100</a>
+				<a class="btn btn-default" href="${ctx}?search=${search}&toOrder=${toOrder}&perPage=IDX_10">10</a>
+				<a class="btn btn-default" href="${ctx}?search=${search}&toOrder=${toOrder}&perPage=IDX_50">50</a>
+				<a class="btn btn-default" href="${ctx}?search=${search}&toOrder=${toOrder}&perPage=IDX_100">100</a>
 			</div>
 		</div>
 	</footer>
 
 	<%@include file="/views/imports/js.jsp"%>
+	<%@include file="/views/imports/i18n.jsp"%>
 </body>
 </html>

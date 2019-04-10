@@ -20,6 +20,9 @@
 			</div>
 		</div>
 	</section>
+		
+	<script src="${ctx}/js/jquery.min.js"></script>
+	<%@include file="/views/imports/i18n.jsp"%>
 
 </body>
 </html>

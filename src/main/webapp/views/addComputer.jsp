@@ -56,5 +56,6 @@
 	
 	<script src="${ctx}/js/jquery.min.js"></script>
 	<script src="${ctx}/js/validation.js"></script>
+	<%@include file="/views/imports/i18n.jsp"%>
 </body>
 </html>

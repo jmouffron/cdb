@@ -22,6 +22,6 @@ public class SpringWebInitializer implements WebApplicationInitializer {
         DispatcherServlet servlet = new DispatcherServlet(ctx);
         ServletRegistration.Dynamic registration = servletCtx.addServlet("app", servlet);
         registration.setLoadOnStartup(1);
-        registration.addMapping("/cdb/");
+        registration.addMapping("/");
     }
 }
