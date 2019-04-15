@@ -10,7 +10,6 @@ import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.service.CompanyService;
-import com.excilys.cdb.service.ServiceFactory;
 
 public class CompanyMapper implements RowMapper<Company> {
   private static CompanyService companyService;

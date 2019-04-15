@@ -1,20 +1,19 @@
-package com.excilys.cdb.view;
+package com.excilys.cdb.cli;
 
 import org.slf4j.LoggerFactory;
 
-import com.excilys.cdb.controller.ControllerUtils;
 import com.excilys.cdb.controller.MenuChoiceEnum;
+import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.exception.ServiceException;
-import com.excilys.cdb.model.Entity;
 
-public class EntityListPage extends Page<Entity> {
+public class EntityListPage extends Page {
 	private long dataPerPage;
 	private long totalPageNumber;
 
 	private long startIndex;
 	private long pageIndex;
 
-	public EntityListPage(Data<Entity> payload, long totalPages, long dataPerPage) throws ServiceException {
+	public EntityListPage(Data payload, long totalPages, long dataPerPage) throws ServiceException {
 		this.data = payload;
 		this.pageIndex = 0;
 		this.logger = LoggerFactory.getLogger(EntityListPage.class);
@@ -22,7 +21,7 @@ public class EntityListPage extends Page<Entity> {
 		this.totalPageNumber = totalPages;
 	}
 
-	private void paginate() {
+	private void paginate() throws PageException {
 		pageIndex = 0;
 		String input;
 
@@ -31,9 +30,10 @@ public class EntityListPage extends Page<Entity> {
 
 			System.out.println("P " + (pageIndex + 1) + "/" + totalPageNumber + " N ");
 
-			input = ControllerUtils.getStringInput("P pour page précédente, N pour la suivante, E pour le menu:",
-					valInputted -> valInputted != "P" || valInputted != "N" || valInputted != "E");
-
+			input = ControllerUtils.getStringInput("P pour page précédente, N pour la suivante, E pour le menu:", ControllerUtils.isPorAorE );
+			
+			logger.error("Input value:" + input);
+			
 			if (input.equals("P")) {
 				pageIndex--;
 				startIndex -= dataPerPage;
@@ -41,7 +41,7 @@ public class EntityListPage extends Page<Entity> {
 				pageIndex++;
 				startIndex += dataPerPage;
 			} else {
-				break;
+				throw new PageException("Problème de page!");
 			}
 		}
 	}
@@ -51,7 +51,11 @@ public class EntityListPage extends Page<Entity> {
 		System.out.println("==============================");
 		System.out.println(" |          Liste           | ");
 		System.out.println("==============================");
-		paginate();
+		try {
+			paginate();
+		} catch (PageException e) {
+			logger.error(e.getMessage());
+		}
 		System.out.println("==============================");
 		return MenuChoiceEnum.DEFAULT;
 	}

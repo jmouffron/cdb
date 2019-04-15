@@ -1,9 +1,8 @@
-package com.excilys.cdb.view;
+package com.excilys.cdb.cli;
 
 import org.slf4j.Logger;
 
 import com.excilys.cdb.controller.MenuChoiceEnum;
-import com.excilys.cdb.model.Entity;
 
 /**
  * @author excilys
@@ -12,7 +11,7 @@ import com.excilys.cdb.model.Entity;
  *
  * @param <T>
  */
-public abstract class Page<Entity> {
+public abstract class Page {
 	/**
 	 * Logging object
 	 */
@@ -20,7 +19,7 @@ public abstract class Page<Entity> {
 	/**
 	 * Data encapsulator object for the view
 	 */
-	protected Data<com.excilys.cdb.model.Entity> data;
+	protected Data data;
 
 	/**
 	 * Returns a MenuChoiceEnum that defines a user choice for the controller

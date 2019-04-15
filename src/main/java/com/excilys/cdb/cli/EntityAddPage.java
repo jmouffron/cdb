@@ -1,14 +1,12 @@
-package com.excilys.cdb.view;
+package com.excilys.cdb.cli;
 
 import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.controller.MenuChoiceEnum;
-import com.excilys.cdb.model.Computer;
-import com.excilys.cdb.model.Entity;
 
-public class EntityAddPage extends Page<Computer> {
+public class EntityAddPage extends Page{
 
-	public EntityAddPage(Data<Entity> payload) {
+	public EntityAddPage(Data payload) {
 		this.data = payload;
 		this.logger = LoggerFactory.getLogger(EntityAddPage.class);
 	}

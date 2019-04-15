@@ -1,15 +1,14 @@
-package com.excilys.cdb.view;
+package com.excilys.cdb.cli;
 
 import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.controller.MenuChoiceEnum;
 import com.excilys.cdb.exception.ServiceException;
-import com.excilys.cdb.model.Entity;
 
-public class EntityPage extends Page<Entity> {
+public class EntityPage extends Page {
 
-	public EntityPage(Data<Entity> data) throws ServiceException {
-		this.data = data;
+	public EntityPage(Data payload) throws ServiceException {
+		this.data = payload;
 		this.logger = LoggerFactory.getLogger(EntityPage.class);
 	}
 

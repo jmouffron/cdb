@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.persistence.DaoCompany;
-import com.excilys.cdb.persistence.DaoCompanyFactory;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeAll;
@@ -20,12 +19,10 @@ class DaoCompanyTest {
 
   private static final Logger log = LoggerFactory.getLogger(DaoComputerTest.class);
   private static DaoCompany daoTested;
-  private static DaoCompanyFactory companyFactory;
   
   @BeforeAll
-  static void setUp(DaoCompanyFactory factory) { 
-    companyFactory = factory;
-    daoTested = companyFactory.getDao();
+  static void setUp() { 
+
   }
   
   @BeforeAll

@@ -2,23 +2,18 @@ package com.excilys.cdb.persistence;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.mapper.CompanyMapper;
-import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Company;
-import com.excilys.cdb.model.Computer;
 import com.excilys.cdb.service.ComputerService;
 
 /**
@@ -26,8 +21,10 @@ import com.excilys.cdb.service.ComputerService;
  * 
  * @author excilys
  *
- */
-public class DaoCompany implements IDaoInstance<Company> {
+*/
+
+@Repository
+public class DaoCompany {
 
   private final String DELETE_ID = "DELETE FROM company WHERE id=? ";
   private final String COMPUTER_CASCADE_DELETE_ID = "DELETE FROM computers WHERE company_id=? ";
@@ -35,7 +32,6 @@ public class DaoCompany implements IDaoInstance<Company> {
   private final String COMPUTER_CASCADE_DELETE_NAME = "DELETE FROM computers LEFT JOIN company ON computer.company_id = company.id WHERE company.name = ? ";
   private final String DESC = " DESC;";
   private final String INSERT = "INSERT INTO company VALUES(?,?)";
-  private final String MAX_ID = "SELECT MAX(id)+1 FROM company;";
   private final String SELECT_ALL = "SELECT id, name FROM company ";
   private final String SELECT_ID = "SELECT id, name FROM company where id=?";
   private final String SELECT_NAME = "SELECT id, name FROM company where name=?";
@@ -45,14 +41,9 @@ public class DaoCompany implements IDaoInstance<Company> {
   private final Logger log = LoggerFactory.getLogger(DaoCompany.class);
   private Datasource datasource;
   
-  @Autowired
   JdbcTemplate jdbcTemplate;
-  
-  public DaoCompany() {
-  }
 
   public DaoCompany(JdbcTemplate jdbc) {
-    super();
     this.jdbcTemplate = jdbc;
   }
 
@@ -60,32 +51,27 @@ public class DaoCompany implements IDaoInstance<Company> {
     return this.datasource.getConnection().get();
   }
   
-  @Override
   public Optional<List<Company>> getAll(){
     List<Company> companyFetched = jdbcTemplate.query(SELECT_ALL, new CompanyMapper());
     return Optional.ofNullable(companyFetched);
   }
-  
-  @Override
+
   public Optional<List<Company>> getAllOrderedBy(String orderBy, boolean desc){
     String QUERY = desc ? ORDER_BY + orderBy + DESC : ORDER_BY + orderBy;
     List<Company> companyFetched = jdbcTemplate.query(QUERY, new CompanyMapper());
     return Optional.ofNullable(companyFetched);
   }
   
-  @Override
   public Optional<Company> getOneById(Long id) {
     Company companyFetched = jdbcTemplate.queryForObject(SELECT_ID, new Object[]{id} ,new CompanyMapper());
     return Optional.ofNullable(companyFetched);
   }
 
-  @Override
   public Optional<Company> getOneByName(String name) {
     Company companyFetched = jdbcTemplate.queryForObject(SELECT_NAME, new Object[]{name} ,new CompanyMapper());
     return Optional.ofNullable(companyFetched);
   }
 
-  @Override
   public boolean create(Company newEntity) throws DaoException {
     int affected = jdbcTemplate.update(INSERT, new Object[] {newEntity});
     if( affected > 0 ) {
@@ -94,7 +80,6 @@ public class DaoCompany implements IDaoInstance<Company> {
     return affected > 0 ? true : false;
   }
   
-  @Override
   public boolean updateById(Company newEntity) throws DaoException {
     int affected = jdbcTemplate.update(UPDATE, new Object[] {newEntity});
     if( affected > 0 ) {

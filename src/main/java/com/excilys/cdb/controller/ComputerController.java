@@ -13,6 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,323 +33,329 @@ import com.excilys.cdb.view.Pagination;
 
 @Controller
 public class ComputerController {
-  private static final String DASHBOARD = "dashboard";
-  private static final String EDIT_COMPUTER = "editComputer";
-  private static final String ADD_COMPUTER = "addComputer";
-  private static final String ERROR = "500";
+	private static final String DASHBOARD = "dashboard";
+	private static final String EDIT_COMPUTER = "editComputer";
+	private static final String ADD_COMPUTER = "addComputer";
+	private static final String ERROR = "500";
 
-  private final Logger logger = LoggerFactory.getLogger(ComputerController.class);
+	private final Logger logger = LoggerFactory.getLogger(ComputerController.class);
 
-  @Autowired
-  ComputerService computerService;
+	ComputerService computerService;
 
-  @Autowired
-  CompanyService companyService;
+	CompanyService companyService;
 
-  @Autowired
-  MessageSource msgSrc;
-  
-  @Autowired
-  Pagination pagination;
+	MessageSource msgSrc;
 
-  public ComputerController(ComputerService computerService, CompanyService companyService, Pagination pagination) {
-    this.computerService = computerService;
-    this.companyService = companyService;
-    this.pagination = pagination;
-  }
+	Pagination pagination;
 
-  private static Map<String, String> columns;
+	public ComputerController(ComputerService computerService, CompanyService companyService, Pagination pagination, MessageSource msg) {
+		this.computerService = computerService;
+		this.companyService = companyService;
+		this.pagination = pagination;
+		this.msgSrc = msg;
+	}
 
-  static {
-    columns = new HashMap<>();
+	private static Map<String, String> columns;
 
-    columns.put("0", "pc_name");
-    columns.put("1", "introduced");
-    columns.put("2", "discontinued");
-    columns.put("3", "cp_name");
-  }
+	static {
+		columns = new HashMap<>();
 
-  @GetMapping({ "/", "/dashboard", "/dashBoard" })
-  public String getDashBoard(@RequestParam(required = false) Map<String, String> paths, Model model) {
-    logger.info(getClass().getName() + " has been called");
+		columns.put("0", "pc_name");
+		columns.put("1", "introduced");
+		columns.put("2", "discontinued");
+		columns.put("3", "cp_name");
+	}
 
-    List<ComputerDTO> computers = null;
-    IndexPagination entitiesPerPage;
-    int startIndex;
-    int page;
-    boolean isDesc;
+	@GetMapping({ "/", "/dashboard", "/dashBoard" })
+	public String getDashBoard(@RequestParam(required = false) Map<String, String> paths, Model model) {
+		logger.info(getClass().getName() + " has been called");
 
-    String success = paths.get("success");
-    String danger = paths.get("danger");
+		List<ComputerDTO> computers = null;
+		IndexPagination entitiesPerPage;
+		int startIndex;
+		int page;
+		boolean isDesc;
 
-    String index = paths.get("startIndex");
-    String perPage = paths.get("perPage");
-    String newPage = paths.get("page");
-    
-    String searchName = paths.get("search");
-    String order = paths.get("order");
-    String toOrder = paths.get("toOrder");
-    String selection = paths.get("selection");
+		String success = paths.get("success");
+		String danger = paths.get("danger");
 
-    isDesc = (order == null || order.equals("")) ? false : true;
-    entitiesPerPage = (perPage == null || perPage.equals("")) ? IndexPagination.IDX_10 : IndexPagination.valueOf(perPage);
-    startIndex = (index == null) ? 0 : Integer.parseInt(index);
-    page = (newPage == null || newPage.equals("0")) ? 1 : Integer.parseInt(newPage);
-    toOrder = (toOrder == null || toOrder.equals("") || !columns.containsKey(toOrder)) ? "pc_name"
-        : columns.get(toOrder);
+		String index = paths.get("startIndex");
+		String perPage = paths.get("perPage");
+		String newPage = paths.get("page");
 
-    if (searchName == null || searchName.isEmpty()) {
-      searchName = "";
-      try {
-        computers = this.computerService.orderBy(toOrder, isDesc).get();
-      } catch (ServiceException | DaoException e) {
-        logger.error(e.getMessage());
-        model.addAttribute("stackTrace", e.getMessage());
-        return ERROR;
-      }
-    } else {
-      try {
-        computers = this.computerService.searchByNameOrdered(searchName, toOrder, isDesc).get();
-      } catch (ServiceException | DaoException e) {
-        logger.error(e.getMessage());
-        model.addAttribute("stackTrace", e.getMessage());
-        return ERROR;
-      }
-    }
+		String searchName = paths.get("search");
+		String order = paths.get("order");
+		String toOrder = paths.get("toOrder");
+		String selection = paths.get("selection");
 
-    model.addAttribute("search", searchName);
-    model.addAttribute("index", startIndex);
-    model.addAttribute("success", success);
-    model.addAttribute("danger", danger);
-    model.addAttribute("sel", selection);
+		isDesc = (order == null || order.equals("")) ? false : true;
+		entitiesPerPage = (perPage == null || perPage.equals("")) ? IndexPagination.IDX_10
+				: IndexPagination.valueOf(perPage);
+		startIndex = (index == null) ? 0 : Integer.parseInt(index);
+		page = (newPage == null || newPage.equals("0")) ? 1 : Integer.parseInt(newPage);
+		toOrder = (toOrder == null || toOrder.equals("") || !columns.containsKey(toOrder)) ? "pc_name"
+				: columns.get(toOrder);
 
-    try {
-      pagination.setPerPage(entitiesPerPage);
-    } catch (PageException e) {
-      logger.error("Hey");
-      model.addAttribute("stackTrace", e.getMessage());
-      return ERROR;
-    }
-    
-    pagination.setElements(computers);
-    pagination.navigate(page);
-    logger.error(pagination.toString());
-    
-    try {
-      model.addAttribute("computerNumber", pagination.getSize());
-      model.addAttribute("totalPages", pagination.getTotalPages());
-      model.addAttribute("pages", pagination.getPages());
-      model.addAttribute("computers", pagination.list().get());
-      model.addAttribute("currentPage", pagination.getCurrentPage());
-    } catch (PageException e) {
-      logger.error(e.getMessage());
-      model.addAttribute("stackTrace", e.getMessage());
-      return ERROR;
-    }
-    model.addAttribute("perPage", perPage);
+		if (searchName == null || searchName.isEmpty()) {
+			searchName = "";
+			try {
+				computers = this.computerService.orderBy(toOrder, isDesc).get();
+			} catch (ServiceException | DaoException e) {
+				logger.error(e.getMessage());
+				model.addAttribute("stackTrace", e.getMessage());
+				return ERROR;
+			}
+		} else {
+			try {
+				computers = this.computerService.searchByNameOrdered(searchName, toOrder, isDesc).get();
+			} catch (ServiceException | DaoException e) {
+				logger.error(e.getMessage());
+				model.addAttribute("stackTrace", e.getMessage());
+				return ERROR;
+			}
+		}
 
-    return DASHBOARD;
-  }
+		model.addAttribute("search", searchName);
+		model.addAttribute("index", startIndex);
+		model.addAttribute("success", success);
+		model.addAttribute("danger", danger);
+		model.addAttribute("sel", selection);
 
-  @PostMapping({ "/", "/dashboard", "/dashBoard" })
-  public String postDeleteComputer(@RequestParam(required = false) Map<String, String> paths, Model model) {
-    logger.info(getClass().getName() + " has been called");
+		try {
+			pagination.setPerPage(entitiesPerPage);
+		} catch (PageException e) {
+			logger.error(e.getMessage());
+			model.addAttribute("stackTrace", e.getMessage());
+			return ERROR;
+		}
 
-    String success = paths.get("success");
-    String danger = paths.get("danger");
-    String selection = paths.get("selection");
+		pagination.setElements(computers);
+		pagination.navigate(page);
 
-    if ("".equals(selection)) {
-      logger.error("No correct computer name found!");
-      model.addAttribute("stackTrace", "No correct computer name found!");
-      return ERROR;
-    }
-    List<Long> computerIdsToDelete = Arrays.asList(selection.split(",")).stream().map(Long::parseLong)
-        .collect(Collectors.toList());
+		try {
+			model.addAttribute("computerNumber", pagination.getSize());
+			model.addAttribute("totalPages", pagination.getTotalPages());
+			model.addAttribute("pages", pagination.getPages());
+			model.addAttribute("computers", pagination.list().get());
+			model.addAttribute("currentPage", pagination.getCurrentPage());
+		} catch (PageException e) {
+			logger.error(e.getMessage());
+			model.addAttribute("stackTrace", e.getMessage());
+			return ERROR;
+		}
+		model.addAttribute("perPage", perPage);
 
-    computerIdsToDelete.forEach((Long id) -> {
-      ComputerDTO computer = null;
-      try {
-        computer = this.computerService.getOneById(id).get();
-      } catch (BadInputException e) {
-        logger.error(e.getMessage());
-        model.addAttribute("stackTrace", e.getMessage());
-      }
+		return DASHBOARD;
+	}
 
-      if (computer == null) {
-        logger.error("Null computer found!");
-        model.addAttribute("stackTrace", "Null computer found!");
-      }
+	@PostMapping({ "/", "/dashboard", "/dashBoard" })
+	public String postDeleteComputer(@RequestParam(required = false) Map<String, String> paths, Model model) {
+		logger.info(getClass().getName() + " has been called");
 
-      boolean isDeleted = false;
+		String success = paths.get("success");
+		String danger = paths.get("danger");
+		String selection = paths.get("selection");
 
-      try {
-        isDeleted = this.computerService.deleteById(computer.getId());
-      } catch (ServiceException | DaoException e) {
-        logger.error(e.getMessage());
-        model.addAttribute("stackTrace", e.getMessage());
-      }
+		if ("".equals(selection)) {
+			logger.error("No correct computer name found!");
+			model.addAttribute("stackTrace", "No correct computer name found!");
+			return ERROR;
+		}
+		List<Long> computerIdsToDelete = Arrays.asList(selection.split(",")).stream().map(Long::parseLong)
+				.collect(Collectors.toList());
 
-      if (isDeleted) {
-        model.addAttribute("success", "The computer " + computer.getName() + " has been correctly deleted!");
-        model.addAttribute("danger", danger);
-      } else {
-        model.addAttribute("success", success);
-        model.addAttribute("danger", "The computer" + computer.getName() + "couldn't be deleted!");
-      }
-    });
+		computerIdsToDelete.forEach((Long id) -> {
+			ComputerDTO computer = null;
+			try {
+				computer = this.computerService.getOneById(id).get();
+			} catch (BadInputException e) {
+				logger.error(e.getMessage());
+				model.addAttribute("stackTrace", e.getMessage());
+			}
 
-    return getDashBoard(paths, model);
-  }
+			if (computer == null) {
+				logger.error("Null computer found!");
+				model.addAttribute("stackTrace", "Null computer found!");
+			}
 
-  @GetMapping({ "addComputer", "/addcomputer", "/AddComputer", "/Addcomputer" })
-  public String getAddComputer(@RequestParam(required = false) Map<String, String> paths, Model model) {
-    logger.info(getClass().getName() + " has been called");
+			try {
+				this.computerService.deleteById(computer.getId());
+			} catch (ServiceException | DaoException e) {
+				logger.error(e.getMessage());
+				model.addAttribute("stackTrace", e.getMessage());
+				model.addAttribute("success", "The computer " + computer.getName() + " has been correctly deleted!");
+				model.addAttribute("danger", danger);
+			}
 
-    String computerName = paths.get("computerName");
-    computerName = (computerName == null || computerName.equals("")) ? "" : computerName.trim();
+			model.addAttribute("success", success);
+			model.addAttribute("danger", "The computer" + computer.getName() + "couldn't be deleted!");
+		});
 
-    List<CompanyDTO> companies = null;
+		return getDashBoard(paths, model);
+	}
 
-    try {
-      companies = this.companyService.orderBy("id", Boolean.TRUE).get();
-    } catch (ServiceException | DaoException e) {
-      logger.error(e.getMessage());
-      model.addAttribute("stackTrace", e.getMessage());
-      return ERROR;
-    }
+	@GetMapping({ "addComputer", "/addcomputer", "/AddComputer", "/Addcomputer" })
+	public String getAddComputer(@Validated @RequestParam(required = false) Map<String, String> paths, Model model) {
+		logger.info(getClass().getName() + " has been called");
 
-    model.addAttribute("companies", companies);
+		String computerName = paths.get("computerName");
+		computerName = (computerName == null || computerName.equals("")) ? "" : computerName.trim();
 
-    return ADD_COMPUTER;
-  }
+		List<CompanyDTO> companies = null;
 
-  @PostMapping({ "/addComputer", "/addcomputer", "/AddComputer", "/Addcomputer" })
-  public String postAddComputer(@RequestParam(required = false) Map<String, String> paths, Model model) {
-    logger.info(getClass().getName() + " has been called");
+		try {
+			companies = this.companyService.orderBy("id", Boolean.TRUE).get();
+		} catch (ServiceException | DaoException e) {
+			logger.error(e.getMessage());
+			model.addAttribute("stackTrace", e.getMessage());
+			return ERROR;
+		}
 
-    String computerName = paths.get("computerName");
-    String introduced = paths.get("introduced");
-    String discontinued = paths.get("discontinued");
-    String companyName = paths.get("companyName");
+		model.addAttribute("companies", companies);
 
-    if (computerName == null || computerName.equals("")) {
-      logger.debug("Empty or null name for computer to be searched.");
-      model.addAttribute("stackTrace", "Empty or null name for computer to be searched.");
-      return ERROR;
-    }
+		return ADD_COMPUTER;
+	}
 
-    ComputerDTO computerDto = new ComputerDTO.ComputerDTOBuilder().setName(computerName).setIntroduced(introduced)
-        .setCompanyName(companyName).setDiscontinued(discontinued).build();
+	@PostMapping({ "/addComputer", "/addcomputer", "/AddComputer", "/Addcomputer" })
+	public String postAddComputer(@RequestParam(required = false) Map<String, String> paths, BindingResult res,
+			Model model) {
+		logger.info(getClass().getName() + " has been called");
 
-    boolean isCreated = false;
-    try {
-      isCreated = this.computerService.create(computerDto);
-    } catch (ServiceException | DaoException e) {
-      logger.debug(e.getMessage());
-      model.addAttribute("stackTrace", e.getMessage());
-      return ERROR;
-    }
+		boolean hasError = setStackTraceBindingError(model, res);
+		if (hasError) {
+			return ERROR;
+		}
 
-    if (isCreated) {
-      model.addAttribute("success", "Computer " + computerDto.getName() + " successfully created!");
-    } else {
-      model.addAttribute("danger", "Computer " + computerDto.getName() + " couldn't be created!");
-    }
+		String computerName = paths.get("computerName");
+		String introduced = paths.get("introduced");
+		String discontinued = paths.get("discontinued");
+		String companyName = paths.get("companyName");
 
-    return getAddComputer(paths, model);
-  }
+		if (computerName == null || computerName.equals("")) {
+			logger.debug("Empty or null name for computer to be searched.");
+			model.addAttribute("stackTrace", "Empty or null name for computer to be searched.");
+			return ERROR;
+		}
 
-  @GetMapping({ "/editComputer", "/editcomputer", "/EditComputer", "/Editcomputer" })
-  public String getEditComputer(@RequestParam(required = false) Map<String, String> paths, Model model) {
-    logger.info(getClass().getName() + " has been called");
+		ComputerDTO computerDto = new ComputerDTO.ComputerDTOBuilder().setName(computerName).setIntroduced(introduced)
+				.setCompanyName(companyName).setDiscontinued(discontinued).build();
 
-    String computerId = paths.get("computerId");
+		try {
+			this.computerService.create(computerDto);
+		} catch (ServiceException | DaoException e) {
+			logger.debug(e.getMessage());
+			model.addAttribute("stackTrace", e.getMessage());
+			model.addAttribute("danger", "Computer " + computerDto.getName() + " couldn't be created!");
+			return ERROR;
+		}
 
-    if ("".equals(computerId)) {
-      logger.debug("Empty or null id for computer to be searched.");
-      model.addAttribute("stackTrace", "Empty or null id for computer to be searched.");
-      return ERROR;
-    }
+		model.addAttribute("success", "Computer " + computerDto.getName() + " successfully created!");
 
-    ComputerDTO computer = null;
-    try {
-      computer = this.computerService.getOneById(Long.parseLong(computerId)).get();
-    } catch (BadInputException e) {
-      logger.error(e.getMessage());
-      model.addAttribute("stackTrace", e.getMessage());
-      return ERROR;
-    }
+		return getDashBoard(paths, model);
+	}
 
-    List<CompanyDTO> companies = null;
-    try {
-      companies = this.companyService.getAll().get();
-    } catch (ServiceException e) {
-      logger.error(e.getMessage());
-      model.addAttribute("stackTrace", e.getMessage());
-      return ERROR;
-    }
+	@GetMapping({ "/editComputer", "/editcomputer", "/EditComputer", "/Editcomputer" })
+	public String getEditComputer(@RequestParam(required = false) Map<String, String> paths, Model model) {
+		logger.info(getClass().getName() + " has been called");
 
-    model.addAttribute("companies", companies);
-    model.addAttribute("computer", computer);
+		String computerId = paths.get("computerId");
 
-    return EDIT_COMPUTER;
-  }
+		if ("".equals(computerId)) {
+			logger.debug("Empty or null id for computer to be searched.");
+			model.addAttribute("stackTrace", "Empty or null id for computer to be searched.");
+			return ERROR;
+		}
 
-  @PostMapping({ "/editComputer", "/editcomputer", "/EditComputer", "/Editcomputer" })
-  public String postEditComputer(@RequestParam(required = false) Map<String, String> paths, Model model) {
-    logger.info(getClass().getName() + " has been called");
+		ComputerDTO computer = null;
+		try {
+			computer = this.computerService.getOneById(Long.parseLong(computerId)).get();
+		} catch (BadInputException e) {
+			logger.error(e.getMessage());
+			model.addAttribute("stackTrace", e.getMessage());
+			return ERROR;
+		}
 
-    String computerId = paths.get("computerId");
-    String computerName = paths.get("computerName");
-    String computerIntro = paths.get("computerIntro");
-    String computerDisco = paths.get("computerDisco");
-    String computerComp = paths.get("computerComp");
-    String companyId = paths.get("companyId");
+		List<CompanyDTO> companies = null;
+		try {
+			companies = this.companyService.getAll().get();
+		} catch (ServiceException e) {
+			logger.error(e.getMessage());
+			model.addAttribute("stackTrace", e.getMessage());
+			return ERROR;
+		}
 
-    List<String> computerData = new ArrayList<>(
-        Arrays.asList(computerId, computerName, computerIntro, computerDisco, computerComp));
-    computerData.forEach(param -> {
-      if ("".equals(param)) {
-        logger.debug("Empty or null id for computer to be searched.");
-        model.addAttribute("stackTrace", "Empty or null id for computer to be searched.");
-      }
-    });
+		model.addAttribute("companies", companies);
+		model.addAttribute("computer", computer);
 
-    ComputerDTO computerInDb = null;
-    try {
-      computerInDb = this.computerService.getOneById(Long.parseLong(computerId)).get();
-    } catch (BadInputException e) {
-      logger.error(e.getMessage());
-      model.addAttribute("stackTrace", e.getMessage());
-      return ERROR;
-    }
+		return EDIT_COMPUTER;
+	}
 
-    ComputerDTO computerToSend = new ComputerDTO.ComputerDTOBuilder().setId(Long.parseLong(computerId))
-        .setCompanyId(Long.parseLong(companyId)).setCompanyName(computerComp).setIntroduced(computerIntro)
-        .setDiscontinued(computerDisco).setName(computerName).build();
+	@PostMapping({ "/editComputer", "/editcomputer", "/EditComputer", "/Editcomputer" })
+	public String postEditComputer(@RequestParam(required = false) Map<String, String> paths, BindingResult res,
+			Model model) {
+		logger.info(getClass().getName() + " has been called");
 
-    if (computerToSend.getId() != computerInDb.getId()) {
-      logger.error("Wrong edit and change of the id!");
-      model.addAttribute("stackTrace", "Wrong edit and change of the id!");
-      return ERROR;
-    }
+		boolean hasError = setStackTraceBindingError(model, res);
+		if (hasError) {
+			return ERROR;
+		}
 
-    boolean isUpdated = false;
-    try {
-      isUpdated = this.computerService.updateById(computerToSend);
-    } catch (ServiceException | DaoException e) {
-      logger.error(e.getMessage());
-      model.addAttribute("stackTrace", e.getMessage());
-      return ERROR;
-    }
+		String computerId = paths.get("computerId");
+		String computerName = paths.get("computerName");
+		String computerIntro = paths.get("computerIntro");
+		String computerDisco = paths.get("computerDisco");
+		String computerComp = paths.get("computerComp");
+		String companyId = paths.get("companyId");
 
-    if (isUpdated) {
-      model.addAttribute("success", "Computer " + computerToSend.getName() + " successfully updated!");
-    } else {
-      model.addAttribute("danger", "Computer " + computerToSend.getName() + " not updated!");
-    }
+		List<String> computerData = new ArrayList<>(
+				Arrays.asList(computerId, computerName, computerIntro, computerDisco, computerComp));
+		computerData.forEach(param -> {
+			if ("".equals(param)) {
+				logger.debug("Empty or null id for computer to be searched.");
+				model.addAttribute("stackTrace", "Empty or null id for computer to be searched.");
+			}
+		});
 
-    return getEditComputer(paths, model);
-  }
+		ComputerDTO computerInDb = null;
+		try {
+			computerInDb = this.computerService.getOneById(Long.parseLong(computerId)).get();
+		} catch (BadInputException e) {
+			logger.error(e.getMessage());
+			model.addAttribute("stackTrace", e.getMessage());
+			return ERROR;
+		}
+
+		ComputerDTO computerToSend = new ComputerDTO.ComputerDTOBuilder().setId(Long.parseLong(computerId))
+				.setCompanyId(Long.parseLong(companyId)).setCompanyName(computerComp).setIntroduced(computerIntro)
+				.setDiscontinued(computerDisco).setName(computerName).build();
+
+		if (computerToSend.getId() != computerInDb.getId()) {
+			logger.error("Wrong edit and change of the id!");
+			model.addAttribute("stackTrace", "Wrong edit and change of the id!");
+			return ERROR;
+		}
+		
+		try {
+			this.computerService.updateById(computerToSend);
+		} catch (ServiceException | DaoException e) {
+			logger.error(e.getMessage());
+			model.addAttribute("stackTrace", e.getMessage());
+			model.addAttribute("danger", "Computer " + computerToSend.getName() + " not updated!");
+			return ERROR;
+		}
+		model.addAttribute("success", "Computer " + computerToSend.getName() + " successfully updated!");
+
+		return getDashBoard(paths, model);
+	}
+
+	private boolean setStackTraceBindingError(Model model, BindingResult res) {
+		if (res.hasErrors()) {
+			StringBuilder stackTrace = new StringBuilder();
+			List<ObjectError> errors = res.getAllErrors();
+			errors.forEach(stackTrace::append);
+			model.addAttribute("stackTrace", stackTrace);
+			return true;
+		}
+		return false;
+	}
 }

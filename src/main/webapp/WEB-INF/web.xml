@@ -11,16 +11,6 @@
 	<welcome-file-list>
 		<welcome-file>dashboard.jsp</welcome-file>
 	</welcome-file-list>
-	<context-param>
-		<param-name>contextClass</param-name>
-		<param-value>
-			org.springframework.web.context.support.AnnotationConfigWebApplicationContext
-		</param-value>
-	</context-param>
-	<listener>
-		<listener-class>org.springframework.web.context.ContextLoaderListener
-		</listener-class>
-	</listener>
 	
 	<!-- Error pages binding -->
 	<error-page>
@@ -35,6 +25,7 @@
 		<error-code>500</error-code>
 		<location>/views/500.jsp</location>
 	</error-page>
+    <!-- Spring context loader -->
 
 	<!-- Resource availability mapping -->
 	<servlet-mapping>

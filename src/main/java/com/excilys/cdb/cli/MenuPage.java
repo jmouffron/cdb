@@ -1,12 +1,10 @@
-package com.excilys.cdb.view;
+package com.excilys.cdb.cli;
 
 import org.slf4j.LoggerFactory;
 
-import com.excilys.cdb.controller.ControllerUtils;
 import com.excilys.cdb.controller.MenuChoiceEnum;
-import com.excilys.cdb.model.Entity;
 
-public class MenuPage extends Page<Entity> {
+public class MenuPage extends Page {
 
 	public MenuPage() {
 		this.logger = LoggerFactory.getLogger(MenuPage.class);
@@ -23,7 +21,8 @@ public class MenuPage extends Page<Entity> {
 		System.out.println("4. Créer un ordinateur.");
 		System.out.println("5. Mettre à jour un ordinateur.");
 		System.out.println("6. Supprimer un ordinateur.");
-		System.out.println("7. Sortir du programme.");
+		System.out.println("7. Supprimer un manufactureur.");
+		System.out.println("8. Sortir du programme.");
 		System.out.println("Rentrer le numéro de l'option voulue.");
 
 		value = ControllerUtils.scan.next();

@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.service.ComputerService;
@@ -29,7 +28,8 @@ public class Pagination {
   ComputerService service;
   
   public Pagination(ComputerService service, int startIndex, IndexPagination perPage) {
-    this.elements = service.getAll().get();
+    this.service = service;
+    this.elements = this.service.getAll().get();
     this.startIndex = startIndex;
     this.perPage = perPage;
     this.totalPages = elements.size() / this.perPage.getIndex();

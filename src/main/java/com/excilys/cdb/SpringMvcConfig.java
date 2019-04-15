@@ -58,12 +58,13 @@ public class SpringMvcConfig implements WebMvcConfigurer {
       return lci;
   }
   
-  public void addResourceHandlers(final ResourceHandlerRegistry registry) {
-    registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
-  }
-  
   @Override
   public void addInterceptors(InterceptorRegistry registry) {
       registry.addInterceptor(localeChangeInterceptor());
   }
+  
+  public void addResourceHandlers(final ResourceHandlerRegistry registry) {
+    registry.addResourceHandler("/resources/**").addResourceLocations("/resources/");
+  }
+  
 }

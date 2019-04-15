@@ -1,11 +1,11 @@
 /**
  * 
  */
-package com.excilys.cdb.view;
+package com.excilys.cdb.cli;
 
 import java.util.List;
 
-import com.excilys.cdb.model.Entity;
+import com.excilys.cdb.dto.EntityDTO;
 
 /**
  * @author excilys
@@ -14,34 +14,34 @@ import com.excilys.cdb.model.Entity;
  *         entities
  *
  */
-public class Data<Entity> {
-	private List<Entity> dataList;
-	private Entity data;
+public class Data {
+	protected List<EntityDTO> dataList;
+	protected EntityDTO data;
 
 	/**
 	 * 
 	 */
-	public Data(List<Entity> dataList) {
+	public Data(List<EntityDTO> dataList) {
 		this.dataList = dataList;
 	}
 
-	public Data(Entity data) {
+	public Data(EntityDTO data) {
 		this.data = data;
 	}
 
-	public List<Entity> getDataList() {
+	public List<EntityDTO> getDataList() {
 		return dataList;
 	}
 
-	public Entity getData() {
+	public EntityDTO getData() {
 		return data;
 	}
 
-	public void setData(List<Entity> data) {
+	public void setData(List<EntityDTO> data) {
 		this.dataList = data;
 	}
 
-	public void setData(Entity data) {
+	public void setData(EntityDTO data) {
 		this.data = data;
 	}
 

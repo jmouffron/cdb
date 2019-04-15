@@ -1,14 +1,14 @@
-package com.excilys.cdb.view;
+package com.excilys.cdb.cli;
+
+import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.controller.MenuChoiceEnum;
 import com.excilys.cdb.exception.ServiceException;
-import com.excilys.cdb.model.Computer;
-import org.slf4j.LoggerFactory;
 
-public class EntityUpdatePage extends Page<Computer> {
+public class EntityDeletePage extends Page {
 
-	public EntityUpdatePage() throws ServiceException {
-		this.logger = LoggerFactory.getLogger(EntityUpdatePage.class);
+	public EntityDeletePage() throws ServiceException {
+		this.logger = LoggerFactory.getLogger(EntityDeletePage.class);
 	}
 
 	@Override
@@ -16,7 +16,7 @@ public class EntityUpdatePage extends Page<Computer> {
 		System.out.println("==============================");
 		System.out.print("Entity ");
 		data.show();
-		System.out.println("updated .");
+		System.out.println("deleted .");
 		System.out.println("==============================");
 		return MenuChoiceEnum.DEFAULT;
 	}

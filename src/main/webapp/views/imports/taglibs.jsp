@@ -3,5 +3,6 @@
 <%@page import="com.excilys.cdb.model.*"%>
 <%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@page session="true" isThreadSafe="true"%>
-<%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@taglib prefix="spring" uri="http://www.springframework.org/tags" %>
+<%@taglib uri = "http://www.springframework.org/tags/form" prefix = "form"%>
 <c:set var ="ctx"  value = "${pageContext.request.contextPath}"/>
