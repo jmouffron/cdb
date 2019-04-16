@@ -2,8 +2,6 @@ package com.excilys.cdb.cli;
 
 import org.slf4j.Logger;
 
-import com.excilys.cdb.controller.MenuChoiceEnum;
-
 /**
  * @author excilys
  * 

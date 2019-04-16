@@ -2,7 +2,6 @@ package com.excilys.cdb.cli;
 
 import org.slf4j.LoggerFactory;
 
-import com.excilys.cdb.controller.MenuChoiceEnum;
 import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.exception.ServiceException;
 

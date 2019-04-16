@@ -21,7 +21,7 @@ public class CompanyDTOValidator implements Validator {
 		
 		CompanyDTO dto = (CompanyDTO) target;
 		
-		if ( dto.getId() <1 ) {
+		if ( dto.getId() < 1 ) {
 			errors.rejectValue("id", "dtocompany.id.invalid");
 		} else if ( dto.getName().length() > 255 ) {
 			errors.rejectValue("name", "dtocompany.name.invalid");

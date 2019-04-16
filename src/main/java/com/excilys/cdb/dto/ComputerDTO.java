@@ -61,6 +61,8 @@ public class ComputerDTO extends EntityDTO {
 		this.companyId = companyId;
 	}
 
+	public ComputerDTO() {}
+
 	@Override
 	public String toString() {
 		return "Computer of id " + this.id + ", of name " + this.name + ", introduced in " + this.introduced

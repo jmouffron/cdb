@@ -11,11 +11,10 @@ import org.springframework.web.servlet.DispatcherServlet;
 
 @Configuration
 public class SpringWebInitializer implements WebApplicationInitializer {
-	public static AnnotationConfigWebApplicationContext ctx;
 
 	@Override
 	public void onStartup(ServletContext servletCtx) {
-		ctx = new AnnotationConfigWebApplicationContext();
+		AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
 		ctx.register(AppConfig.class);
 		ctx.setServletContext(servletCtx);
 		ctx.refresh();

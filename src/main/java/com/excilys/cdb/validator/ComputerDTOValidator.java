@@ -30,11 +30,12 @@ public class ComputerDTOValidator implements Validator {
 		ComputerDTO dto = (ComputerDTO) obj;
 
 		Pattern pattern = Pattern.compile("^[0-9]{2}-[0-9]{2}-[0-9]{4}$", Pattern.CASE_INSENSITIVE);
+		
 		if ( dto.getName().length() > 255 ) {
 			errors.rejectValue("name", "dtopc.name.invalid");
-		}else if (!(pattern.matcher(dto.getIntroduced()).matches())) {
+		} else if ( !(pattern.matcher( dto.getIntroduced() ).matches() ) ) {
 			errors.rejectValue("introduced", "dtopc.introduced.invalid");
-		} else if (!(pattern.matcher(dto.getDiscontinued()).matches())) {
+		} else if ( !(pattern.matcher( dto.getDiscontinued() ).matches() ) ) {
 			errors.rejectValue("discontinued", "dtopc.introduced.invalid");
 		} else if ( dto.getIntroduced() == null && dto.getDiscontinued() != null ) {
 			errors.rejectValue("discontinued", "dtopc.introduced.invalid");

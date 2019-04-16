@@ -18,44 +18,49 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-xs-8 col-xs-offset-2 box">
-					<div class="label label-default pull-right">id: ${computer.id}</div>
+					<div class="label label-default pull-right">id:
+						${computer.id}</div>
 					<h1>Edit Computer</h1>
 
-					<form action="/editComputer" method="POST">
-						<input type="hidden" value="${computer.id}" id="${computer.id}" />
+					<form:form action="${ctx}/editComputer" method="POST"
+						modelAttribute="dto">
+						<form:input path="id" type="hidden"
+							value="${computer.id}" id="${computer.id}" />
 
 						<fieldset>
 							<div class="form-group">
-								<label for="computerName">Computer name</label> <input
-									type="text" class="form-control" id="computerName"
-									placeholder="Computer name" value="${computer.name}">
+								<form:label path="name" for="computerName"><spring:message code="editComputer.computer_name" /></form:label>
+								<form:input path="name" type="text"
+									class="form-control" id="computerName"
+									placeholder="Computer name" value="${computer.name}" />
 							</div>
 							<div class="form-group">
-								<label for="introduced">Introduced date</label> <input
-									type="date" class="form-control" id="introduced"
-									placeholder="Introduced date" value="${computer.introduced}">
+								<form:label path="introduced" for="introduced"><spring:message code='editComputer.introduced_name' /></form:label>
+								<form:input path="introduced" type="date"
+									class="form-control" id="introduced"
+									placeholder="Introduced date" value="${computer.introduced}" />
 							</div>
 							<div class="form-group">
-								<label for="discontinued">Discontinued date</label> <input
-									type="date" class="form-control" id="discontinued"
-									placeholder="Discontinued date" value="${computer.discontinued}">
-									
+								<form:label path="discontinued" for="discontinued"><spring:message code='editComputer.discontinued_date' /></form:label>
+								<form:input path="discontinued" type="date"
+									class="form-control" id="discontinued"
+									placeholder="Discontinued date"
+									value="${computer.discontinued}" />
+
 							</div>
 							<div class="form-group">
-								<label for="companyId">Company</label> <select
-									class="form-control" id="companyId">
-									<option value="${computer.companyId}">${computer.companyName}</option>
-									<c:forEach items="${companies}" var="company">
-										<option value="${company.id}">${company.name}</option>
-									</c:forEach>
-								</select>
+								<form:label path="companyName" for="companyId"><spring:message code='editComputer.company' /></form:label>
+								<form:select path="companyName" class="form-control"
+									id="companyId" items="${companies}">
+									<form:option value="${companies.id}" items="${companies}" />
+								</form:select>
 							</div>
 						</fieldset>
 						<div class="actions pull-right">
-							<input type="submit" value="Edit" class="btn btn-primary">
-							or <a href="/dashboard" class="btn btn-default">Cancel</a>
+							<input type="submit" value="<spring:message code='editComputer.edit' />" class="btn btn-primary">
+							or <a href="${ctx}/dashboard" class="btn btn-default"><spring:message code='editComputer.cancel' /></a>
 						</div>
-					</form>
+					</form:form>
 				</div>
 			</div>
 		</div>

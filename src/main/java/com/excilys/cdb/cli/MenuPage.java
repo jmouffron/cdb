@@ -2,8 +2,6 @@ package com.excilys.cdb.cli;
 
 import org.slf4j.LoggerFactory;
 
-import com.excilys.cdb.controller.MenuChoiceEnum;
-
 public class MenuPage extends Page {
 
 	public MenuPage() {

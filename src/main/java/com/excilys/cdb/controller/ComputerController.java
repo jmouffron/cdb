@@ -17,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -37,6 +38,7 @@ public class ComputerController {
 	private static final String EDIT_COMPUTER = "editComputer";
 	private static final String ADD_COMPUTER = "addComputer";
 	private static final String ERROR = "500";
+	private static final String REDIRECT_DASHBOARD = "redirect:dashboard";
 
 	private final Logger logger = LoggerFactory.getLogger(ComputerController.class);
 
@@ -144,14 +146,20 @@ public class ComputerController {
 			return ERROR;
 		}
 		model.addAttribute("perPage", perPage);
+		model.addAttribute("computersDestroyed", new ArrayList<ComputerDTO>());
 
 		return DASHBOARD;
 	}
 
 	@PostMapping({ "/", "/dashboard", "/dashBoard" })
-	public String postDeleteComputer(@RequestParam(required = false) Map<String, String> paths, Model model) {
+	public String postDeleteComputer(@RequestParam(required = false) Map<String, String> paths, @Validated @ModelAttribute("computers") List<ComputerDTO> computers, BindingResult res, Model model) {
 		logger.info(getClass().getName() + " has been called");
-
+		
+		boolean hasError = setStackTraceBindingError(model, res);
+		if (hasError) {
+			return ERROR;
+		}
+		
 		String success = paths.get("success");
 		String danger = paths.get("danger");
 		String selection = paths.get("selection");
@@ -191,7 +199,7 @@ public class ComputerController {
 			model.addAttribute("danger", "The computer" + computer.getName() + "couldn't be deleted!");
 		});
 
-		return getDashBoard(paths, model);
+		return REDIRECT_DASHBOARD;
 	}
 
 	@GetMapping({ "addComputer", "/addcomputer", "/AddComputer", "/Addcomputer" })
@@ -212,12 +220,13 @@ public class ComputerController {
 		}
 
 		model.addAttribute("companies", companies);
+		model.addAttribute("computer", new ComputerDTO());
 
 		return ADD_COMPUTER;
 	}
 
 	@PostMapping({ "/addComputer", "/addcomputer", "/AddComputer", "/Addcomputer" })
-	public String postAddComputer(@RequestParam(required = false) Map<String, String> paths, BindingResult res,
+	public String postAddComputer(@RequestParam(required = false) Map<String, String> paths, @Validated @ModelAttribute("computer") ComputerDTO computer, BindingResult res,
 			Model model) {
 		logger.info(getClass().getName() + " has been called");
 
@@ -226,49 +235,27 @@ public class ComputerController {
 			return ERROR;
 		}
 
-		String computerName = paths.get("computerName");
-		String introduced = paths.get("introduced");
-		String discontinued = paths.get("discontinued");
-		String companyName = paths.get("companyName");
-
-		if (computerName == null || computerName.equals("")) {
-			logger.debug("Empty or null name for computer to be searched.");
-			model.addAttribute("stackTrace", "Empty or null name for computer to be searched.");
-			return ERROR;
-		}
-
-		ComputerDTO computerDto = new ComputerDTO.ComputerDTOBuilder().setName(computerName).setIntroduced(introduced)
-				.setCompanyName(companyName).setDiscontinued(discontinued).build();
-
 		try {
-			this.computerService.create(computerDto);
+			this.computerService.create(computer);
 		} catch (ServiceException | DaoException e) {
 			logger.debug(e.getMessage());
 			model.addAttribute("stackTrace", e.getMessage());
-			model.addAttribute("danger", "Computer " + computerDto.getName() + " couldn't be created!");
+			model.addAttribute("danger", "Computer " + computer.getName() + " couldn't be created!");
 			return ERROR;
 		}
 
-		model.addAttribute("success", "Computer " + computerDto.getName() + " successfully created!");
+		model.addAttribute("success", "Computer " + computer.getName() + " successfully created!");
 
-		return getDashBoard(paths, model);
+		return REDIRECT_DASHBOARD;
 	}
 
 	@GetMapping({ "/editComputer", "/editcomputer", "/EditComputer", "/Editcomputer" })
-	public String getEditComputer(@RequestParam(required = false) Map<String, String> paths, Model model) {
+	public String getEditComputer(@RequestParam(required = false, value="computerId") long computerId, Model model) {
 		logger.info(getClass().getName() + " has been called");
-
-		String computerId = paths.get("computerId");
-
-		if ("".equals(computerId)) {
-			logger.debug("Empty or null id for computer to be searched.");
-			model.addAttribute("stackTrace", "Empty or null id for computer to be searched.");
-			return ERROR;
-		}
 
 		ComputerDTO computer = null;
 		try {
-			computer = this.computerService.getOneById(Long.parseLong(computerId)).get();
+			computer = this.computerService.getOneById(computerId).get();
 		} catch (BadInputException e) {
 			logger.error(e.getMessage());
 			model.addAttribute("stackTrace", e.getMessage());
@@ -283,15 +270,15 @@ public class ComputerController {
 			model.addAttribute("stackTrace", e.getMessage());
 			return ERROR;
 		}
-
 		model.addAttribute("companies", companies);
 		model.addAttribute("computer", computer);
-
+		model.addAttribute("dto", new ComputerDTO());
+		
 		return EDIT_COMPUTER;
 	}
 
 	@PostMapping({ "/editComputer", "/editcomputer", "/EditComputer", "/Editcomputer" })
-	public String postEditComputer(@RequestParam(required = false) Map<String, String> paths, BindingResult res,
+	public String postEditComputer(@Validated @ModelAttribute("dto") ComputerDTO computer, BindingResult res,
 			Model model) {
 		logger.info(getClass().getName() + " has been called");
 
@@ -300,52 +287,32 @@ public class ComputerController {
 			return ERROR;
 		}
 
-		String computerId = paths.get("computerId");
-		String computerName = paths.get("computerName");
-		String computerIntro = paths.get("computerIntro");
-		String computerDisco = paths.get("computerDisco");
-		String computerComp = paths.get("computerComp");
-		String companyId = paths.get("companyId");
-
-		List<String> computerData = new ArrayList<>(
-				Arrays.asList(computerId, computerName, computerIntro, computerDisco, computerComp));
-		computerData.forEach(param -> {
-			if ("".equals(param)) {
-				logger.debug("Empty or null id for computer to be searched.");
-				model.addAttribute("stackTrace", "Empty or null id for computer to be searched.");
-			}
-		});
-
 		ComputerDTO computerInDb = null;
 		try {
-			computerInDb = this.computerService.getOneById(Long.parseLong(computerId)).get();
+			computerInDb = this.computerService.getOneById(computer.getId()).get();
 		} catch (BadInputException e) {
 			logger.error(e.getMessage());
 			model.addAttribute("stackTrace", e.getMessage());
 			return ERROR;
 		}
 
-		ComputerDTO computerToSend = new ComputerDTO.ComputerDTOBuilder().setId(Long.parseLong(computerId))
-				.setCompanyId(Long.parseLong(companyId)).setCompanyName(computerComp).setIntroduced(computerIntro)
-				.setDiscontinued(computerDisco).setName(computerName).build();
-
-		if (computerToSend.getId() != computerInDb.getId()) {
+		if (computer.getId() != computerInDb.getId()) {
 			logger.error("Wrong edit and change of the id!");
 			model.addAttribute("stackTrace", "Wrong edit and change of the id!");
 			return ERROR;
 		}
 		
 		try {
-			this.computerService.updateById(computerToSend);
+			this.computerService.updateById(computer);
 		} catch (ServiceException | DaoException e) {
 			logger.error(e.getMessage());
 			model.addAttribute("stackTrace", e.getMessage());
-			model.addAttribute("danger", "Computer " + computerToSend.getName() + " not updated!");
+			model.addAttribute("danger", "Computer " + computer.getName() + " not updated!");
 			return ERROR;
 		}
-		model.addAttribute("success", "Computer " + computerToSend.getName() + " successfully updated!");
+		model.addAttribute("success", "Computer " + computer.getName() + " successfully updated!");
 
-		return getDashBoard(paths, model);
+		return REDIRECT_DASHBOARD;
 	}
 
 	private boolean setStackTraceBindingError(Model model, BindingResult res) {

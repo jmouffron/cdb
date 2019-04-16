@@ -18,26 +18,26 @@
 			<div class="row">
 				<div class="col-xs-8 col-xs-offset-2 box">
 					<h1><spring:message code="addComputer.heading" /></h1>
-					<form:form method="POST" action="${ctx}/addStudent">
+					<form:form method="POST" action="${ctx}/addComputer" modelAttribute="computer">
 						<fieldset>
 							<div class="form-group">
-								<form:label path="computer.name">Computer Name</form:label>
-								<form:input path="computer.name" class="form-control" id="computerName"
+								<form:label path="name"><spring:message code="addComputer.computer_name" /></form:label>
+								<form:input path="name" class="form-control" id="computerName"
 									placeholder="Computer name" value="${ computerName }" />
 							</div>
 							<div class="form-group">
-								<form:label path="computer.introduced">Introduced date</form:label> <form:input
-									path="computer.introduced" type="date" class="form-control" id="introduced"
+								<form:label path="introduced"><spring:message code="addComputer.introduced_date" /></form:label> <form:input
+									path="introduced" type="date" class="form-control" id="introduced"
 									placeholder="Introduced date" value="${ introduced }" />
 							</div>
 							<div class="form-group">
-								<form:label path="computer.discontinued">Discontinued date</form:label> <form:input
-									path="computer.discontinued" type="date" class="form-control" id="discontinued"
+								<form:label path="discontinued"><spring:message code="addComputer.discontinued_date" /></form:label> <form:input
+									path="discontinued" type="date" class="form-control" id="discontinued"
 									placeholder="Discontinued date" value="${ discontinued }" />
 							</div>
 							<div class="form-group">
-								<form:label path="computer.companyId">Company</form:label> 
-								<form:select path="computer.companyId"
+								<form:label path="companyName"><spring:message code="addComputer.company" /></form:label> 
+								<form:select path="companyName"
 									class="form-control" id="companyId" items="${companies}">
 									<form:option value="${companies.id}" items="${companies}" />
 								</form:select>
@@ -48,37 +48,6 @@
 							or <a href="${ctx}/dashboard" class="btn btn-default"><spring:message code="addComputer.cancel" /></a>
 						</div>
 					</form:form>
-					<form action="${ctx}/addComputer" method="POST">
-						<fieldset>
-							<div class="form-group">
-								<label for="computerName">Computer name</label> <input
-									type="text" class="form-control" id="computerName"
-									placeholder="Computer name" value="${ computerName }">
-							</div>
-							<div class="form-group">
-								<label for="introduced">Introduced date</label> <input
-									type="date" class="form-control" id="introduced"
-									placeholder="Introduced date" value="${ introduced }">
-							</div>
-							<div class="form-group">
-								<label for="discontinued">Discontinued date</label> <input
-									type="date" class="form-control" id="discontinued"
-									placeholder="Discontinued date" value="${ discontinued }">
-							</div>
-							<div class="form-group">
-								<label for="companyId">Company</label> <select
-									class="form-control" id="companyId">
-									<c:forEach items="${companies}" var="company">
-										<option value="${company.id}">${company.name}</option>
-									</c:forEach>
-								</select>
-							</div>
-						</fieldset>
-						<div class="actions pull-right">
-							<input type="submit" value="Add" class="btn btn-primary">
-							or <a href="${ctx}/dashboard" class="btn btn-default">Cancel</a>
-						</div>
-					</form>
 				</div>
 			</div>
 		</div>
