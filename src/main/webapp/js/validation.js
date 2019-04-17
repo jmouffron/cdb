@@ -6,7 +6,7 @@ $(function() {
 	$("#introduced").val() == "" ? $("#discontinued").attr('readonly', true): $("#discontinued").attr("readonly", false);
 	$("#computerName").attr("required", true);
 	
-	$("div #computerName").on("focus blur", function(e){
+	$("div #computerName").on("focus blur", function(){
 		if ( $(this).val() == "" || !$(this).val().match(regexWord) ){
 			invalidate($(this))
 		} else {
@@ -14,7 +14,7 @@ $(function() {
 		}
 	})
 	
-	$("div #introduced").on("focus blur", function(e){
+	$("div #introduced").on("focus blur", function( ){
 		let intro = new Date($(this).val())
 		let disco = new Date($("#discontinued").val())
 
@@ -35,7 +35,7 @@ $(function() {
 		}
 	})
 	
-	$("div #discontinued").on("focus blur", function(e){
+	$("div #discontinued").on("focus blur", function( ){
 		let intro = new Date($("#introduced").val())
 		let disco = new Date($(this).val())
 		
@@ -53,7 +53,7 @@ $(function() {
 		}
 	})
 	
-	$("div #companyId").on("focus blur", function(e) {
+	$("div #companyId").on("focus blur", function( ) {
 		if ( $(this).val() == '' || !$("#companyId option").toArray().contains( $("#companyId").val() ) ){
 			invalidate($(this))
 		} else {
@@ -63,7 +63,7 @@ $(function() {
 	
 	$('form[action="/cdb/addComputer"]').first().on("submit", function(){
 		ctx = $(this)
-		$(this).find("fieldset div").forEach( childInput => {
+		$(this).find("fieldset div").forEach( _ => {
 			if ( $(this).hasClass('has-error') || !$(this).hasClass('has-success') ){
 				ctx.preventDefault()
 			}

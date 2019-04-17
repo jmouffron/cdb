@@ -3,13 +3,27 @@ package com.excilys.cdb.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import javax.persistence.JoinColumn;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.PastOrPresent;
+
 import com.excilys.cdb.utils.DateUtils;
 
-public class Computer extends Entity implements Serializable{
+@Table(name="computer")
+public class Computer extends Entity implements Serializable {
 
-  private static final long serialVersionUID = 2256380163459893961L;
-  private Timestamp introduced;
+	private static final long serialVersionUID = 2256380163459893961L;
+	
+	@PastOrPresent
+	@Temporal(TemporalType.TIMESTAMP)
+	private Timestamp introduced;
+	@PastOrPresent
+	@Temporal(TemporalType.TIMESTAMP)
 	private Timestamp discontinued;
+
+	@JoinColumn(name = "company", referencedColumnName = "company_id")
 	private Company company;
 
 	public Timestamp getIntroduced() {
@@ -57,49 +71,45 @@ public class Computer extends Entity implements Serializable{
 		return "Computer of id " + this.id + ", of name " + this.name + ", introduced in " + this.introduced
 				+ ", discontinued in " + this.discontinued + " manufacturé par " + this.company;
 	}
-	
-	
 
 	@Override
-  public int hashCode() {
-    final int prime = 31;
-    int result = super.hashCode();
-    result = prime * result + ((company == null) ? 0 : company.hashCode());
-    result = prime * result + ((discontinued == null) ? 0 : discontinued.hashCode());
-    result = prime * result + ((introduced == null) ? 0 : introduced.hashCode());
-    return result;
-  }
+	public int hashCode() {
+		final int prime = 31;
+		int result = super.hashCode();
+		result = prime * result + ((company == null) ? 0 : company.hashCode());
+		result = prime * result + ((discontinued == null) ? 0 : discontinued.hashCode());
+		result = prime * result + ((introduced == null) ? 0 : introduced.hashCode());
+		return result;
+	}
 
-  @Override
-  public boolean equals(Object obj) {
-    if (this == obj)
-      return true;
-    if (!super.equals(obj))
-      return false;
-    if (getClass() != obj.getClass())
-      return false;
-    Computer other = (Computer) obj;
-    if (company == null) {
-      if (other.company != null)
-        return false;
-    } else if (!company.equals(other.company))
-      return false;
-    if (discontinued == null) {
-      if (other.discontinued != null)
-        return false;
-    } else if (!discontinued.equals(other.discontinued))
-      return false;
-    if (introduced == null) {
-      if (other.introduced != null)
-        return false;
-    } else if (!introduced.equals(other.introduced))
-      return false;
-    return true;
-  }
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (!super.equals(obj))
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Computer other = (Computer) obj;
+		if (company == null) {
+			if (other.company != null)
+				return false;
+		} else if (!company.equals(other.company))
+			return false;
+		if (discontinued == null) {
+			if (other.discontinued != null)
+				return false;
+		} else if (!discontinued.equals(other.discontinued))
+			return false;
+		if (introduced == null) {
+			if (other.introduced != null)
+				return false;
+		} else if (!introduced.equals(other.introduced))
+			return false;
+		return true;
+	}
 
-
-
-  /**
+	/**
 	 * @author excilys
 	 *
 	 *         An inner Builder class for computer entities

@@ -9,14 +9,15 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,6 +30,8 @@ import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.exception.ServiceException;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
+import com.excilys.cdb.validator.CompanyDTOValidator;
+import com.excilys.cdb.validator.ComputerDTOValidator;
 import com.excilys.cdb.view.IndexPagination;
 import com.excilys.cdb.view.Pagination;
 
@@ -49,7 +52,7 @@ public class ComputerController {
 	MessageSource msgSrc;
 
 	Pagination pagination;
-
+	
 	public ComputerController(ComputerService computerService, CompanyService companyService, Pagination pagination, MessageSource msg) {
 		this.computerService = computerService;
 		this.companyService = companyService;
@@ -67,7 +70,12 @@ public class ComputerController {
 		columns.put("2", "discontinued");
 		columns.put("3", "cp_name");
 	}
-
+	
+	@InitBinder
+    protected void initBinder(WebDataBinder binder) {
+        binder.setValidator(new ComputerDTOValidator());
+	}
+	
 	@GetMapping({ "/", "/dashboard", "/dashBoard" })
 	public String getDashBoard(@RequestParam(required = false) Map<String, String> paths, Model model) {
 		logger.info(getClass().getName() + " has been called");

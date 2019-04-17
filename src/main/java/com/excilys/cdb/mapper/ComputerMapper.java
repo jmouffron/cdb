@@ -8,15 +8,23 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 
 import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.model.Computer;
+import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.utils.DateUtils;
 
+@Component
 public class ComputerMapper implements RowMapper<Computer>{
-
+  private CompanyMapper corpMapper;
+  
+  public ComputerMapper(CompanyMapper mapper) {
+	  this.corpMapper = mapper;
+  }
+  
   static public Computer map(ResultSet rs) throws SQLException {
 
     Long id = rs.getLong("id");
@@ -46,14 +54,14 @@ public class ComputerMapper implements RowMapper<Computer>{
     return Optional.ofNullable(computerDTO);
   }
 
-  static public Optional<Computer> mapToComputer(ComputerDTO dto) throws BadInputException {
-    Company company = CompanyMapper.mapToCompany(dto);
-    
+  public Optional<Computer> mapToComputer(ComputerDTO dto, CompanyService service) throws BadInputException {
+    Company company = corpMapper.mapToCompany(dto, service);
+    System.out.println(dto);
     Computer computer = new Computer.ComputerBuilder()
         .setId( dto.getId())
         .setName( dto.getName())
-        .setIntroduced( DateUtils.stringToTimestamp( dto.getIntroduced() ) )
-        .setDiscontinued( DateUtils.stringToTimestamp( dto.getIntroduced() )  )
+        .setIntroduced( DateUtils.stringToTimestamp( dto.getIntroduced() + " 00:00:00" ) )
+        .setDiscontinued( DateUtils.stringToTimestamp( dto.getIntroduced() + " 00:00:00")  )
         .setCompany(company)
         .build();
 

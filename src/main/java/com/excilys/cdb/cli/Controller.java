@@ -9,14 +9,11 @@ import org.springframework.stereotype.Component;
 
 import com.excilys.cdb.dto.CompanyDTO;
 import com.excilys.cdb.dto.ComputerDTO;
-import com.excilys.cdb.dto.EntityDTO;
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.exception.ServiceException;
-import com.excilys.cdb.model.Entity;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
-import com.excilys.cdb.service.ServiceFactory;
 
 /**
  * A Front Controller class to handle user interaction and view data injection.

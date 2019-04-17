@@ -28,7 +28,7 @@
     <!-- Spring context loader -->
 
 	<!-- Resource availability mapping -->
-	<servlet-mapping>
+    <servlet-mapping>
 		<servlet-name>default</servlet-name>
 		<url-pattern>*.css</url-pattern>
 	</servlet-mapping>

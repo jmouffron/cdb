@@ -22,21 +22,16 @@ import com.excilys.cdb.validator.ServiceValidator;
 public class ComputerService {
 	@Autowired
 	private DaoComputer dao;
+	private ComputerMapper pcMapper;
+	private CompanyService corpService;
 	private static Logger log = LoggerFactory.getLogger(ComputerService.class);
 
-	public ComputerService() {
-	}
 
-	public ComputerService(DaoComputer dao) {
-		super();
+	public ComputerService(DaoComputer dao, CompanyService service, ComputerMapper mapper) {
 		this.dao = dao;
+		this.corpService = service;
+		this.pcMapper = mapper;
 	}
-
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.excilys.cdb.service.IService#getAll()
-	 */
 
 	public Optional<List<ComputerDTO>> getAll() {
 		List<ComputerDTO> list = null;
@@ -46,25 +41,12 @@ public class ComputerService {
 		return Optional.ofNullable(list);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see com.excilys.cdb.service.IService#orderBy(java.lang.String, boolean)
-	 */
-
 	public Optional<List<ComputerDTO>> orderBy(String name, boolean isDesc) throws ServiceException, DaoException {
 		List<ComputerDTO> list = null;
 		list = this.dao.getAllOrderedBy(name, isDesc).get().stream().map(ComputerMapper::mapToDTO).map(Optional::get)
 				.collect(Collectors.toList());
 		return Optional.ofNullable(list);
 	}
-
-	/**
-	 * @param name
-	 * @return
-	 * @throws DaoException
-	 * @throws ServiceException
-	 */
 
 	public Optional<List<ComputerDTO>> searchByName(String name) {
 		String regex = "(?i)(.*)" + name + "(.*)";
@@ -87,59 +69,28 @@ public class ComputerService {
 		return Optional.ofNullable(filteredComputers);
 	}
 
-	/*
-	 * @see com.excilys.cdb.service.IService#getOneById(java.lang.Long)
-	 */
-
 	public Optional<ComputerDTO> getOneById(Long id) throws BadInputException {
-		ServiceValidator.idValidator(id, "Computer");
-
 		return ComputerMapper.mapToDTO(this.dao.getOneById(id).get());
 	}
-
-	/*
-	 * @see com.excilys.cdb.service.IService#getOneByName(java.lang.String)
-	 */
-
+	
 	public Optional<ComputerDTO> getOneByName(String name) throws BadInputException {
-		ServiceValidator.nameValidator(name, "Computer");
-
 		return ComputerMapper.mapToDTO(this.dao.getOneByName(name).get());
 	}
 
-	/*
-	 * @see com.excilys.cdb.service.IService#create(com.excilys.cdb.model.Entity)
-	 */
 	public void create(ComputerDTO newEntity) throws ServiceException, DaoException {
-		ServiceValidator.computerDTOValidator(newEntity, "Computer");
-		Computer computer = ComputerMapper.mapToComputer(newEntity).get();
+		Computer computer = pcMapper.mapToComputer(newEntity, corpService).get();
 
 		this.dao.create(computer);
 	}
-
-	/*
-	 * @see
-	 * com.excilys.cdb.service.IService#updateById(com.excilys.cdb.model.Entity)
-	 */
-
+	
 	public void updateById(ComputerDTO newEntity) throws BadInputException, DaoException {
-		ServiceValidator.computerDTOValidator(newEntity, "Computer");
-		Computer computer = ComputerMapper.mapToComputer(newEntity).get();
-
+		Computer computer = pcMapper.mapToComputer(newEntity, corpService).get();
 		this.dao.updateById(computer);
 	}
 
-	/*
-	 * @see com.excilys.cdb.service.IService#deleteById(java.lang.Long)
-	 */
 	public void deleteById(Long id) throws BadInputException, DaoException {
-		ServiceValidator.idValidator(id, "Computer");
 		this.dao.deleteById(id);
 	}
-
-	/*
-	 * @see com.excilys.cdb.service.IService#deleteByName(java.lang.String)
-	 */
 
 	public void deleteByName(String name) throws ServiceException, DaoException {
 		ServiceValidator.nameValidator(name, "Computer");

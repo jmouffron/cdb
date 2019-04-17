@@ -20,45 +20,62 @@
 				<div class="col-xs-8 col-xs-offset-2 box">
 					<div class="label label-default pull-right">id:
 						${computer.id}</div>
-					<h1>Edit Computer</h1>
+					<h1><spring:message code="editComputer.heading" /></h1>
 
 					<form:form action="${ctx}/editComputer" method="POST"
 						modelAttribute="dto">
-						<form:input path="id" type="hidden"
-							value="${computer.id}" id="${computer.id}" />
+						<form:input path="id" type="hidden" value="${computer.id}"
+							id="${computer.id}" />
 
 						<fieldset>
+							<form:errors path="*" cssClass="errorblock" element="div" />
 							<div class="form-group">
-								<form:label path="name" for="computerName"><spring:message code="editComputer.computer_name" /></form:label>
-								<form:input path="name" type="text"
-									class="form-control" id="computerName"
-									placeholder="Computer name" value="${computer.name}" />
+								<form:label path="name" for="computerName">
+									<spring:message code="editComputer.computer_name" />
+								</form:label>
+								<form:errors path="name" cssClass="errorblock" element="div" />
+								<form:input path="name" type="text" class="form-control"
+									id="computerName"
+									placeholder="<spring:message code='editComputer.computer_name' />"
+									value="${computer.name}" />
 							</div>
 							<div class="form-group">
-								<form:label path="introduced" for="introduced"><spring:message code='editComputer.introduced_name' /></form:label>
-								<form:input path="introduced" type="date"
-									class="form-control" id="introduced"
-									placeholder="Introduced date" value="${computer.introduced}" />
+								<form:label path="introduced" for="introduced">
+									<spring:message code='editComputer.introduced_date' />
+								</form:label>
+								<form:errors path="introduced" cssClass="errorblock" element="div" />
+								<form:input path="introduced" type="date" class="form-control"
+									id="introduced"
+									placeholder="<spring:message code='editComputer.introduced_date' />"
+									value="${computer.introduced}" />
 							</div>
 							<div class="form-group">
-								<form:label path="discontinued" for="discontinued"><spring:message code='editComputer.discontinued_date' /></form:label>
-								<form:input path="discontinued" type="date"
-									class="form-control" id="discontinued"
-									placeholder="Discontinued date"
+								<form:label path="discontinued" for="discontinued">
+									<spring:message code='editComputer.discontinued_date' />
+								</form:label>
+								<form:errors path="discontinued" cssClass="errorblock" element="div" />
+								<form:input path="discontinued" type="date" class="form-control"
+									id="discontinued"
+									placeholder="<spring:message code='editComputer.discontinued_date' />"
 									value="${computer.discontinued}" />
 
 							</div>
 							<div class="form-group">
-								<form:label path="companyName" for="companyId"><spring:message code='editComputer.company' /></form:label>
-								<form:select path="companyName" class="form-control"
-									id="companyId" items="${companies}">
-									<form:option value="${companies.id}" items="${companies}" />
+								<form:label path="companyId" for="companyId">
+									<spring:message code='editComputer.company' />
+								</form:label>
+								<form:select path="companyId" class="form-control" id="companyId">
+									<form:option value="${ computer.companyId }" selected="selected">${ computer.companyName }</form:option>
+									<form:options itemValue="id" itemLabel="name" items="${companies}" />
 								</form:select>
 							</div>
 						</fieldset>
 						<div class="actions pull-right">
-							<input type="submit" value="<spring:message code='editComputer.edit' />" class="btn btn-primary">
-							or <a href="${ctx}/dashboard" class="btn btn-default"><spring:message code='editComputer.cancel' /></a>
+							<input type="submit"
+								value="<spring:message code='editComputer.edit' />"
+								class="btn btn-primary"> or <a href="${ctx}/dashboard"
+								class="btn btn-default"><spring:message
+									code='editComputer.cancel' /></a>
 						</div>
 					</form:form>
 				</div>
