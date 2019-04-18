@@ -3,6 +3,7 @@ package com.excilys.cdb.model;
 import java.io.Serializable;
 
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Basic;
 
@@ -20,7 +21,7 @@ public abstract class Entity implements Serializable {
 	@Id
 	@Min(0)
 	@PositiveOrZero
-	@GeneratedValue
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	protected long id;
 	
 	@Size(min=2,max=255,message="Should be between 2 and 255 character!")

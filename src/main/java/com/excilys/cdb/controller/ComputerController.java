@@ -5,7 +5,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.LongStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +30,13 @@ import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.exception.PageException;
 import com.excilys.cdb.exception.ServiceException;
+import com.excilys.cdb.mapper.ComputerMapper;
+import com.excilys.cdb.model.ModelList;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.validator.CompanyDTOValidator;
 import com.excilys.cdb.validator.ComputerDTOValidator;
+import com.excilys.cdb.validator.ModelListValidator;
 import com.excilys.cdb.view.IndexPagination;
 import com.excilys.cdb.view.Pagination;
 
@@ -45,19 +50,20 @@ public class ComputerController {
 
 	private final Logger logger = LoggerFactory.getLogger(ComputerController.class);
 
-	ComputerService computerService;
+	private ComputerService computerService;
 
-	CompanyService companyService;
+	private CompanyService companyService;
 
-	MessageSource msgSrc;
+	private ComputerMapper pcMapper;
 
-	Pagination pagination;
-	
-	public ComputerController(ComputerService computerService, CompanyService companyService, Pagination pagination, MessageSource msg) {
+	private Pagination pagination;
+
+	public ComputerController(ComputerService computerService, CompanyService companyService, Pagination pagination,
+			ComputerMapper mapper) {
 		this.computerService = computerService;
 		this.companyService = companyService;
 		this.pagination = pagination;
-		this.msgSrc = msg;
+		this.pcMapper = mapper;
 	}
 
 	private static Map<String, String> columns;
@@ -70,12 +76,17 @@ public class ComputerController {
 		columns.put("2", "discontinued");
 		columns.put("3", "cp_name");
 	}
-	
-	@InitBinder
-    protected void initBinder(WebDataBinder binder) {
-        binder.setValidator(new ComputerDTOValidator());
+
+	@InitBinder("computer")
+	protected void initDTOBinder(WebDataBinder binder) {
+		binder.setValidator(new ComputerDTOValidator());
 	}
-	
+
+	@InitBinder("computersDestroyed")
+	protected void initListDTOBinder(WebDataBinder binder) {
+		binder.setValidator(new ModelListValidator());
+	}
+
 	@GetMapping({ "/", "/dashboard", "/dashBoard" })
 	public String getDashBoard(@RequestParam(required = false) Map<String, String> paths, Model model) {
 		logger.info(getClass().getName() + " has been called");
@@ -154,44 +165,39 @@ public class ComputerController {
 			return ERROR;
 		}
 		model.addAttribute("perPage", perPage);
-		model.addAttribute("computersDestroyed", new ArrayList<ComputerDTO>());
+		model.addAttribute("toOrder", toOrder);
+		model.addAttribute("computersDestroyed", new ModelList());
 
 		return DASHBOARD;
 	}
 
 	@PostMapping({ "/", "/dashboard", "/dashBoard" })
-	public String postDeleteComputer(@RequestParam(required = false) Map<String, String> paths, @Validated @ModelAttribute("computers") List<ComputerDTO> computers, BindingResult res, Model model) {
+	public String postDeleteComputer(@RequestParam(required = false) Map<String, String> paths,
+			@Validated @ModelAttribute("computersDestroyed") ModelList computers, BindingResult res, Model model) {
 		logger.info(getClass().getName() + " has been called");
-		
+
 		boolean hasError = setStackTraceBindingError(model, res);
 		if (hasError) {
 			return ERROR;
 		}
-		
-		String success = paths.get("success");
-		String danger = paths.get("danger");
-		String selection = paths.get("selection");
 
-		if ("".equals(selection)) {
-			logger.error("No correct computer name found!");
-			model.addAttribute("stackTrace", "No correct computer name found!");
-			return ERROR;
-		}
-		List<Long> computerIdsToDelete = Arrays.asList(selection.split(",")).stream().map(Long::parseLong)
-				.collect(Collectors.toList());
+		StringBuilder success = new StringBuilder(Optional.ofNullable(paths.get("success")).orElse(""));
+		StringBuilder danger = new StringBuilder(Optional.ofNullable(paths.get("danger")).orElse(""));
 
-		computerIdsToDelete.forEach((Long id) -> {
+		LongStream.of(computers.getIds()).forEach( (long id) -> {
 			ComputerDTO computer = null;
 			try {
 				computer = this.computerService.getOneById(id).get();
 			} catch (BadInputException e) {
 				logger.error(e.getMessage());
 				model.addAttribute("stackTrace", e.getMessage());
+				model.addAttribute("danger", e.getMessage());
 			}
 
 			if (computer == null) {
-				logger.error("Null computer found!");
-				model.addAttribute("stackTrace", "Null computer found!");
+				logger.error("Null computer of id " + id);
+				model.addAttribute("stackTrace", "Null computer of id " + id );
+				model.addAttribute("danger", "Null computer of id " + id );
 			}
 
 			try {
@@ -199,13 +205,13 @@ public class ComputerController {
 			} catch (ServiceException | DaoException e) {
 				logger.error(e.getMessage());
 				model.addAttribute("stackTrace", e.getMessage());
-				model.addAttribute("success", "The computer " + computer.getName() + " has been correctly deleted!");
-				model.addAttribute("danger", danger);
+				model.addAttribute("danger", "The computer " + computer.getName() + " has been incorrectly deleted!");
 			}
-
-			model.addAttribute("success", success);
-			model.addAttribute("danger", "The computer" + computer.getName() + "couldn't be deleted!");
+			success.append("The computer " + computer.getName() + " has been correctly deleted!\n");
+			
 		});
+		model.addAttribute("success", success);
+		model.addAttribute("danger", danger);
 
 		return REDIRECT_DASHBOARD;
 	}
@@ -234,8 +240,8 @@ public class ComputerController {
 	}
 
 	@PostMapping({ "/addComputer", "/addcomputer", "/AddComputer", "/Addcomputer" })
-	public String postAddComputer(@RequestParam(required = false) Map<String, String> paths, @Validated @ModelAttribute("computer") ComputerDTO computer, BindingResult res,
-			Model model) {
+	public String postAddComputer(@RequestParam(required = false) Map<String, String> paths,
+			@Validated @ModelAttribute("computer") ComputerDTO computer, BindingResult res, Model model) {
 		logger.info(getClass().getName() + " has been called");
 
 		boolean hasError = setStackTraceBindingError(model, res);
@@ -244,7 +250,7 @@ public class ComputerController {
 		}
 
 		try {
-			this.computerService.create(computer);
+			this.computerService.create(pcMapper.mapToComputer(computer, companyService).get());
 		} catch (ServiceException | DaoException e) {
 			logger.debug(e.getMessage());
 			model.addAttribute("stackTrace", e.getMessage());
@@ -258,7 +264,7 @@ public class ComputerController {
 	}
 
 	@GetMapping({ "/editComputer", "/editcomputer", "/EditComputer", "/Editcomputer" })
-	public String getEditComputer(@RequestParam(required = false, value="computerId") long computerId, Model model) {
+	public String getEditComputer(@RequestParam(required = false, value = "computerId") long computerId, Model model) {
 		logger.info(getClass().getName() + " has been called");
 
 		ComputerDTO computer = null;
@@ -281,7 +287,7 @@ public class ComputerController {
 		model.addAttribute("companies", companies);
 		model.addAttribute("computer", computer);
 		model.addAttribute("dto", new ComputerDTO());
-		
+
 		return EDIT_COMPUTER;
 	}
 
@@ -309,9 +315,9 @@ public class ComputerController {
 			model.addAttribute("stackTrace", "Wrong edit and change of the id!");
 			return ERROR;
 		}
-		
+
 		try {
-			this.computerService.updateById(computer);
+			this.computerService.updateById(pcMapper.mapToComputer(computer, companyService).get());
 		} catch (ServiceException | DaoException e) {
 			logger.error(e.getMessage());
 			model.addAttribute("stackTrace", e.getMessage());

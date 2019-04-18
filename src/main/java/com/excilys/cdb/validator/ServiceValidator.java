@@ -73,7 +73,7 @@ public class ServiceValidator {
 			throw new BadInputException();
 		}
 		if (newEntity.getIntroduced() != null && newEntity.getDiscontinued() != null) {
-			if (newEntity.getIntroduced().after(newEntity.getDiscontinued())) {
+			if (newEntity.getIntroduced().compareTo(newEntity.getDiscontinued()) > 0) {
 				log.error("Discontinued Date on NewEntity before Introduced Date for " + entity);
 				throw new BadInputException();
 			}
@@ -105,7 +105,7 @@ public class ServiceValidator {
       throw new BadInputException();
     }
     if (newEntity.getIntroduced() != null && newEntity.getDiscontinued() != null) {
-      if (DateUtils.stringToTimestamp( newEntity.getIntroduced() ).after( DateUtils.stringToTimestamp( newEntity.getIntroduced() ) ) ) {
+      if (DateUtils.stringToTimestamp( newEntity.getIntroduced() ).compareTo( DateUtils.stringToTimestamp( newEntity.getIntroduced() ) ) > 0 ) {
         log.error("Discontinued Date on NewEntity before Introduced Date for " + entity);
         throw new BadInputException();
       }

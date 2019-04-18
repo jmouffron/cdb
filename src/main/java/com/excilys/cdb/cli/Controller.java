@@ -12,6 +12,7 @@ import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.exception.ServiceException;
+import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 
@@ -30,11 +31,13 @@ public class Controller {
 	
 	private ComputerService computerService;
 	private CompanyService companyService;
+	private ComputerMapper pcMapper;
 
-	private Controller(ComputerService pcService, CompanyService corpService) {
+	private Controller(ComputerService pcService, CompanyService corpService, ComputerMapper pcMapper) {
 		this.page = new MenuPage();
 		this.computerService = pcService;
 		this.companyService = corpService;
+		this.pcMapper = pcMapper;
 	}
 
 	/**
@@ -284,7 +287,7 @@ public class Controller {
 	 */
 	private void addEntity(ComputerDTO newEntity) {
 		try {
-			this.computerService.create(newEntity);
+			this.computerService.create(pcMapper.mapToComputer(newEntity, companyService).get());
 		} catch (ServiceException | DaoException e) {
 			logger.error("Couldn't add entity" + newEntity.getName() + "!");
 		}

@@ -18,7 +18,7 @@ public class DaoComputer {
 	private final String DELETE_ID = "DELETE FROM computer WHERE id=? ";
 	private final String DELETE_NAME = "DELETE FROM computer WHERE name=? ";
 	private final String DESC = " DESC";
-	private final String INSERT = "INSERT INTO computer VALUES(?,?,?,?)";
+	private final String INSERT = "INSERT INTO computer (name,introduced,discontinued,company_id) VALUES (?,?,?,?)";
 	private final String SELECT_ALL = "SELECT pc.id, pc.name as pc_name, pc.introduced, pc.discontinued, pc.company_id, c.name as cp_name FROM computer pc INNER JOIN company c ON pc.company_id=c.id";
 	private final String SELECT_ID = SELECT_ALL + " where pc.id=? ";
 	private final String SELECT_NAME = SELECT_ALL + " where pc.name=? ";
@@ -58,7 +58,7 @@ public class DaoComputer {
 	}
 
 	public void create(Computer newEntity) throws DaoException {
-		int affected = jdbcTemplate.update(INSERT, new Object[] { newEntity.getName(), newEntity.getIntroduced(), newEntity.getDiscontinued(), newEntity.getCompany().getId(), newEntity.getId() });
+		int affected = jdbcTemplate.update(INSERT, new Object[] { newEntity.getName(), newEntity.getIntroduced(), newEntity.getDiscontinued(), newEntity.getCompany().getId() });
 		if (affected < 1) {
 			throw new DaoException("Couldn't insert " + newEntity.getName());
 		}

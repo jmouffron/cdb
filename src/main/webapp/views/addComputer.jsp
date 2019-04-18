@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<title><spring:message code="addComputer.title" /></title>
+<title><spring:message code="addComputer.heading" /></title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta http-equiv="X-UA-Compatible" content="ie=edge">
 <meta charset="utf-8">
@@ -24,11 +24,11 @@
 						modelAttribute="computer">
 						<fieldset>
 							<div class="form-group">
-								<form:errors path="*" cssClass="errorblock" element="div" />
+								<form:errors path="*" cssClass="danger" element="div" />
 								<form:label path="name">
 									<spring:message code="addComputer.computer_name" />
 								</form:label>
-								<form:errors path="name" cssClass="errorblock" element="div" />
+								<form:errors path="name" cssClass="danger" element="div" />
 								<form:input path="name" class="form-control" id="computerName"
 									placeholder="<spring:message code='addComputer.computer_name' />"
 									value="${ computerName }" />
@@ -37,7 +37,7 @@
 								<form:label path="introduced">
 									<spring:message code="addComputer.introduced_date" />
 								</form:label>
-								<form:errors path="introduced" cssClass="errorblock" element="div" />
+								<form:errors path="introduced" cssClass="danger" element="div" />
 								<form:input path="introduced" type="date" class="form-control"
 									id="introduced"
 									placeholder="<spring:message code='addComputer.introduced_date' />"
@@ -47,19 +47,23 @@
 								<form:label path="discontinued">
 									<spring:message code="addComputer.discontinued_date" />
 								</form:label>
-								<form:errors path="discontinued" cssClass="errorblock" element="div" />
+								<form:errors path="discontinued" cssClass="danger" element="div" />
 								<form:input path="discontinued" type="date" class="form-control"
 									id="discontinued"
 									placeholder="<spring:message code='addComputer.discontinued_date' />"
 									value="${ discontinued }" />
 							</div>
 							<div class="form-group">
-								<form:label path="companyId">
-									<spring:message code="addComputer.company" />
+								<form:label path="companyId" for="companyId">
+									<spring:message code='addComputer.company' />
 								</form:label>
 								<form:select path="companyId" class="form-control"
-									id="companyId" items="${companies}">
-									<form:options itemValue="id" itemLabel="name" items="${companies}" />
+									id="companyId">
+									<form:option value="${ companyId }" selected="selected">
+										${ companyName }
+									</form:option>
+									<form:options itemValue="id" itemLabel="name"
+										items="${companies}" />
 								</form:select>
 							</div>
 						</fieldset>

@@ -77,15 +77,12 @@ public class ComputerService {
 		return ComputerMapper.mapToDTO(this.dao.getOneByName(name).get());
 	}
 
-	public void create(ComputerDTO newEntity) throws ServiceException, DaoException {
-		Computer computer = pcMapper.mapToComputer(newEntity, corpService).get();
-
-		this.dao.create(computer);
+	public void create(Computer newEntity) throws ServiceException, DaoException {
+		this.dao.create(newEntity);
 	}
 	
-	public void updateById(ComputerDTO newEntity) throws BadInputException, DaoException {
-		Computer computer = pcMapper.mapToComputer(newEntity, corpService).get();
-		this.dao.updateById(computer);
+	public void updateById(Computer newEntity) throws BadInputException, DaoException {
+		this.dao.updateById(newEntity);
 	}
 
 	public void deleteById(Long id) throws BadInputException, DaoException {

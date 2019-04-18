@@ -5,7 +5,7 @@
 		<div class="navbar-brand navbar-right text-center">
 			<label><spring:message code="dashboard.lang" /></label>
 			<select id="locales">
-				<option value="">  </option>
+				<option value=""></option>
 				<option value="en">EN</option>
 				<option value="fr">FR</option>
 			</select>

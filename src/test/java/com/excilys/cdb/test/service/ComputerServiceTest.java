@@ -15,17 +15,17 @@ import org.slf4j.LoggerFactory;
 import com.excilys.cdb.exception.BadInputException;
 import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.exception.ServiceException;
+import com.excilys.cdb.mapper.ComputerMapper;
 import com.excilys.cdb.model.Company;
 import com.excilys.cdb.persistence.DaoComputer;
 import com.excilys.cdb.dto.ComputerDTO;
+import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
-import com.excilys.cdb.service.ServiceFactory;
 import com.excilys.cdb.utils.DateUtils;
 
 class ComputerServiceTest {
 	private static Logger log = LoggerFactory.getLogger(ComputerServiceTest.class);
-	static ComputerService service;
-	static DaoComputer daoComputerDTO;
+	private static ComputerService service;
 
 	static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-mm-dd hh:mm:ss");
 
@@ -33,15 +33,21 @@ class ComputerServiceTest {
 	String badDiscontinued = DateUtils.getBeforeNowTimestamp(Period.ofYears(3)).toString();
 	String introduced = DateUtils.getBeforeNowTimestamp(Period.ofYears(3)).toString();
 	String discontinued = DateUtils.getNowTimestamp().toString();
+	private static ComputerMapper pcMapper;
+	private static CompanyService corpService;
 
 	@BeforeAll
-	static void setUp(ServiceFactory factory) {
-		service = factory.getComputerService();
+	static void setUp(ComputerService pcService, CompanyService companyService, ComputerMapper mapper) {
+		service = pcService;
+		corpService = companyService;
+		pcMapper = mapper;
 	}
 
 	@AfterAll
 	static void tearDown() {
 		service = null;
+		corpService = null;
+		pcMapper = null;
 	}
 
 	@Test
@@ -52,7 +58,7 @@ class ComputerServiceTest {
 				.setDiscontinued(discontinued).setName("New computer").setCompanyId(companyDummy.getId()).build();
 
 		try {
-			service.create(computerDummy);
+			service.create(pcMapper.mapToComputer(computerDummy, corpService).get());
 		} catch (BadInputException | DaoException e) {
 			log.error("Create Failure, BadInputException launched!");
 			fail("BadInputException thrown with good inputs.");
@@ -68,7 +74,7 @@ class ComputerServiceTest {
 				.build();
 
 		try {
-			service.create(badComputerDTODummy);
+			service.create(pcMapper.mapToComputer(badComputerDTODummy, corpService).get());
 			fail("BadInputException non thrown with bad inputs.");
 		} catch (BadInputException | DaoException e) {
 			log.debug("BadInput Success, Create Exception launched!");
@@ -89,8 +95,8 @@ class ComputerServiceTest {
 				.setDiscontinued(updatedDiscontinued).setName("New name").setCompanyId(updatedcompany.getId()).build();
 
 		try {
-			service.create(computerDummy);
-			service.updateById(computerUpdated);
+			service.create(pcMapper.mapToComputer(computerDummy, corpService).get());
+			service.updateById(pcMapper.mapToComputer(computerUpdated, corpService).get());
 		} catch (BadInputException | DaoException e) {
 			log.error("Update Failure, BadInputException launched!");
 			fail("BadInputException thrown with good inputs.");
@@ -106,7 +112,7 @@ class ComputerServiceTest {
 				.build();
 
 		try {
-			service.updateById(badComputerDTODummy);
+			service.updateById(pcMapper.mapToComputer(badComputerDTODummy, corpService).get());
 			fail("BadInputException non thrown with bad inputs.");
 		} catch (BadInputException | DaoException e) {
 			log.debug("BadInput Success, Update Exception launched!");
@@ -122,7 +128,7 @@ class ComputerServiceTest {
 				.setCompanyId(companyDummy.getId()).build();
 
 		try {
-			service.create(computerDummy);
+			service.create(pcMapper.mapToComputer(computerDummy, corpService).get());
 			service.deleteById(computerDummy.getId());
 		} catch (BadInputException | DaoException e) {
 			log.error("Delete Failure, BadInputException launched!");
@@ -139,7 +145,7 @@ class ComputerServiceTest {
 				.build();
 
 		try {
-			service.create(badComputerDTODummy);
+			service.create(pcMapper.mapToComputer(badComputerDTODummy, corpService).get());
 			service.deleteById(badComputerDTODummy.getId());
 			fail("BadInputException non thrown with bad inputs.");
 		} catch (BadInputException | DaoException e) {

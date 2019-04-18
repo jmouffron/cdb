@@ -1,5 +1,8 @@
 package com.excilys.cdb.validator;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.springframework.stereotype.Component;
@@ -11,11 +14,12 @@ import com.excilys.cdb.dto.ComputerDTO;
 import com.excilys.cdb.utils.DateUtils;
 
 @Component
+
 public class ComputerDTOValidator implements Validator {
 
 	@Override
 	public boolean supports(Class<?> clazz) {
-		return ComputerDTO.class.isAssignableFrom(clazz);
+		return ComputerDTO.class.isAssignableFrom(clazz) ;
 	}
 
 	@Override
@@ -23,8 +27,19 @@ public class ComputerDTOValidator implements Validator {
 		if (obj == null) {
 			errors.reject("500", "Computer is null!");
 		}
+		
+		if(obj instanceof List) {
+			List<ComputerDTO> computers = (List<ComputerDTO>) obj;
+			computers.forEach( pc -> verif(pc, errors));
+		}else {
+			verif(obj, errors);
+		}
+		
+	}
+	
+	private void verif(Object obj, Errors errors) {
 		ComputerDTO dto = (ComputerDTO) obj;
-
+		System.out.println();
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "dtopc.name.empty");
 
 		if (!"".equals(dto.getDiscontinued())) {
@@ -49,8 +64,8 @@ public class ComputerDTOValidator implements Validator {
 			if (!(pattern.matcher(dto.getDiscontinued()).matches())) {
 				errors.rejectValue("discontinued", "dtopc.introduced.invalid");
 			}
-			if (DateUtils.stringToTimestamp(dto.getIntroduced())
-					.compareTo(DateUtils.stringToTimestamp(dto.getDiscontinued())) > 0) {
+			if (DateUtils.stringToTimestamp(dto.getIntroduced() + " 00:00:00")
+					.compareTo(DateUtils.stringToTimestamp(dto.getDiscontinued() + " 00:00:00")) > 0) {
 				errors.rejectValue("introduced", "dtopc.introduced.invalid");
 				errors.rejectValue("discontinued", "dtopc.introduced.invalid");
 			}

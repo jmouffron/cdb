@@ -54,7 +54,7 @@ $(function() {
 	})
 	
 	$("div #companyId").on("focus blur", function( ) {
-		if ( $(this).val() == '' || !$("#companyId option").toArray().contains( $("#companyId").val() ) ){
+		if ( $(this).val() == '' || !$("#companyId option").toArray().map(option => option.value).includes( $("#companyId").val() ) ){
 			invalidate($(this))
 		} else {
 			validate($(this))

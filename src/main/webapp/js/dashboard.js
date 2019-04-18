@@ -28,13 +28,13 @@ $(function () {
 // Function setCheckboxValues
 (function ($) {
 
-    $.fn.setCheckboxValues = function (_, checkboxFieldName) {
+    $.fn.setCheckboxValues = function ( input, checkboxFieldName) {
 
         var str = $('.' + checkboxFieldName + ':checked').map(function () {
             return this.value;
         }).get().join();
 
-        $(this).attr('value', str);
+        $(`#deleteForm input[name=${input}]`).val(str);
 
         return this;
     };
@@ -64,8 +64,8 @@ $(function () {
 (function ($) {
     $.fn.deleteSelected = function () {
         if (confirm("Are you sure you want to delete the selected computers?")) {
-            $('#deleteForm input[name=selection]').setCheckboxValues('selection', 'cb');
-            $('#deleteForm').submit();
+            $('#deleteForm input[name=ids]').setCheckboxValues('ids', 'cb');
+            $('#deleteForm').submit()
         }
     };
 }(jQuery));
