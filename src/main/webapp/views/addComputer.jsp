@@ -28,7 +28,7 @@
 								<form:label path="name">
 									<spring:message code="addComputer.computer_name" />
 								</form:label>
-								<form:errors path="name" cssClass="danger" element="div" />
+								<form:errors path="name" cssClass="alert-danger" element="div" />
 								<form:input path="name" class="form-control" id="computerName"
 									placeholder="<spring:message code='addComputer.computer_name' />"
 									value="${ computerName }" />
@@ -37,7 +37,7 @@
 								<form:label path="introduced">
 									<spring:message code="addComputer.introduced_date" />
 								</form:label>
-								<form:errors path="introduced" cssClass="danger" element="div" />
+								<form:errors path="introduced" cssClass="alert-danger" element="div" />
 								<form:input path="introduced" type="date" class="form-control"
 									id="introduced"
 									placeholder="<spring:message code='addComputer.introduced_date' />"
@@ -47,7 +47,7 @@
 								<form:label path="discontinued">
 									<spring:message code="addComputer.discontinued_date" />
 								</form:label>
-								<form:errors path="discontinued" cssClass="danger" element="div" />
+								<form:errors path="discontinued" cssClass="alert-danger" element="div" />
 								<form:input path="discontinued" type="date" class="form-control"
 									id="discontinued"
 									placeholder="<spring:message code='addComputer.discontinued_date' />"

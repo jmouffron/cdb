@@ -1,11 +1,11 @@
 package com.excilys.cdb;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.Properties;
 
 import javax.sql.DataSource;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -15,6 +15,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.orm.hibernate.HibernateTransactionManager;
 import org.springframework.orm.hibernate.LocalSessionFactoryBean;
 import org.springframework.web.context.annotation.RequestScope;
 
@@ -54,10 +55,27 @@ public class AppConfig {
 	}
 
 	@Bean
-  public LocalSessionFactoryBean sessionFactory() {
-	  LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-	  sessionFactory.setDataSource(Datasource());
-	  
-	  return sessionFactory;		 
-  }
+	public LocalSessionFactoryBean SessionFactory() {
+		LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
+		sessionFactory.setDataSource(Datasource());
+		sessionFactory.setMappingResources(new String[] {"classpath:hbm.cfg.xml"});
+		sessionFactory.setHibernateProperties(hibernateProperties());
+		return sessionFactory;
+	}
+	
+    private Properties hibernateProperties() {
+    	Properties hbmProps = new Properties();
+    	try {
+			hbmProps.load(getClass().getClassLoader().getResourceAsStream("datasource.properties"));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    	return hbmProps;
+	}
+
+	@Bean
+    public HibernateTransactionManager getTransactionManager() {
+        HibernateTransactionManager transactionManager = new HibernateTransactionManager();
+        return transactionManager;
+    }
 }

@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.mapper.ComputerMapper;
@@ -34,29 +35,34 @@ public class DaoComputer {
 		this.jdbcTemplate = jdbc;
 		this.pcMapper = mapper;
 	}
-
+	
+	@Transactional(readOnly=true)
 	public Optional<List<Computer>> getAll() {
 		List<Computer> computerFetched = jdbcTemplate.query(SELECT_ALL, pcMapper);
 		return Optional.ofNullable(computerFetched);
 	}
-
+	
+	@Transactional(readOnly=true)
 	public Optional<List<Computer>> getAllOrderedBy(String orderBy, boolean desc) {
 		String QUERY = desc ? ORDER_BY + orderBy + DESC : ORDER_BY + orderBy;
 		List<Computer> computerFetched = jdbcTemplate.query(QUERY, pcMapper);
 		return Optional.ofNullable(computerFetched);
 	}
 
+	@Transactional(readOnly=true)
 	public Optional<Computer> getOneById(Long id) {
 		Computer computerFetched = jdbcTemplate.queryForObject(SELECT_ID, new Object[] { id }, pcMapper);
 		return Optional.ofNullable(computerFetched);
 	}
 
+	@Transactional(readOnly=true)
 	public Optional<Computer> getOneByName(String name) {
 		Computer computerFetched = jdbcTemplate.queryForObject(SELECT_NAME, new Object[] { name },
 				pcMapper);
 		return Optional.ofNullable(computerFetched);
 	}
 
+	@Transactional
 	public void create(Computer newEntity) throws DaoException {
 		int affected = jdbcTemplate.update(INSERT, new Object[] { newEntity.getName(), newEntity.getIntroduced(), newEntity.getDiscontinued(), newEntity.getCompany().getId() });
 		if (affected < 1) {
@@ -64,6 +70,7 @@ public class DaoComputer {
 		}
 	}
 
+	@Transactional
 	public void updateById(Computer newEntity) throws DaoException {
 		log.error("" + newEntity.getCompany().getId());
 		int affected = jdbcTemplate.update(UPDATE, new Object[] { newEntity.getName(), newEntity.getIntroduced(), newEntity.getDiscontinued(), newEntity.getCompany().getId(), newEntity.getId() });
@@ -72,13 +79,14 @@ public class DaoComputer {
 		}
 	}
 
+	@Transactional
 	public void deleteById(Long id) throws DaoException {
 		int affected = jdbcTemplate.update(DELETE_ID, new Object[] { id });
 		if (affected < 1) {
 			throw new DaoException("Couldn't delete entity");
 		}
 	}
-
+	@Transactional
 	public void deleteByName(String name) throws DaoException {
 		int affected = jdbcTemplate.update(DELETE_NAME, new Object[] { name });
 		if (affected < 1) {

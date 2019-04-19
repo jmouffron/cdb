@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.excilys.cdb.exception.DaoException;
 import com.excilys.cdb.mapper.CompanyMapper;
@@ -52,29 +53,34 @@ public class DaoCompany {
 	private Connection getConnection() throws DaoException {
 		return this.datasource.getConnection().get();
 	}
-
+	
+	@Transactional(readOnly=true)
 	public Optional<List<Company>> getAll() {
 		List<Company> companyFetched = jdbcTemplate.query(SELECT_ALL, corpMapper);
 		return Optional.ofNullable(companyFetched);
 	}
-
+	
+	@Transactional(readOnly=true)
 	public Optional<List<Company>> getAllOrderedBy(String orderBy, boolean desc) {
 		String QUERY = desc ? ORDER_BY + orderBy + DESC : ORDER_BY + orderBy;
 		List<Company> companyFetched = jdbcTemplate.query(QUERY, corpMapper);
 		return Optional.ofNullable(companyFetched);
 	}
-
+	
+	@Transactional(readOnly=true)
 	public Optional<Company> getOneById(Long id) {
 		Company companyFetched = jdbcTemplate.queryForObject(SELECT_ID, new Object[] { id }, corpMapper);
 		return Optional.ofNullable(companyFetched);
 	}
-
+	
+	@Transactional(readOnly=true)
 	public Optional<Company> getOneByName(String name) {
 		log.error(name);
 		Company companyFetched = jdbcTemplate.queryForObject(SELECT_NAME, new Object[] { name }, corpMapper);
 		return Optional.ofNullable(companyFetched);
 	}
 
+	@Transactional
 	public boolean create(Company newEntity) throws DaoException {
 		int affected = jdbcTemplate.update(INSERT, new Object[] { newEntity });
 		if (affected > 0) {
@@ -82,7 +88,8 @@ public class DaoCompany {
 		}
 		return affected > 0 ? true : false;
 	}
-
+	
+	@Transactional
 	public boolean updateById(Company newEntity) throws DaoException {
 		int affected = jdbcTemplate.update(UPDATE, new Object[] { newEntity });
 		if (affected > 0) {
@@ -90,7 +97,8 @@ public class DaoCompany {
 		}
 		return affected > 0 ? true : false;
 	}
-
+	
+	@Transactional
 	public boolean deleteById(Long id) throws DaoException {
 		int lineAffected = 0;
 
@@ -118,7 +126,8 @@ public class DaoCompany {
 
 		return lineAffected > 0 ? true : false;
 	}
-
+	
+	@Transactional
 	public boolean deleteByName(String name, ComputerService service) throws DaoException {
 		int lineAffected = 0;
 		Connection conn = getConnection();

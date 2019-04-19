@@ -35,6 +35,7 @@
 		<spring.hibernate.version>1.2.9</spring.hibernate.version>
 		<spring.orm.version>1.0.2</spring.orm.version>
 		<dbunit.version>2.6.0</dbunit.version>
+		<hibernate.version>6.0.0.Alpha2</hibernate.version>
 	</properties>
 
 	<dependencies>
@@ -94,21 +95,6 @@
 
 		<dependency>
 			<groupId>org.springframework</groupId>
-			<artifactId>spring-core</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-context</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
 			<artifactId>spring-webmvc</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
@@ -120,16 +106,6 @@
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-beans</artifactId>
-			<version>${spring.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-jdbc</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
 		<dependency>
@@ -169,9 +145,10 @@
 			<version>${spring.hibernate.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>spring</groupId>
-			<artifactId>spring-orm</artifactId>
-			<version>${spring.orm.version}</version>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>${hibernate.version}</version>
+			<type>pom</type>
 		</dependency>
 	</dependencies>
 

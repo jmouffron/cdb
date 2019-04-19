@@ -47,7 +47,9 @@ public class ComputerController {
 	private static final String ADD_COMPUTER = "addComputer";
 	private static final String ERROR = "500";
 	private static final String REDIRECT_DASHBOARD = "redirect:dashboard";
-
+	private static final String REDIRECT_ADD = "redirect:addComputer";
+	private static final String REDIRECT_EDIT = "redirect:editComputer";
+	
 	private final Logger logger = LoggerFactory.getLogger(ComputerController.class);
 
 	private ComputerService computerService;
@@ -57,6 +59,7 @@ public class ComputerController {
 	private ComputerMapper pcMapper;
 
 	private Pagination pagination;
+
 
 	public ComputerController(ComputerService computerService, CompanyService companyService, Pagination pagination,
 			ComputerMapper mapper) {
@@ -246,7 +249,7 @@ public class ComputerController {
 
 		boolean hasError = setStackTraceBindingError(model, res);
 		if (hasError) {
-			return ERROR;
+			return REDIRECT_ADD;
 		}
 
 		try {
@@ -298,7 +301,7 @@ public class ComputerController {
 
 		boolean hasError = setStackTraceBindingError(model, res);
 		if (hasError) {
-			return ERROR;
+			return REDIRECT_EDIT;
 		}
 
 		ComputerDTO computerInDb = null;
