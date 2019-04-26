@@ -1,0 +1,1 @@
+<script src="${ctx}/js/i18n.js"></script>

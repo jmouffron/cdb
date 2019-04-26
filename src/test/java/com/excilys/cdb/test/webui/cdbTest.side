@@ -1,0 +1,54 @@
+{
+  "id": "4bfe1969-5e7b-4604-8a2f-cce6c9390908",
+  "version": "2.0",
+  "name": "cdbTest",
+  "url": "http://localhost:8080",
+  "tests": [{
+    "id": "536d7243-eff5-4a44-a88e-3485304aa82d",
+    "name": "givenDashboardwhenPaginateDashboardthenSuceed",
+    "commands": [{
+      "id": "939024b6-937b-4486-ab19-57840eb94211",
+      "comment": "",
+      "command": "open",
+      "target": "/cdb/",
+      "targets": [],
+      "value": ""
+    }, {
+      "id": "1d9c6ee8-eccd-40e5-8a0b-1d04e53b491d",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=2",
+      "targets": [
+        ["linkText=2", "linkText"],
+        ["css=li:nth-child(3) > a", "css:finder"],
+        ["xpath=(//a[contains(text(),'2')])[4]", "xpath:link"],
+        ["xpath=//a[contains(@href, '/cdb?page=2&search=&toOrder=')]", "xpath:href"],
+        ["xpath=//li[3]/a", "xpath:position"]
+      ],
+      "value": ""
+    }, {
+      "id": "4ba5b786-b188-4912-ab02-2fc5757996f9",
+      "comment": "",
+      "command": "click",
+      "target": "linkText=1",
+      "targets": [
+        ["linkText=1", "linkText"],
+        ["css=li:nth-child(2) > a", "css:finder"],
+        ["xpath=(//a[contains(text(),'1')])[2]", "xpath:link"],
+        ["xpath=(//a[contains(@href, '/cdb?page=1&search=&toOrder=')])[2]", "xpath:href"],
+        ["xpath=//li[2]/a", "xpath:position"]
+      ],
+      "value": ""
+    }]
+  }],
+  "suites": [{
+    "id": "3132c36c-7744-4925-88e2-d1cb02c10725",
+    "name": "Default Suite",
+    "persistSession": false,
+    "parallel": false,
+    "timeout": 300,
+    "tests": ["536d7243-eff5-4a44-a88e-3485304aa82d"]
+  }],
+  "urls": ["http://localhost:8080/"],
+  "plugins": []
+}
