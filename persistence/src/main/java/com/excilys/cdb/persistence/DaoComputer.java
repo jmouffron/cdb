@@ -1,97 +1,215 @@
 package com.excilys.cdb.persistence;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.excilys.cdb.binding.dto.ComputerDTO;
 import com.excilys.cdb.binding.exception.DaoException;
-import com.excilys.cdb.persistence.mapper.ComputerMapper;
 import com.excilys.cdb.core.model.Computer;
 
 @Repository
 public class DaoComputer {
 
-	private final String DELETE_ID = "DELETE FROM computer WHERE id=? ";
-	private final String DELETE_NAME = "DELETE FROM computer WHERE name=? ";
-	private final String DESC = " DESC";
-	private final String INSERT = "INSERT INTO computer (name,introduced,discontinued,company_id) VALUES (?,?,?,?)";
-	private final String SELECT_ALL = "SELECT pc.id, pc.name as pc_name, pc.introduced, pc.discontinued, pc.company_id, c.name as cp_name FROM computer pc INNER JOIN company c ON pc.company_id=c.id";
-	private final String SELECT_ID = SELECT_ALL + " where pc.id=? ";
-	private final String SELECT_NAME = SELECT_ALL + " where pc.name=? ";
-	private final String UPDATE = "UPDATE computer SET name=?,introduced=?,discontinued=?,company_id=? WHERE id=? ";
-	private final String ORDER_BY = SELECT_ALL + " ORDER BY ";
+	private static final Logger log = LoggerFactory.getLogger(DaoComputer.class);
+	private SessionFactory sessionFactory;
 
-	private final Logger log = LoggerFactory.getLogger(DaoComputer.class);
-
-	private JdbcTemplate jdbcTemplate;
-	private ComputerMapper pcMapper;
-
-	public DaoComputer(JdbcTemplate jdbc, ComputerMapper mapper) {
-		this.jdbcTemplate = jdbc;
-		this.pcMapper = mapper;
-	}
-	
-	@Transactional(readOnly=true)
-	public Optional<List<Computer>> getAll() {
-		List<Computer> computerFetched = jdbcTemplate.query(SELECT_ALL, pcMapper);
-		return Optional.ofNullable(computerFetched);
-	}
-	
-	@Transactional(readOnly=true)
-	public Optional<List<Computer>> getAllOrderedBy(String orderBy, boolean desc) {
-		String QUERY = desc ? ORDER_BY + orderBy + DESC : ORDER_BY + orderBy;
-		List<Computer> computerFetched = jdbcTemplate.query(QUERY, pcMapper);
-		return Optional.ofNullable(computerFetched);
+	public DaoComputer(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
 	}
 
-	@Transactional(readOnly=true)
+	private Session getSession() {
+		return sessionFactory.openSession();
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<List<Computer>> getAll() throws DaoException {
+		return criteriaBuild(Computer.class);
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<List<Computer>> getAllOrderedBy(String orderBy, boolean desc) throws DaoException {
+		return criteriaOrder(Computer.class, orderBy, desc);
+	}
+
+	@Transactional(readOnly = true)
 	public Optional<Computer> getOneById(Long id) {
-		Computer computerFetched = jdbcTemplate.queryForObject(SELECT_ID, new Object[] { id }, pcMapper);
-		return Optional.ofNullable(computerFetched);
+		Computer criteriaComputer = criteriaGet(Computer.class, id);
+		return Optional.ofNullable(criteriaComputer);
 	}
 
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	public Optional<Computer> getOneByName(String name) {
-		Computer computerFetched = jdbcTemplate.queryForObject(SELECT_NAME, new Object[] { name },
-				pcMapper);
-		return Optional.ofNullable(computerFetched);
+		Computer criteriaComputer = criteriaGet(Computer.class, name);
+		return Optional.ofNullable(criteriaComputer);
 	}
 
 	@Transactional
 	public void create(Computer newEntity) throws DaoException {
-		int affected = jdbcTemplate.update(INSERT, new Object[] { newEntity.getName(), newEntity.getIntroduced(), newEntity.getDiscontinued(), newEntity.getCompany().getId() });
-		if (affected < 1) {
-			throw new DaoException("Couldn't insert " + newEntity.getName());
+		try (Session session = getSession();) {
+			session.persist(newEntity);
 		}
 	}
 
 	@Transactional
 	public void updateById(Computer newEntity) throws DaoException {
-		log.error("" + newEntity.getCompany().getId());
-		int affected = jdbcTemplate.update(UPDATE, new Object[] { newEntity.getName(), newEntity.getIntroduced(), newEntity.getDiscontinued(), newEntity.getCompany().getId(), newEntity.getId() });
-		if (affected < 1) {
-			throw new DaoException("Couldn't update " + newEntity.getName());
+		try (Session session = getSession();) {
+
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaUpdate<Computer> updater = builder.createCriteriaUpdate(Computer.class);
+			Root<Computer> root = updater.from(Computer.class);
+
+			updater.set("name", newEntity.getName());
+
+			if (newEntity.getIntroduced() != null) {
+				updater.set("introduced", newEntity.getIntroduced());
+			}
+			if (newEntity.getDiscontinued() != null) {
+				updater.set("discontinued", newEntity.getDiscontinued());
+			}
+			if (newEntity.getCompany() != null) {
+				updater.set("company", newEntity.getCompany());
+			}
+
+			updater.where(builder.equal(root.get("id"), newEntity.getId()));
+
+			session.createQuery(updater).executeUpdate();
+
 		}
 	}
 
 	@Transactional
 	public void deleteById(Long id) throws DaoException {
-		int affected = jdbcTemplate.update(DELETE_ID, new Object[] { id });
-		if (affected < 1) {
-			throw new DaoException("Couldn't delete entity");
+		try (Session session = getSession();) {
+
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaDelete<Computer> deleter = builder.createCriteriaDelete(Computer.class);
+			Root<Computer> root = deleter.from(Computer.class);
+
+			deleter.where(builder.equal(root.get("id"), id));
+
+			session.createQuery(deleter).executeUpdate();
 		}
 	}
+
 	@Transactional
 	public void deleteByName(String name) throws DaoException {
-		int affected = jdbcTemplate.update(DELETE_NAME, new Object[] { name });
-		if (affected < 1) {
-			throw new DaoException("Couldn't delete entity");
+		try (Session session = getSession();) {
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaDelete<Computer> deleter = builder.createCriteriaDelete(Computer.class);
+			Root<Computer> root = deleter.from(Computer.class);
+
+			deleter.where(builder.equal(root.get("name"), name));
+
+			session.createQuery(deleter).executeUpdate();
 		}
+	}
+
+	private <T> Optional<List<T>> criteriaBuild(Class<T> clazz, Predicate... predicates) throws DaoException {
+		Optional<List<T>> computerFetched = Optional.empty();
+		try (Session session = getSession();) {
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaQuery<T> query = builder.createQuery(clazz);
+			Root<T> root = query.from(clazz);
+			query.select(root);
+			Arrays.asList(predicates).forEach(predicate -> query.select(root).where(predicate));
+			TypedQuery<T> typedQuery = session.createQuery(query);
+			computerFetched = Optional.ofNullable(typedQuery.getResultList());
+		}
+
+		return computerFetched;
+	}
+
+	private <T> Optional<List<T>> criteriaOrder(Class<T> clazz, String orderBy, boolean desc) throws DaoException {
+		Optional<List<T>> criteriaComputers;
+		try (Session session = getSession();) {
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaQuery<T> query = builder.createQuery(clazz);
+			Root<T> root = query.from(clazz);
+			query.select(root);
+			if( desc ) {
+				query.orderBy(builder.desc(root.get(orderBy)));
+			} else {
+				query.orderBy(builder.asc(root.get(orderBy)));
+			}
+			TypedQuery<T> typedQuery = session.createQuery(query);
+			criteriaComputers = Optional.ofNullable(typedQuery.getResultList());
+		}
+
+		return criteriaComputers;
+	}
+
+	private <T> T criteriaGet(Class<T> clazz, long id) {
+		Optional<TypedQuery<T>> typedQuery = Optional.empty();
+
+		try (Session session = getSession();) {
+
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaQuery<T> query = builder.createQuery(clazz);
+			Root<T> root = query.from(clazz);
+
+			query.select(root).where(builder.equal(root.get("id"), id));
+
+			typedQuery = Optional.ofNullable(session.createQuery(query));
+
+		}
+
+		return typedQuery.get().getSingleResult();
+	}
+
+	private <T> T criteriaGet(Class<T> clazz, String name) {
+		Optional<TypedQuery<T>> typedQuery = Optional.empty();
+
+		try (Session session = getSession();) {
+
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaQuery<T> query = builder.createQuery(clazz);
+			Root<T> root = query.from(clazz);
+
+			query.select(root).where(builder.equal(root.get("name"), name));
+
+			typedQuery = Optional.ofNullable(session.createQuery(query));
+
+		}
+
+		return typedQuery.get().getSingleResult();
+	}
+
+	private <T> Optional<List<T>> criteriaSearch(Class<T> clazz, String pattern) {
+
+		Optional<List<T>> computerFetched;
+		try (Session session = getSession();) {
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaQuery<T> query = builder.createQuery(clazz);
+			Root<T> root = query.from(clazz);
+
+			String patternBuilt = new StringBuilder(pattern).insert(0, "%").append("%").toString();
+			query.select(root).where(builder.like(root.get("name"), patternBuilt));
+
+			TypedQuery<T> typedQuery = session.createQuery(query);
+			computerFetched = Optional.ofNullable(typedQuery.getResultList());
+		}
+
+		return computerFetched;
+	}
+
+	public Optional<List<Computer>> searchBy(String name) {
+		return criteriaSearch(Computer.class,name);
 	}
 
 }

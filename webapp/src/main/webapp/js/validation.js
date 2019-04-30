@@ -18,14 +18,14 @@ $(function() {
 		let intro = new Date($(this).val())
 		let disco = new Date($("#discontinued").val())
 
-		if ( intro == "Invalid Date" ){
+		if ( !$(this).val() === '' || intro == "Invalid Date" ){
 			invalidate($(this))
 			$("#discontinued").attr('readonly', true)
 			console.log("invalid date")
-		} else if ( !$(this).val().match(regexDate) ) {
+		} else if ( !$(this).val() === '' || !$(this).val().match(regexDate) ) {
 			invalidate( $(this) )
 			console.log("invalid regexp")
-		} else if ( $(this).val() == '' || (  $("#discontinued").val() != "" && intro >= disco ) ){
+		} else if ( !$(this).val() == '' || (  $("#discontinued").val() != "" && intro >= disco ) ){
 			invalidate($(this))
 			$("#discontinued").attr('readonly', true)
 			console.log("invalid value or invalid compared to disco")
@@ -39,13 +39,13 @@ $(function() {
 		let intro = new Date($("#introduced").val())
 		let disco = new Date($(this).val())
 		
-		if ( intro == "Invalid Date" || disco == "Invalid Date" ){
+		if ( $(this).val() == '' || intro == "Invalid Date" || disco == "Invalid Date" ){
 			invalidate($(this))
-		} else if ( !$(this).val().match(regexDate) ) {
+		} else if ( $(this).val() == '' || !$(this).val().match(regexDate) ) {
 			invalidate( $(this) )
 		} else if ( $(this).val() == '' || $(this).val() <= $('#introduced').val() ){
 			invalidate($(this))
-		} else if (!$("#discontinued").val() instanceof Date){
+		} else if ( $(this).val() == '' || !$("#discontinued").val() instanceof Date){
 			invalidate($(this))
 		} else {
 			validate($(this))

@@ -33,7 +33,7 @@ public class ComputerService {
 		this.pcMapper = mapper;
 	}
 
-	public Optional<List<ComputerDTO>> getAll() {
+	public Optional<List<ComputerDTO>> getAll() throws DaoException {
 		List<ComputerDTO> list = null;
 		list = this.dao.getAll().get().stream().map(ComputerMapper::mapToDTO).map(Optional::get)
 				.collect(Collectors.toList());
@@ -48,7 +48,7 @@ public class ComputerService {
 		return Optional.ofNullable(list);
 	}
 
-	public Optional<List<ComputerDTO>> searchByName(String name) {
+	public Optional<List<ComputerDTO>> searchByName(String name) throws DaoException {
 		String regex = "(?i)(.*)" + name + "(.*)";
 		List<ComputerDTO> filteredComputers = null;
 		filteredComputers = this.dao.getAll().get().stream()
@@ -60,10 +60,8 @@ public class ComputerService {
 
 	public Optional<List<ComputerDTO>> searchByNameOrdered(String name, String order, boolean isDesc)
 			throws ServiceException, DaoException {
-		String regex = "(?i)(.*)" + name + "(.*)";
 		List<ComputerDTO> filteredComputers = null;
-		filteredComputers = this.dao.getAllOrderedBy(order, isDesc).get().stream()
-				.filter(computer -> computer.getName().matches(regex) || computer.getCompany().getName().matches(regex))
+		filteredComputers = this.dao.searchBy(name).get().stream()
 				.map(ComputerMapper::mapToDTO).map(Optional::get).collect(Collectors.toList());
 
 		return Optional.ofNullable(filteredComputers);

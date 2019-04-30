@@ -3,19 +3,48 @@ package com.excilys.cdb.core.model;
 import java.io.Serializable;
 import java.sql.Timestamp;
 
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.Size;
 
 import com.excilys.cdb.core.utils.DateUtils;
 
+@Entity
 @Table(name="computer")
-public class Computer extends Entity implements Serializable {
+public class Computer implements Serializable {
 
 	private static final long serialVersionUID = 2256380163459893961L;
+	public Computer() {
+		
+	}
+	@Id
+	@Min(0)
+	@PositiveOrZero
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@Column(name="id")
+	protected long id;
+	
+	@Size(min=2,max=255,message="Should be between 2 and 255 character!")
+	@NotEmpty
+	@NotBlank
+	@Basic(optional=false)
+	@Column(name="name")
+	protected String name;
 	
 	@PastOrPresent
 	@Temporal(TemporalType.TIMESTAMP)
@@ -25,8 +54,24 @@ public class Computer extends Entity implements Serializable {
 	private Timestamp discontinued;
 
 	@ManyToOne
-	@JoinColumn(name = "company", referencedColumnName = "company_id")
+    @JoinColumn(name = "company_id")
 	private Company company;
+
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
 
 	public Timestamp getIntroduced() {
 		return introduced;

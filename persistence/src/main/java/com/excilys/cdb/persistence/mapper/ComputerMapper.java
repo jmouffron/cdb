@@ -44,24 +44,24 @@ public class ComputerMapper implements RowMapper<Computer>{
   }
 
   static public Optional<ComputerDTO> mapToDTO(Computer computer) {
-
+	boolean isCompanyNull = computer.getCompany() == null;
     ComputerDTO computerDTO = new ComputerDTO.ComputerDTOBuilder().setId(computer.getId()).setName(computer.getName())
         .setIntroduced(computer.getIntroduced() == null ? null : DateUtils.stringToDateString( computer.getIntroduced() ) )
         .setDiscontinued(computer.getDiscontinued() == null ? null : DateUtils.stringToDateString( computer.getDiscontinued() ) )
-        .setCompanyId(computer.getCompany().getId())
-        .setCompanyName(computer.getCompany().getName()).build();
+        .setCompanyId(isCompanyNull ? 0 : computer.getCompany().getId())
+        .setCompanyName(isCompanyNull ? null : computer.getCompany().getName()).build();
 
     return Optional.ofNullable(computerDTO);
   }
 
   public Optional<Computer> mapToComputer(ComputerDTO dto, DaoCompany dao) throws BadInputException {
     Company company = corpMapper.mapToCompany(dto, dao);
-    System.out.println(dto);
+    System.out.println("Introduced: " + dto.getIntroduced());
     Computer computer = new Computer.ComputerBuilder()
         .setId( dto.getId())
         .setName( dto.getName())
-        .setIntroduced( DateUtils.stringToTimestamp( dto.getIntroduced() + " 00:00:00" ) )
-        .setDiscontinued( DateUtils.stringToTimestamp( dto.getIntroduced() + " 00:00:00")  )
+        .setIntroduced( dto.getIntroduced().isEmpty() ? null : DateUtils.stringToTimestamp( dto.getIntroduced() + " 00:00:00" ) )
+        .setDiscontinued( dto.getDiscontinued().isEmpty() ? null :DateUtils.stringToTimestamp( dto.getDiscontinued() + " 00:00:00")  )
         .setCompany(company)
         .build();
 

@@ -16,7 +16,7 @@
 			<div class="row">
 				<div class="col-xs-8 col-xs-offset-2 box">
 					<h1>Delete Company</h1>
-					<form action="/deleteComputer" method="POST">
+					<form action="/computer/delete" method="POST">
 						<fieldset>
 							<div class="form-group">
 								<p>${computer}</p>
@@ -24,7 +24,7 @@
 						</fieldset>
 						<div class="actions pull-right">
 							<input type="submit" value="Delete" class="btn btn-primary">
-							or <a href="/dashboard" class="btn btn-default">Cancel</a>
+							or <a href="/computer" class="btn btn-default">Cancel</a>
 						</div>
 					</form>
 				</div>

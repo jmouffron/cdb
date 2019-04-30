@@ -20,17 +20,18 @@
 					<h1>
 						<spring:message code="addComputer.heading" />
 					</h1>
-					<form:form method="POST" action="${ctx}/addComputer"
+					<form:form method="POST" action="${ctx}/computer/add"
 						modelAttribute="computer">
 						<fieldset>
 							<div class="form-group">
 								<form:errors path="*" cssClass="danger" element="div" />
 								<form:label path="name">
-									<spring:message code="addComputer.computer_name" />
+									<spring:message code="addComputer.computer_name" var="name_placeholder"/>
+									${name_placeholder}
 								</form:label>
 								<form:errors path="name" cssClass="alert-danger" element="div" />
 								<form:input path="name" class="form-control" id="computerName"
-									placeholder="<spring:message code='addComputer.computer_name' />"
+									placeholder="${name_placeholder}"
 									value="${ computerName }" />
 							</div>
 							<div class="form-group">
@@ -70,7 +71,7 @@
 						<div class="actions pull-right">
 							<input type="submit"
 								value="<spring:message code='addComputer.add' />"
-								class="btn btn-primary" /> or <a href="${ctx}/dashboard"
+								class="btn btn-primary" /> or <a href="${ctx}/computer"
 								class="btn btn-default"><spring:message
 									code="addComputer.cancel" /></a>
 						</div>

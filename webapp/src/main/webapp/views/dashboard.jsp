@@ -31,7 +31,7 @@
 			<div id="actions" class="form-horizontal">
 				<div class="pull-left">
 					<form id="searchForm"
-						action="${ctx}/?search=${search}&toOrder=${toOrder}" method="GET"
+						action="${ctx}/computer?search=${search}&toOrder=${toOrder}" method="GET"
 						class="form-inline">
 
 						<input type="search" id="searchbox" name="search"
@@ -44,7 +44,7 @@
 				</div>
 				<div class="pull-right">
 					<a class="btn btn-success" id="addComputer"
-						href="${ctx}/addComputer"><spring:message
+						href="${ctx}/computer/add"><spring:message
 							code="dashboard.add_computer" /></a> <a class="btn btn-default"
 						id="editComputer" href="#" onclick="$.fn.toggleEditMode();"><spring:message
 							code="dashboard.edit" /></a>
@@ -52,7 +52,7 @@
 			</div>
 		</div>
 
-		<form:form id="deleteForm" action="${ctx}/" method="POST"
+		<form:form id="deleteForm" action="${ctx}/computer" method="POST"
 			modelAttribute="computersDestroyed">
 			<form:input type="hidden" name="ids" value="" path="ids" />
 		</form:form>
@@ -76,25 +76,25 @@
 									</a>
 								</span></th>
 								<th class="text-center"><spring:message code="dashboard.computer_name" /> <a
-									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=0&order=true"><i
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=0&order=true"><i
 										class="fa fa-caret-down"></i></a><a
-									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=0"><i
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=0"><i
 										class="fa fa-caret-up"></i></a></th>
 								<th class="text-center"><spring:message code="dashboard.introduced_date" /> <a
-									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=1&order=true"><i
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=1&order=true"><i
 										class="fa fa-caret-down"></i></a><a
-									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=1"><i
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=1"><i
 										class="fa fa-caret-up"></i></a></th>
 								<th class="text-center"><spring:message code="dashboard.discontinued_date" />
 									<a
-									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=2&order=true"><i
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=2&order=true"><i
 										class="fa fa-caret-down"></i></a><a
-									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=2"><i
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=2"><i
 										class="fa fa-caret-up"></i></a></th>
 								<th class="text-center"><spring:message code="dashboard.company" /> <a
-									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=3&order=true"><i
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=3&order=true"><i
 										class="fa fa-caret-down"></i></a><a
-									href="${ctx}/?page=${currentPage}&search=${search}&toOrder=3"><i
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=3"><i
 										class="fa fa-caret-up"></i></a></th>
 
 							</tr>
@@ -106,7 +106,7 @@
 									<td class="editMode text-center"><input type="checkbox" name="cb"
 										class="cb" value="${computer.id}" /></td>
 									<td class="text-center"><a
-										href="${ctx}/editComputer/?computerId=${computer.id}"
+										href="${ctx}/computer/edit/${computer.id}"
 										onclick=""> ${computer.name} </a></td>
 									<td class="text-center">${computer.introduced}</td>
 									<td class="text-center">${computer.discontinued}</td>
@@ -126,27 +126,43 @@
 			<ul class="pagination">
 				<c:if test="${ currentPage != 1}">
 					<li><a
-						href="${ctx}?page=${ currentPage - 1 > 0 ? currentPage -1: 1}&search=${search}&toOrder=${toOrder}&perPage=${perPage}"
+						href="${ctx}/computer?page=${ currentPage - 1 > 0 ? currentPage -1: 1}&search=${search}&toOrder=${toOrder}&perPage=${perPage}"
 						aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
 					</a></li>
 				</c:if>
 				<c:forEach var="i" items="${pages}">
 
 					<c:choose>
+						<c:when test="${ currentPage != 1 && i == 1  }">
+							<li><a
+								href="${ctx}/computer?page=${i}&search=${search}&toOrder=${toOrder}&perPage=${perPage}">${i}</a></li>
+							<li><a>...</a></li>
+						</c:when>
+						<c:when test="${ (currentPage - 1 > 1) && i == (currentPage - 1) }">
+							<li><a
+								href="${ctx}/computer?page=${i}&search=${search}&toOrder=${toOrder}&perPage=${perPage}">${i}</a></li>
+						</c:when>
 						<c:when test="${i == currentPage}">
 							<li class="active"><a
-								href="${ctx}?page=${i}&search=${search}&toOrder=${toOrder}&perPage=${perPage}">${i}</a></li>
+								href="${ctx}/computer?page=${i}&search=${search}&toOrder=${toOrder}&perPage=${perPage}">${i}</a></li>
 						</c:when>
-						<c:otherwise>
+						<c:when test="${i == currentPage + 1 }">
+							<li>
+								<a
+									href="${ctx}/computer?page=${i}&search=${search}&toOrder=${toOrder}&perPage=${perPage}">${i}</a>
+							</li>
+							<li><a>...</a></li>
+						</c:when>
+						<c:when test="${(totalPages - 1 != currentPage) && (i == totalPages - 1 || i == totalPages)}">
 							<li><a
-								href="${ctx}?page=${i}&search=${search}&toOrder=${toOrder}&perPage=${perPage}">${i}</a></li>
-						</c:otherwise>
+								href="${ctx}/computer?page=${i}&search=${search}&toOrder=${toOrder}&perPage=${perPage}">${i}</a></li>
+						</c:when>
 					</c:choose>
 
 				</c:forEach>
 				<c:if test="${ currentPage + 1 <= totalPages}">
 					<li><a
-						href="${ctx}?page=${ currentPage + 1 }&search=${search}&perPage=${perPage}&toOrder=${ toOrder }"
+						href="${ctx}/computer?page=${ currentPage + 1 }&search=${search}&perPage=${perPage}&toOrder=${ toOrder }"
 						aria-label="Next"> <span aria-hidden="true">&raquo;</span>
 					</a></li>
 				</c:if>
@@ -154,11 +170,11 @@
 
 			<div class="btn-group btn-group-sm pull-right" role="group">
 				<a class="btn btn-default"
-					href="${ctx}?search=${search}&toOrder=${toOrder}&perPage=IDX_10">10</a>
+					href="${ctx}/computer?search=${search}&toOrder=${toOrder}&perPage=IDX_10">10</a>
 				<a class="btn btn-default"
-					href="${ctx}?search=${search}&toOrder=${toOrder}&perPage=IDX_50">50</a>
+					href="${ctx}/computer?search=${search}&toOrder=${toOrder}&perPage=IDX_50">50</a>
 				<a class="btn btn-default"
-					href="${ctx}?search=${search}&toOrder=${toOrder}&perPage=IDX_100">100</a>
+					href="${ctx}/computer?search=${search}&toOrder=${toOrder}&perPage=IDX_100">100</a>
 			</div>
 		</div>
 	</footer>

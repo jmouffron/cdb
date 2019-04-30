@@ -18,11 +18,10 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-xs-8 col-xs-offset-2 box">
-					<div class="label label-default pull-right">id:
-						${computer.id}</div>
+					<div class="label label-default pull-right">id: ${computer.id}</div>
 					<h1><spring:message code="editComputer.heading" /></h1>
 
-					<form:form action="${ctx}/editComputer" method="POST"
+					<form:form action="${ctx}/computer/edit/${computer.id}" method="POST"
 						modelAttribute="dto">
 						<form:input path="id" type="hidden" value="${computer.id}"
 							id="${computer.id}" />
@@ -73,7 +72,7 @@
 						<div class="actions pull-right">
 							<input type="submit"
 								value="<spring:message code='editComputer.edit' />"
-								class="btn btn-primary"> or <a href="${ctx}/dashboard"
+								class="btn btn-primary"> or <a href="${ctx}/computer"
 								class="btn btn-default"><spring:message
 									code='editComputer.cancel' /></a>
 						</div>

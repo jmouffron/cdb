@@ -1,6 +1,5 @@
 package com.excilys.cdb.binding.validator;
 
-import java.awt.List;
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -10,10 +9,7 @@ public class ModelListValidator implements Validator {
 
 	@Override
 	public boolean supports(Class<?> clazz) {
-		if(clazz.getSuperclass().getSimpleName().equals("EntityList")) {
-			return true;
-		}
-		return List.class.isAssignableFrom(clazz);
+		return clazz.getSimpleName().equals("ModelList");
 	}
 
 	@Override

@@ -5,6 +5,9 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.hibernate.HibernateException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -21,6 +24,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
 import org.springframework.web.context.annotation.RequestScope;
 
+import com.excilys.cdb.binding.exception.DaoException;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.view.IndexPagination;
 import com.excilys.cdb.service.view.Pagination;
@@ -30,7 +34,8 @@ import com.excilys.cdb.service.view.Pagination;
 @EnableTransactionManagement
 @ComponentScan(basePackages = "com.excilys.cdb", includeFilters = @Filter(type = FilterType.REGEX, pattern = "com.excilys.cdb.servlet"))
 public class AppConfig implements TransactionManagementConfigurer{
-
+	
+	static private Logger logger = LoggerFactory.getLogger(AppConfig.class);
 	Environment env;
 
 	public AppConfig(Environment env) {
@@ -53,7 +58,7 @@ public class AppConfig implements TransactionManagementConfigurer{
 
 	@Bean
 	@RequestScope
-	public Pagination pagination(ComputerService service) {
+	public Pagination pagination(ComputerService service) throws DaoException {
 		return new Pagination(service, 0, IndexPagination.IDX_10);
 	}
 
@@ -71,7 +76,8 @@ public class AppConfig implements TransactionManagementConfigurer{
     	try {
 			hbmProps.load(getClass().getClassLoader().getResourceAsStream("datasource.properties"));
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
+			throw new HibernateException(e.getMessage());
 		}
     	return hbmProps;
 	}

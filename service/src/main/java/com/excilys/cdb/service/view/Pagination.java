@@ -7,6 +7,7 @@ import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import com.excilys.cdb.binding.dto.ComputerDTO;
+import com.excilys.cdb.binding.exception.DaoException;
 import com.excilys.cdb.binding.exception.PageException;
 import com.excilys.cdb.service.ComputerService;
 
@@ -27,12 +28,10 @@ public class Pagination {
   @Autowired 
   ComputerService service;
   
-  public Pagination(ComputerService service, int startIndex, IndexPagination perPage) {
+  public Pagination(ComputerService service, int startIndex, IndexPagination perPage) throws DaoException {
     this.service = service;
-    this.elements = this.service.getAll().get();
     this.startIndex = startIndex;
     this.perPage = perPage;
-    this.totalPages = elements.size() / this.perPage.getIndex();
     this.currentPage = 1;
   }
 

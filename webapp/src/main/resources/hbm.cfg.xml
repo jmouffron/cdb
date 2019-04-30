@@ -26,7 +26,7 @@
 
         <property name="hibernate.dbcp.maxWaitMillis">-1</property>
 
-        <mapping class="com.excilys.cdb.model.*" />
+        <mapping class="com.excilys.cdb.core.model.*" />
 
     </session-factory>
 

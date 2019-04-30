@@ -12,7 +12,6 @@ import com.excilys.cdb.binding.dto.ComputerDTO;
 import com.excilys.cdb.binding.utils.DateUtils;
 
 @Component
-
 public class ComputerDTOValidator implements Validator {
 
 	@Override

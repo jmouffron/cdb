@@ -19,8 +19,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.excilys.cdb.binding.dto.CompanyDTO;
 import com.excilys.cdb.binding.dto.ComputerDTO;
@@ -38,6 +40,7 @@ import com.excilys.cdb.binding.validator.ModelList;
 import com.excilys.cdb.binding.validator.ModelListValidator;
 
 @Controller
+@RequestMapping("/computer")
 public class ComputerController {
 	private static final String DASHBOARD = "dashboard";
 	private static final String EDIT_COMPUTER = "editComputer";
@@ -71,10 +74,10 @@ public class ComputerController {
 	static {
 		columns = new HashMap<>();
 
-		columns.put("0", "pc_name");
+		columns.put("0", "name");
 		columns.put("1", "introduced");
 		columns.put("2", "discontinued");
-		columns.put("3", "cp_name");
+		columns.put("3", "company");
 	}
 
 	@InitBinder("computer")
@@ -87,7 +90,7 @@ public class ComputerController {
 		binder.setValidator(new ModelListValidator());
 	}
 
-	@GetMapping({ "/", "/dashboard", "/dashBoard" })
+	@GetMapping({ "","/", "/dashboard", "/dashBoard" })
 	public String getDashBoard(@RequestParam(required = false) Map<String, String> paths, Model model) {
 		logger.info(getClass().getName() + " has been called");
 
@@ -114,7 +117,7 @@ public class ComputerController {
 				: IndexPagination.valueOf(perPage);
 		startIndex = (index == null) ? 0 : Integer.parseInt(index);
 		page = (newPage == null || newPage.equals("0")) ? 1 : Integer.parseInt(newPage);
-		toOrder = (toOrder == null || toOrder.equals("") || !columns.containsKey(toOrder)) ? "pc_name"
+		toOrder = (toOrder == null || toOrder.equals("") || !columns.containsKey(toOrder)) ? columns.getOrDefault(0,"name")
 				: columns.get(toOrder);
 
 		if (searchName == null || searchName.isEmpty()) {
@@ -164,6 +167,7 @@ public class ComputerController {
 			model.addAttribute("stackTrace", e.getMessage());
 			return ERROR;
 		}
+		
 		model.addAttribute("perPage", perPage);
 		model.addAttribute("toOrder", toOrder);
 		model.addAttribute("computersDestroyed", new ModelList());
@@ -216,7 +220,7 @@ public class ComputerController {
 		return REDIRECT_DASHBOARD;
 	}
 
-	@GetMapping({ "addComputer", "/addcomputer", "/AddComputer", "/Addcomputer" })
+	@GetMapping({ "/add" })
 	public String getAddComputer(@Validated @RequestParam(required = false) Map<String, String> paths, Model model) {
 		logger.info(getClass().getName() + " has been called");
 
@@ -239,7 +243,7 @@ public class ComputerController {
 		return ADD_COMPUTER;
 	}
 
-	@PostMapping({ "/addComputer", "/addcomputer", "/AddComputer", "/Addcomputer" })
+	@PostMapping({ "/add" })
 	public String postAddComputer(@RequestParam(required = false) Map<String, String> paths,
 			@Validated @ModelAttribute("computer") ComputerDTO computer, BindingResult res, Model model) {
 		logger.info(getClass().getName() + " has been called");
@@ -263,8 +267,8 @@ public class ComputerController {
 		return REDIRECT_DASHBOARD;
 	}
 
-	@GetMapping({ "/editComputer", "/editcomputer", "/EditComputer", "/Editcomputer" })
-	public String getEditComputer(@RequestParam(required = false, value = "computerId") long computerId, Model model) {
+	@GetMapping({ "/edit/{id}" })
+	public String getEditComputer(@PathVariable(required = false, value = "computerId") Long computerId, Model model) {
 		logger.info(getClass().getName() + " has been called");
 
 		ComputerDTO computer = null;
@@ -291,7 +295,7 @@ public class ComputerController {
 		return EDIT_COMPUTER;
 	}
 
-	@PatchMapping({ "/editComputer", "/editcomputer", "/EditComputer", "/Editcomputer" })
+	@PatchMapping({ "/edit/{id}" })
 	public String postEditComputer(@Validated @ModelAttribute("dto") ComputerDTO computer, BindingResult res,
 			Model model) {
 		logger.info(getClass().getName() + " has been called");

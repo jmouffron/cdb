@@ -1,5 +1,8 @@
 package com.excilys.cdb.binding.validator;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class ModelList {
 	protected long[] ids;
 	

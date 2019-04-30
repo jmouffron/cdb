@@ -41,7 +41,10 @@
     <logger name="org.springframework.*" level="DEBUG">
         <appender-ref ref="STDOUT" />
     </logger>
-    <logger name="com.zaxxer.hikari.pool.HikariPool" level="ERROR">
+    <logger name="com.zaxxer.hikari.*" level="DEBUG">
+        <appender-ref ref="STDOUT" />
+    </logger>
+    <logger name="com.zaxxer.hikari.pool.HikariPool" level="DEBUG">
         <appender-ref ref="STDOUT" />
     </logger>
 </configuration>

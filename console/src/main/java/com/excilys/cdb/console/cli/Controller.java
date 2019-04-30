@@ -43,10 +43,11 @@ public class Controller {
 	/**
 	 * Starts the process of listening on user input and launches the application
 	 * loop
+	 * @throws DaoException 
 	 * 
 	 * @throws ServiceException
 	 */
-	public void start() {
+	public void start() throws DaoException {
 		boolean looper = true;
 
 		while (looper) {
@@ -114,9 +115,10 @@ public class Controller {
 	 * List all instances of an entity in the database
 	 * 
 	 * @param serviceType
+	 * @throws DaoException 
 	 * @throws ServiceException
 	 */
-	private void listAllEntity(Class clazz) {
+	private void listAllEntity(Class clazz) throws DaoException {
 
 		List entities = null;
 		try {
@@ -249,8 +251,9 @@ public class Controller {
 	 * 
 	 * @return List<Entity>
 	 * @throws ServiceException
+	 * @throws DaoException 
 	 */
-	private List getAllEntities(Class clazz) throws ServiceException {
+	private List getAllEntities(Class clazz) throws ServiceException, DaoException {
 		List dto = null;
 		switch (clazz.getSimpleName()) {
 			case "ComputerService":
