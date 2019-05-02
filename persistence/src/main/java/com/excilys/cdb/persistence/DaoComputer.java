@@ -3,6 +3,7 @@ package com.excilys.cdb.persistence;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -11,15 +12,15 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.CriteriaUpdate;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
-
+import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.excilys.cdb.binding.dto.ComputerDTO;
 import com.excilys.cdb.binding.exception.DaoException;
 import com.excilys.cdb.core.model.Computer;
 
@@ -37,39 +38,37 @@ public class DaoComputer {
 		return sessionFactory.openSession();
 	}
 
-	@Transactional(readOnly = true)
 	public Optional<List<Computer>> getAll() throws DaoException {
 		return criteriaBuild(Computer.class);
 	}
 
-	@Transactional(readOnly = true)
 	public Optional<List<Computer>> getAllOrderedBy(String orderBy, boolean desc) throws DaoException {
-		return criteriaOrder(Computer.class, orderBy, desc);
+		return criteriaOrder(orderBy, desc);
 	}
 
-	@Transactional(readOnly = true)
 	public Optional<Computer> getOneById(Long id) {
-		Computer criteriaComputer = criteriaGet(Computer.class, id);
+		Computer criteriaComputer = criteriaGet(id).get();
 		return Optional.ofNullable(criteriaComputer);
 	}
 
-	@Transactional(readOnly = true)
 	public Optional<Computer> getOneByName(String name) {
-		Computer criteriaComputer = criteriaGet(Computer.class, name);
+		Computer criteriaComputer = criteriaGet(name).get();
 		return Optional.ofNullable(criteriaComputer);
 	}
 
-	@Transactional
 	public void create(Computer newEntity) throws DaoException {
 		try (Session session = getSession();) {
-			session.persist(newEntity);
+			session.save(newEntity);
+		} catch (HibernateException e) {
+			log.error(e.getMessage());
+			throw new DaoException(e.getMessage());
 		}
 	}
-
-	@Transactional
+	
 	public void updateById(Computer newEntity) throws DaoException {
-		try (Session session = getSession();) {
 
+		try (Session session = getSession();) {
+			Transaction tx = session.beginTransaction();
 			CriteriaBuilder builder = session.getCriteriaBuilder();
 			CriteriaUpdate<Computer> updater = builder.createCriteriaUpdate(Computer.class);
 			Root<Computer> root = updater.from(Computer.class);
@@ -89,14 +88,18 @@ public class DaoComputer {
 			updater.where(builder.equal(root.get("id"), newEntity.getId()));
 
 			session.createQuery(updater).executeUpdate();
+			tx.commit();
 
+		} catch (HibernateException e) {
+			log.error(e.getMessage());
+			throw new DaoException(e.getMessage());
 		}
+
 	}
 
-	@Transactional
 	public void deleteById(Long id) throws DaoException {
 		try (Session session = getSession();) {
-
+			Transaction tx = session.beginTransaction();
 			CriteriaBuilder builder = session.getCriteriaBuilder();
 			CriteriaDelete<Computer> deleter = builder.createCriteriaDelete(Computer.class);
 			Root<Computer> root = deleter.from(Computer.class);
@@ -104,10 +107,13 @@ public class DaoComputer {
 			deleter.where(builder.equal(root.get("id"), id));
 
 			session.createQuery(deleter).executeUpdate();
+			tx.commit();
+		} catch (HibernateException e) {
+			log.error(e.getMessage());
+			throw new DaoException(e.getMessage());
 		}
 	}
 
-	@Transactional
 	public void deleteByName(String name) throws DaoException {
 		try (Session session = getSession();) {
 			CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -117,6 +123,9 @@ public class DaoComputer {
 			deleter.where(builder.equal(root.get("name"), name));
 
 			session.createQuery(deleter).executeUpdate();
+		} catch (HibernateException e) {
+			log.error(e.getMessage());
+			throw new DaoException(e.getMessage());
 		}
 	}
 
@@ -130,64 +139,70 @@ public class DaoComputer {
 			Arrays.asList(predicates).forEach(predicate -> query.select(root).where(predicate));
 			TypedQuery<T> typedQuery = session.createQuery(query);
 			computerFetched = Optional.ofNullable(typedQuery.getResultList());
+		} catch (HibernateException e) {
+			log.error(e.getMessage());
+			throw new DaoException(e.getMessage());
 		}
 
 		return computerFetched;
 	}
 
-	private <T> Optional<List<T>> criteriaOrder(Class<T> clazz, String orderBy, boolean desc) throws DaoException {
-		Optional<List<T>> criteriaComputers;
+	private Optional<List<Computer>> criteriaOrder(String orderBy, boolean desc) throws DaoException {
+		Optional<List<Computer>> criteriaComputers;
 		try (Session session = getSession();) {
 			CriteriaBuilder builder = session.getCriteriaBuilder();
-			CriteriaQuery<T> query = builder.createQuery(clazz);
-			Root<T> root = query.from(clazz);
-			query.select(root);
-			if( desc ) {
-				query.orderBy(builder.desc(root.get(orderBy)));
+			CriteriaQuery<Computer> query = builder.createQuery(Computer.class);
+			Root<Computer> root = query.from(Computer.class);
+
+			if (desc) {
+				query.select(root).where().orderBy(builder.desc(root.<Set<String>>get(orderBy)));
 			} else {
-				query.orderBy(builder.asc(root.get(orderBy)));
+				query.select(root).where().orderBy(builder.asc(root.<Set<String>>get(orderBy)));
 			}
-			TypedQuery<T> typedQuery = session.createQuery(query);
+
+			query = query.select(root);
+			TypedQuery<Computer> typedQuery = session.createQuery(query);
 			criteriaComputers = Optional.ofNullable(typedQuery.getResultList());
 		}
 
 		return criteriaComputers;
 	}
 
-	private <T> T criteriaGet(Class<T> clazz, long id) {
-		Optional<TypedQuery<T>> typedQuery = Optional.empty();
-
+	private Optional<Computer> criteriaGet(long id) {
+		Optional<Computer> computer = Optional.empty();
 		try (Session session = getSession();) {
 
 			CriteriaBuilder builder = session.getCriteriaBuilder();
-			CriteriaQuery<T> query = builder.createQuery(clazz);
-			Root<T> root = query.from(clazz);
+			CriteriaQuery<Computer> query = builder.createQuery(Computer.class);
+			Root<Computer> root = query.from(Computer.class);
 
-			query.select(root).where(builder.equal(root.get("id"), id));
+			query.select(root);
+			query.where(builder.equal(root.get("id"), id));
 
-			typedQuery = Optional.ofNullable(session.createQuery(query));
-
+			TypedQuery<Computer> typedQuery = session.createQuery(query);
+			log.error("Computer : " + typedQuery.getSingleResult());
+			computer = Optional.ofNullable(typedQuery.getSingleResult());
 		}
 
-		return typedQuery.get().getSingleResult();
+		return computer;
 	}
 
-	private <T> T criteriaGet(Class<T> clazz, String name) {
-		Optional<TypedQuery<T>> typedQuery = Optional.empty();
-
+	private Optional<Computer> criteriaGet(String name) {
+		Optional<Computer> computer = Optional.empty();
 		try (Session session = getSession();) {
 
 			CriteriaBuilder builder = session.getCriteriaBuilder();
-			CriteriaQuery<T> query = builder.createQuery(clazz);
-			Root<T> root = query.from(clazz);
+			CriteriaQuery<Computer> query = builder.createQuery(Computer.class);
+			Root<Computer> root = query.from(Computer.class);
 
 			query.select(root).where(builder.equal(root.get("name"), name));
 
-			typedQuery = Optional.ofNullable(session.createQuery(query));
-
+			TypedQuery<Computer> typedQuery = session.createQuery(query);
+			log.error("Computer : " + typedQuery.getSingleResult());
+			computer = Optional.ofNullable(typedQuery.getSingleResult());
 		}
 
-		return typedQuery.get().getSingleResult();
+		return computer;
 	}
 
 	private <T> Optional<List<T>> criteriaSearch(Class<T> clazz, String pattern) {
@@ -198,8 +213,8 @@ public class DaoComputer {
 			CriteriaQuery<T> query = builder.createQuery(clazz);
 			Root<T> root = query.from(clazz);
 
-			String patternBuilt = new StringBuilder(pattern).insert(0, "%").append("%").toString();
-			query.select(root).where(builder.like(root.get("name"), patternBuilt));
+			query.select(root);
+			query.where(builder.like(root.get("name"), "%" + pattern + "%"));
 
 			TypedQuery<T> typedQuery = session.createQuery(query);
 			computerFetched = Optional.ofNullable(typedQuery.getResultList());
@@ -209,7 +224,7 @@ public class DaoComputer {
 	}
 
 	public Optional<List<Computer>> searchBy(String name) {
-		return criteriaSearch(Computer.class,name);
+		return criteriaSearch(Computer.class, name);
 	}
 
 }

@@ -52,7 +52,7 @@
 			</div>
 		</div>
 
-		<form:form id="deleteForm" action="${ctx}/computer" method="POST"
+		<form:form id="deleteForm" action="${ctx}/computer/" method="POST"
 			modelAttribute="computersDestroyed">
 			<form:input type="hidden" name="ids" value="" path="ids" />
 		</form:form>

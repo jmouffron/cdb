@@ -12,13 +12,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -30,17 +26,16 @@ public class Company implements Serializable {
 	
 	@Id
 	@Min(0)
-	@PositiveOrZero
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="id")
 	protected long id;
 	
 	@Size(min=2,max=255,message="Should be between 2 and 255 character!")
-	@NotEmpty
-	@NotBlank
+	@NotNull
 	@Basic(optional=false)
 	@Column(name="name")
 	protected String name;
+	
 	public Company() {
 		
 	}
@@ -51,7 +46,6 @@ public class Company implements Serializable {
 
 	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 	Set<Computer> computers;
 
 	@Override

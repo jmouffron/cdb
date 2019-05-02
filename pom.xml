@@ -35,7 +35,7 @@
 		<spring.version>5.1.5.RELEASE</spring.version>
 		<spring.hibernate.version>1.2.9</spring.hibernate.version>
 		<dbunit.version>2.6.0</dbunit.version>
-		<hibernate.version>6.0.0.Alpha2</hibernate.version>
+		<hibernate.version>5.2.4.Final</hibernate.version>
 		<hibernate.jpa.version>1.0.0.Final</hibernate.jpa.version>
 		<hibernate.validation.version>5.2.4.Final</hibernate.validation.version>
 	</properties>
@@ -91,11 +91,7 @@
 			<artifactId>spring-webmvc</artifactId>
 			<version>${spring.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.hibernate.orm</groupId>
-			<artifactId>hibernate-hikaricp</artifactId>
-			<version>${hibernate.version}</version>
-		</dependency>
+
 		<dependency>
 			<groupId>org.springframework</groupId>
 			<artifactId>spring-tx</artifactId>
@@ -115,6 +111,16 @@
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
 			<version>4.0.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.orm</groupId>
+			<artifactId>hibernate-hikaricp</artifactId>
+			<version>${hibernate.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate</groupId>
+			<artifactId>hibernate-core</artifactId>
+			<version>${hibernate.version}</version>
 		</dependency>
 	</dependencies>
 	<modules>

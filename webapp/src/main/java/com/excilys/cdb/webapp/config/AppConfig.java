@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.TransactionManagementConfigurer;
 import org.springframework.web.context.annotation.RequestScope;
 
+import com.excilys.cdb.binding.exception.DaoException;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.service.view.IndexPagination;
 import com.excilys.cdb.service.view.Pagination;
@@ -51,7 +52,7 @@ public class AppConfig implements TransactionManagementConfigurer{
 
 	@Bean
 	@RequestScope
-	public Pagination pagination(ComputerService service) {
+	public Pagination pagination(ComputerService service) throws DaoException {
 		return new Pagination(service, 0, IndexPagination.IDX_10);
 	}
 

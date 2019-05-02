@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.excilys.cdb.binding.dto.ComputerDTO;
 import com.excilys.cdb.binding.exception.BadInputException;
@@ -19,6 +20,7 @@ import com.excilys.cdb.persistence.mapper.ComputerMapper;
 import com.excilys.cdb.binding.validator.ServiceValidator;
 
 @Service
+@Transactional
 public class ComputerService {
 	@Autowired
 	private DaoComputer dao;
@@ -26,13 +28,13 @@ public class ComputerService {
 	private CompanyService corpService;
 	private static Logger log = LoggerFactory.getLogger(ComputerService.class);
 
-
 	public ComputerService(DaoComputer dao, CompanyService service, ComputerMapper mapper) {
 		this.dao = dao;
 		this.corpService = service;
 		this.pcMapper = mapper;
 	}
 
+	@Transactional(readOnly = true)
 	public Optional<List<ComputerDTO>> getAll() throws DaoException {
 		List<ComputerDTO> list = null;
 		list = this.dao.getAll().get().stream().map(ComputerMapper::mapToDTO).map(Optional::get)
@@ -40,7 +42,8 @@ public class ComputerService {
 
 		return Optional.ofNullable(list);
 	}
-
+	
+	@Transactional(readOnly = true)
 	public Optional<List<ComputerDTO>> orderBy(String name, boolean isDesc) throws ServiceException, DaoException {
 		List<ComputerDTO> list = null;
 		list = this.dao.getAllOrderedBy(name, isDesc).get().stream().map(ComputerMapper::mapToDTO).map(Optional::get)
@@ -48,6 +51,7 @@ public class ComputerService {
 		return Optional.ofNullable(list);
 	}
 
+	@Transactional(readOnly = true)
 	public Optional<List<ComputerDTO>> searchByName(String name) throws DaoException {
 		String regex = "(?i)(.*)" + name + "(.*)";
 		List<ComputerDTO> filteredComputers = null;
@@ -57,28 +61,31 @@ public class ComputerService {
 
 		return Optional.ofNullable(filteredComputers);
 	}
-
+	
+	@Transactional(readOnly = true)
 	public Optional<List<ComputerDTO>> searchByNameOrdered(String name, String order, boolean isDesc)
 			throws ServiceException, DaoException {
 		List<ComputerDTO> filteredComputers = null;
-		filteredComputers = this.dao.searchBy(name).get().stream()
-				.map(ComputerMapper::mapToDTO).map(Optional::get).collect(Collectors.toList());
+		filteredComputers = this.dao.searchBy(name).get().stream().map(ComputerMapper::mapToDTO).map(Optional::get)
+				.collect(Collectors.toList());
 
 		return Optional.ofNullable(filteredComputers);
 	}
 
+	@Transactional(readOnly = true)
 	public Optional<ComputerDTO> getOneById(Long id) throws BadInputException {
 		return ComputerMapper.mapToDTO(this.dao.getOneById(id).get());
 	}
 	
+	@Transactional(readOnly = true)
 	public Optional<ComputerDTO> getOneByName(String name) throws BadInputException {
 		return ComputerMapper.mapToDTO(this.dao.getOneByName(name).get());
 	}
-
+	
 	public void create(Computer newEntity) throws ServiceException, DaoException {
 		this.dao.create(newEntity);
 	}
-	
+
 	public void updateById(Computer newEntity) throws BadInputException, DaoException {
 		this.dao.updateById(newEntity);
 	}
@@ -88,7 +95,6 @@ public class ComputerService {
 	}
 
 	public void deleteByName(String name) throws ServiceException, DaoException {
-		ServiceValidator.nameValidator(name, "Computer");
 		this.dao.deleteByName(name);
 	}
 

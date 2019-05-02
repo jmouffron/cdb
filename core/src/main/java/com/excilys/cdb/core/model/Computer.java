@@ -6,20 +6,14 @@ import java.sql.Timestamp;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
 import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.PastOrPresent;
-import javax.validation.constraints.PositiveOrZero;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.excilys.cdb.core.utils.DateUtils;
@@ -34,23 +28,18 @@ public class Computer implements Serializable {
 	}
 	@Id
 	@Min(0)
-	@PositiveOrZero
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	@Column(name="id")
-	protected long id;
+	private long id;
 	
 	@Size(min=2,max=255,message="Should be between 2 and 255 character!")
-	@NotEmpty
-	@NotBlank
+	@NotNull
 	@Basic(optional=false)
 	@Column(name="name")
-	protected String name;
+	private String name;
 	
-	@PastOrPresent
-	@Temporal(TemporalType.TIMESTAMP)
 	private Timestamp introduced;
-	@PastOrPresent
-	@Temporal(TemporalType.TIMESTAMP)
+	
 	private Timestamp discontinued;
 
 	@ManyToOne

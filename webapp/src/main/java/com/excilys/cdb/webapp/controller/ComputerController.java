@@ -49,6 +49,7 @@ public class ComputerController {
 	private static final String REDIRECT_DASHBOARD = "redirect:dashboard";
 	private static final String REDIRECT_ADD = "redirect:addComputer";
 	private static final String REDIRECT_EDIT = "redirect:editComputer";
+	private static final String REDIRECT_OP = "redirect:/computer";
 	
 	private final Logger logger = LoggerFactory.getLogger(ComputerController.class);
 
@@ -175,7 +176,7 @@ public class ComputerController {
 		return DASHBOARD;
 	}
 
-	@DeleteMapping({ "/", "/dashboard", "/dashBoard" })
+	@PostMapping({ "/", "/dashboard", "/dashBoard" })
 	public String postDeleteComputer(@RequestParam(required = false) Map<String, String> paths,
 			@Validated @ModelAttribute("computersDestroyed") ModelList computers, BindingResult res, Model model) {
 		logger.info(getClass().getName() + " has been called");
@@ -217,7 +218,7 @@ public class ComputerController {
 		model.addAttribute("success", success);
 		model.addAttribute("danger", danger);
 
-		return REDIRECT_DASHBOARD;
+		return REDIRECT_OP;
 	}
 
 	@GetMapping({ "/add" })
@@ -264,11 +265,11 @@ public class ComputerController {
 
 		model.addAttribute("success", "Computer " + computer.getName() + " successfully created!");
 
-		return REDIRECT_DASHBOARD;
+		return REDIRECT_OP;
 	}
 
 	@GetMapping({ "/edit/{id}" })
-	public String getEditComputer(@PathVariable(required = false, value = "computerId") Long computerId, Model model) {
+	public String getEditComputer(@PathVariable(required = false, value = "id") Long computerId, Model model) {
 		logger.info(getClass().getName() + " has been called");
 
 		ComputerDTO computer = null;
@@ -295,7 +296,7 @@ public class ComputerController {
 		return EDIT_COMPUTER;
 	}
 
-	@PatchMapping({ "/edit/{id}" })
+	@PostMapping({ "/edit/{id}" })
 	public String postEditComputer(@Validated @ModelAttribute("dto") ComputerDTO computer, BindingResult res,
 			Model model) {
 		logger.info(getClass().getName() + " has been called");
@@ -330,7 +331,7 @@ public class ComputerController {
 		}
 		model.addAttribute("success", "Computer " + computer.getName() + " successfully updated!");
 
-		return REDIRECT_DASHBOARD;
+		return REDIRECT_OP;
 	}
 
 	private boolean setStackTraceBindingError(Model model, BindingResult res) {
