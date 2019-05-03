@@ -36,7 +36,7 @@
 								<form:input path="name" type="text" class="form-control"
 									id="computerName"
 									placeholder="<spring:message code='editComputer.computer_name' />"
-									value="${computer.name}" />
+									value="${computer.name}"  autofocus="autofocus"/>
 							</div>
 							<div class="form-group">
 								<form:label path="introduced" for="introduced">

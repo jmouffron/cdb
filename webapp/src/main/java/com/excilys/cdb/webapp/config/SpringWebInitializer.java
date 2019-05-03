@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 @Configuration
-@Import({AppConfig.class,SpringMvcConfig.class})
+@Import({AppConfig.class,SpringMvcConfig.class, SecurityWebInitializer.class, SecurityWebConfig.class})
 public class SpringWebInitializer extends AbstractAnnotationConfigDispatcherServletInitializer{
 
 	@Override

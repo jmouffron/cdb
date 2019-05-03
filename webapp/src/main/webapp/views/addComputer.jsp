@@ -32,7 +32,7 @@
 								<form:errors path="name" cssClass="alert-danger" element="div" />
 								<form:input path="name" class="form-control" id="computerName"
 									placeholder="${name_placeholder}"
-									value="${ computerName }" />
+									value="${ computerName }" autofocus="autofocus" />
 							</div>
 							<div class="form-group">
 								<form:label path="introduced">
