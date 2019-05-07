@@ -1,15 +1,10 @@
 package com.excilys.cdb.core.model;
 
 import java.io.Serializable;
-import java.util.Collection;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.JoinColumn;
 
 @Entity
 public class Role implements Serializable {
@@ -21,18 +16,10 @@ public class Role implements Serializable {
     private Long id;
  
     private String name;
-    
-    @ManyToMany(mappedBy = "roles")
-    private Collection<User> users;
- 
-    @ManyToMany
-    @JoinTable(
-        name = "roles_privileges", 
-        joinColumns = @JoinColumn(
-          name = "role_id", referencedColumnName = "id"), 
-        inverseJoinColumns = @JoinColumn(
-          name = "privilege_id", referencedColumnName = "id"))
-    private Collection<Privilege> privileges;
+
+	public Role(String name) {
+		this.name = name;
+	}
 
 	public Long getId() {
 		return id;
@@ -50,25 +37,9 @@ public class Role implements Serializable {
 		this.name = name;
 	}
 
-	public Collection<User> getUsers() {
-		return users;
-	}
-
-	public void setUsers(Collection<User> users) {
-		this.users = users;
-	}
-
-	public Collection<Privilege> getPrivileges() {
-		return privileges;
-	}
-
-	public void setPrivileges(Collection<Privilege> privileges) {
-		this.privileges = privileges;
-	}
-
 	@Override
 	public String toString() {
-		return "Role [id=" + id + ", name=" + name + ", users=" + users + ", privileges=" + privileges + "]";
+		return "Role [id=" + id + ", name=" + name + "]";
 	}
 
 	@Override
@@ -77,8 +48,6 @@ public class Role implements Serializable {
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		result = prime * result + ((privileges == null) ? 0 : privileges.hashCode());
-		result = prime * result + ((users == null) ? 0 : users.hashCode());
 		return result;
 	}
 
@@ -101,16 +70,7 @@ public class Role implements Serializable {
 				return false;
 		} else if (!name.equals(other.name))
 			return false;
-		if (privileges == null) {
-			if (other.privileges != null)
-				return false;
-		} else if (!privileges.equals(other.privileges))
-			return false;
-		if (users == null) {
-			if (other.users != null)
-				return false;
-		} else if (!users.equals(other.users))
-			return false;
 		return true;
-	}   
+	}
+
 }

@@ -1,33 +1,28 @@
 package com.excilys.cdb.service;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import java.util.Optional;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.excilys.cdb.binding.dto.UserDTO;
 import com.excilys.cdb.binding.exception.DaoException;
-import com.excilys.cdb.core.model.Privilege;
+import com.excilys.cdb.binding.exception.EmailExistException;
 import com.excilys.cdb.core.model.Role;
 import com.excilys.cdb.core.model.User;
-import com.excilys.cdb.persistence.DaoRole;
 import com.excilys.cdb.persistence.DaoUser;
 
 @Service
+@Transactional
 public class UserService implements UserDetailsService {
 
 	private DaoUser dao;
-	private DaoRole roleDao;
 
-	public UserService(DaoUser dao, DaoRole role) {
+	public UserService(DaoUser dao) {
 		this.dao = dao;
-		this.roleDao = role;
 	}
 
 	public boolean isUsernameTaken(String username) {
@@ -38,52 +33,35 @@ public class UserService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 		try {
 			return this.dao.getOneByUsername(username);
-		} catch (DaoException e) {
+		} catch( DaoException e ) {
 			throw new UsernameNotFoundException(e.getMessage());
 		}
 	}
-
-	private Collection<? extends GrantedAuthority> getAuthorities(Collection<Role> roles) {
-		return getGrantedAuthorities(getPrivileges(roles));
-	}
-	
-	private List<String> getPrivileges(Collection<Role> roles) {
-		  
-        List<String> privileges = new ArrayList<>();
-        List<Privilege> collection = new ArrayList<>();
-        for (Role role : roles) {
-            collection.addAll(role.getPrivileges());
-        }
-        for (Privilege item : collection) {
-            privileges.add(item.getName());
-        }
-        return privileges;
-    }
- 
-    private List<GrantedAuthority> getGrantedAuthorities(List<String> privileges) {
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        privileges.forEach( privilege -> {
-            authorities.add(new SimpleGrantedAuthority(privilege));
-        });
-        
-        return authorities;
-    }
    
-    
-    @Override
-    public User registerNewUserAccount(UserDto dto) throws EmailExistsException {
-      
+    public User create(UserDTO dto) throws EmailExistException, DaoException {
+    	
         if (emailExist(dto.getEmail())) {
             throw new EmailExistException("There is already an account with that username: " + dto.getUsername());
         }
-        User user = new User();
-     
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setPassword(dto.getPassword());
-        user.setEmail(dto.getEmail());
-     
-        user.setRoles(Arrays.asList(roleDao.findByName("ROLE_USER")));
+        
+        User user = new User.UserBuilder()
+        		.setUsername(dto.getUsername())
+		        .setPassword(dto.getPassword())
+		        .setEmail(dto.getEmail())
+		        .setRoles(Arrays.asList(new Role("ROLE_USER")))
+		        .build();
+        
         return dao.create(user);
     }
+    
+    public boolean emailExist(String email) {
+    	Optional<UserDetails> foundUser = Optional.empty();
+    	try {
+			foundUser = Optional.ofNullable(dao.getOneByUsername(email));
+		} catch (DaoException e) {
+			foundUser = Optional.empty();
+		}
+    	return foundUser.isPresent() ? true : false;
+    }
+
 }

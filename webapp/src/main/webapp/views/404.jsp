@@ -13,7 +13,7 @@
 	<%@include file="imports/header.jsp"%>
 
 	<section id="main">
-		<div class="container">
+		<div class="container-fluid">
 			<div class="alert alert-danger">
 				Error 404: Page not found ! <br /> ${ stackTrace }
 			</div>

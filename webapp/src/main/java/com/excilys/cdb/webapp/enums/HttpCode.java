@@ -1,7 +1,7 @@
 package com.excilys.cdb.webapp.enums;
 
 public enum HttpCode {
-	NOT_FOUND("404"), FORBIDDEN("403"), SERVER_ERROR("500"), EXCEPTION("exception");
+	UNAUTHORIZED("401"),NOT_FOUND("404"), FORBIDDEN("403"), SERVER_ERROR("500"), EXCEPTION("exception");
 	
 	private String code;
 	

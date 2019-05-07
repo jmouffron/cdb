@@ -2,76 +2,57 @@ package com.excilys.cdb.core.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.validation.constraints.AssertTrue;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
-@Entity
-@Table(name="user")
-public class User implements Serializable {
-	
-	private static final long serialVersionUID = 4633530839541647026L;
-	
-	public User() {
-		
-	}
-	
-	public User(String username, String password ) {
-		this.username = username;
-		this.password = password;
-		this.createdAt = Timestamp.valueOf(LocalDateTime.now());
-		this.updatedAt = Timestamp.valueOf(LocalDateTime.now());
-	}
-	
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+public class User implements Serializable, UserDetails {
+
+	private static final long serialVersionUID = -7784560651717187287L;
+
+	@Transient
+	private String token = "";
+
 	@Id
-	@Size(min=2,max=255,message="Should be between 2 and 255 character!")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+
+	@Size(min = 2, max = 255, message = "Should be between 2 and 255 character!")
 	@NotNull
-	@Basic(optional=false)
-	@Column(name="username")
+	@Basic(optional = false)
+	@Column(name = "username")
 	private String username;
-	
-	@Id
-	@Size(min=8,max=255,message="Should be between 8 and 255 character!")
-	@NotNull
-	@Basic(optional=false)
-	@Column(name="password")
-	private String password;
-	
-	@CreationTimestamp
-	private Timestamp createdAt;
-	
-	@UpdateTimestamp
-	private Timestamp updatedAt;
 
-	private boolean enabled;
-    private boolean tokenExpired;
-    
-    @ManyToMany
-    @JoinTable( 
-        name = "users_roles", 
-        joinColumns = @JoinColumn(
-          name = "user_id", referencedColumnName = "username"), 
-        inverseJoinColumns = @JoinColumn(
-          name = "role_id", referencedColumnName = "id")) 
-    private Collection<Role> roles;
-	
-	@Override
-	public String toString() {
-		return "User of username " + this.username + " of role " + this.roles;
-	}
+	@Id
+	@Size(min = 8, max = 255, message = "Should be between 8 and 255 character!")
+	@NotNull
+	@Basic(optional = false)
+	@Column(name = "password")
+	@JsonIgnore
+	private String password;
+
+	@JsonIgnore
+	private String email;
 
 	public String getUsername() {
 		return username;
@@ -87,6 +68,14 @@ public class User implements Serializable {
 
 	public void setPassword(String password) {
 		this.password = password;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
 	}
 
 	public Timestamp getCreatedAt() {
@@ -105,14 +94,6 @@ public class User implements Serializable {
 		this.updatedAt = updatedAt;
 	}
 
-	public Collection<Role> getRoles() {
-		return roles;
-	}
-
-	public void setRoles(Collection<Role> roles) {
-		this.roles = roles;
-	}
-
 	public boolean isEnabled() {
 		return enabled;
 	}
@@ -128,61 +109,236 @@ public class User implements Serializable {
 	public void setTokenExpired(boolean tokenExpired) {
 		this.tokenExpired = tokenExpired;
 	}
+	
+	@CreationTimestamp
+	private Timestamp createdAt;
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((createdAt == null) ? 0 : createdAt.hashCode());
-		result = prime * result + (enabled ? 1231 : 1237);
-		result = prime * result + ((password == null) ? 0 : password.hashCode());
-		result = prime * result + ((roles == null) ? 0 : roles.hashCode());
-		result = prime * result + (tokenExpired ? 1231 : 1237);
-		result = prime * result + ((updatedAt == null) ? 0 : updatedAt.hashCode());
-		result = prime * result + ((username == null) ? 0 : username.hashCode());
-		return result;
+	@UpdateTimestamp
+	private Timestamp updatedAt;
+
+	@AssertTrue
+	private boolean enabled;
+	private boolean tokenExpired;
+
+	private List<Role> roles;
+
+	public User(@Size(min = 2, max = 255, message = "Should be between 2 and 255 character!") @NotNull String username,
+			@Size(min = 8, max = 255, message = "Should be between 8 and 255 character!") @NotNull String password,
+			String email, Timestamp createdAt, Timestamp updatedAt, boolean enabled, boolean tokenExpired, List<Role> roles) {
+		super();
+		this.username = username;
+		this.password = password;
+		this.email = email;
+		this.createdAt = createdAt;
+		this.updatedAt = updatedAt;
+		this.enabled = enabled;
+		this.tokenExpired = tokenExpired;
+		this.roles = roles;
+	}
+	
+	public User(Long id, String username, String password,String email,List<Role> roles) {
+		this.id = id;
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.roles = roles;
+	}
+
+	public User() {
+		super();
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		User other = (User) obj;
-		if (createdAt == null) {
-			if (other.createdAt != null)
-				return false;
-		} else if (!createdAt.equals(other.createdAt))
-			return false;
-		if (enabled != other.enabled)
-			return false;
-		if (password == null) {
-			if (other.password != null)
-				return false;
-		} else if (!password.equals(other.password))
-			return false;
-		if (roles == null) {
-			if (other.roles != null)
-				return false;
-		} else if (!roles.equals(other.roles))
-			return false;
-		if (tokenExpired != other.tokenExpired)
-			return false;
-		if (updatedAt == null) {
-			if (other.updatedAt != null)
-				return false;
-		} else if (!updatedAt.equals(other.updatedAt))
-			return false;
-		if (username == null) {
-			if (other.username != null)
-				return false;
-		} else if (!username.equals(other.username))
-			return false;
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		List<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
+		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+		Optional<Role> admin = roles.stream()
+			.filter(role -> role.getName().equals("ADMIN"))
+			.findAny();
+		if (admin.isPresent()) {
+			authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
+		}
+		return authorities;
+	}
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public List<Role> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(List<Role> roles) {
+		this.roles = roles;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
 		return true;
 	}
 
-}
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
 
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	public static class UserBuilder {
+
+		@Transient
+		private String token = "";
+
+		@Id
+		@GeneratedValue(strategy = GenerationType.IDENTITY)
+		private Long id;
+
+		@Size(min = 2, max = 255, message = "Should be between 2 and 255 character!")
+		@NotNull
+		@Basic(optional = false)
+		@Column(name = "username")
+		private String username;
+
+		@Id
+		@Size(min = 8, max = 255, message = "Should be between 8 and 255 character!")
+		@NotNull
+		@Basic(optional = false)
+		@Column(name = "password")
+		@JsonIgnore
+		private String password;
+
+		@CreationTimestamp
+		private Timestamp createdAt;
+
+		@UpdateTimestamp
+		private Timestamp updatedAt;
+
+		@JsonIgnore
+		private String email;
+
+		public String getEmail() {
+			return email;
+		}
+
+		public UserBuilder setEmail(String email) {
+			this.email = email;
+			return this;
+		}
+
+		@AssertTrue
+		private boolean enabled;
+		private boolean tokenExpired;
+
+		private List<Role> roles;
+
+		public String getToken() {
+			return token;
+		}
+
+		public UserBuilder setToken(String token) {
+			this.token = token;
+			return this;
+		}
+
+		public Long getId() {
+			return id;
+		}
+
+		public UserBuilder setId(Long id) {
+			this.id = id;
+			return this;
+		}
+
+		public String getUsername() {
+			return username;
+		}
+
+		public UserBuilder setUsername(String username) {
+			this.username = username;
+			return this;
+		}
+
+		public String getPassword() {
+			return password;
+		}
+
+		public UserBuilder setPassword(String password) {
+			this.password = password;
+			return this;
+		}
+
+		public Timestamp getCreatedAt() {
+			return createdAt;
+		}
+
+		public UserBuilder setCreatedAt(Timestamp createdAt) {
+			this.createdAt = createdAt;
+			return this;
+		}
+
+		public Timestamp getUpdatedAt() {
+			return updatedAt;
+		}
+
+		public UserBuilder setUpdatedAt(Timestamp updatedAt) {
+			this.updatedAt = updatedAt;
+			return this;
+		}
+
+		public boolean isEnabled() {
+			return enabled;
+		}
+
+		public UserBuilder setEnabled(boolean enabled) {
+			this.enabled = enabled;
+			return this;
+		}
+
+		public boolean isTokenExpired() {
+			return tokenExpired;
+		}
+
+		public UserBuilder setTokenExpired(boolean tokenExpired) {
+			this.tokenExpired = tokenExpired;
+			return this;
+		}
+
+		public List<Role> getRoles() {
+			return roles;
+		}
+
+		public UserBuilder setRoles(List<Role> roles) {
+			this.roles = roles;
+			return this;
+		}
+
+		public User build() {
+			Timestamp now = Timestamp.from(Instant.now());
+			if( createdAt == null && updatedAt != null) {
+				return new User(username, password, email, createdAt, now, true, false, roles);
+			} else if ( updatedAt == null && createdAt != null) {
+				return new User(username, password, email, now, updatedAt, true, false, roles);
+			} else if (createdAt == null && updatedAt == null ) {
+				return new User(username, password, email, now, now, true, false, roles);
+			} else {
+				return new User(username, password, email, now, now, true, false, roles);
+			}
+		}
+	}
+}

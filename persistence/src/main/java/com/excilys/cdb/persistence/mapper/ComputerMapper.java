@@ -55,14 +55,14 @@ public class ComputerMapper implements RowMapper<Computer>{
   }
 
   public Optional<Computer> mapToComputer(ComputerDTO dto, DaoCompany dao) throws BadInputException {
-    Company company = corpMapper.mapToCompany(dto, dao);
+    Optional<Company> company = corpMapper.mapToCompany(dto, dao);
     System.out.println("Introduced: " + dto.getIntroduced());
     Computer computer = new Computer.ComputerBuilder()
         .setId( dto.getId())
         .setName( dto.getName())
         .setIntroduced( dto.getIntroduced().isEmpty() ? null : DateUtils.stringToTimestamp( dto.getIntroduced() + " 00:00:00" ) )
         .setDiscontinued( dto.getDiscontinued().isEmpty() ? null :DateUtils.stringToTimestamp( dto.getDiscontinued() + " 00:00:00")  )
-        .setCompany(company)
+        .setCompany(company.orElseThrow(BadInputException::new))
         .build();
 
     return Optional.ofNullable(computer);

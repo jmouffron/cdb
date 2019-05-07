@@ -5,6 +5,7 @@ import java.util.Optional;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.hibernate.HibernateException;
@@ -45,8 +46,8 @@ public class DaoUser {
 			CriteriaQuery<User> query = builder.createQuery(User.class);
 			Root<User> root = query.from(User.class);
 			query.select(root);
-			
-			query.where(builder.equal(root.get("username"), username));
+			Predicate preds = builder.or(builder.equal(root.get("username"), username), builder.equal(root.get("email"), username) );
+			query.where(preds);
 			
 			TypedQuery<User> typedQuery = session.createQuery(query);
 			user = Optional.ofNullable(typedQuery.getSingleResult());
@@ -57,10 +58,10 @@ public class DaoUser {
 		
 		UserBuilder builder = null;
 	    if (user.isPresent()) {
-	      String [] roles = (String[]) user.get().getRoles().stream().map(Role::getName).toArray();
+	      String [] role = (String[]) user.get().getRoles().stream().map(Role::getName).toArray();
 	      builder = org.springframework.security.core.userdetails.User.withUsername(username);
 	      builder.password(encoder.encode(user.get().getPassword()));
-	      builder.roles(roles);
+	      builder.roles(role);
 	    } else {
 	      throw new UsernameNotFoundException("User not found.");
 	    }
@@ -80,10 +81,5 @@ public class DaoUser {
 		}
 		return newUser;
 	}
-
-	public User findByEmail(String email) {
-		return null;
-	}
-
 	
 }

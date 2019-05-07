@@ -24,42 +24,40 @@
 					<form:form action="${ctx}/signup" method="post"
 						modelAttribute="user">
 						<fieldset>
+
+							<form:errors path="*" cssClass="alert-danger" element="div" />
 							<div class="form-group">
-								<form:errors path="*" cssClass="alert-danger" element="div" />
-								<p>
-									<form:label path="username" for="username">
-										<spring:message code="signup.username" />
-									</form:label>
-									<form:input path="username" class="form-control" type="text"
-										id="username" name="username"  autofocus="autofocus"/>
-									<form:errors path="username" cssClass="alert-danger"
-										element="div" />
-								</p>
-								<p>
-									<form:label path="password" for="password">
-										<spring:message code="signup." />
-									</form:label>
-									<form:input path="password" class="form-control"
-										type="password" id="password" name="password" />
-									<form:errors path="password" cssClass="alert-danger"
-										element="div" />
-								</p>
-								<p>
-									<form:label path="remember" for="remember">
-										<spring:message code="signup.remember" />
-									</form:label>
-									<form:checkbox class="form-control" path="remember"
-										id="remember" />
-								</p>
+								<form:label path="username">
+									<spring:message code="signup.username" />
+								</form:label>
+								<form:input path="username" class="form-control" type="text"
+									id="username" name="username" autofocus="autofocus" />
+								<form:errors path="username" cssClass="alert-danger"
+									element="div" />
+							</div>
+							<div class="form-group">
+								<form:label path="password">
+									<spring:message code="signup.password" />
+								</form:label>
+								<form:input path="password" class="form-control" type="password"
+									id="password" name="password" />
+								<form:errors path="password" cssClass="alert-danger"
+									element="div" />
+							</div>
+							<div class="actions pull-right">
 								<input type="hidden" name="${_csrf.parameterName}"
 									value="${_csrf.token}" />
-								<button type="submit" class="btn">
+								<button type="submit" class="btn btn-primary">
 									<spring:message code="signup.commit" />
 								</button>
-								<a href="${ctx}"><button class="btn">
+								<a href="${ctx}"><button class="btn btn-danger">
 										<spring:message code="signup.cancel" />
 									</button> </a>
 							</div>
+							<a href="<c:url value='${ctx}/login'/>"><button
+									class="btn btn-info">
+									<spring:message code="signup.login" />
+								</button> </a>
 						</fieldset>
 					</form:form>
 				</div>

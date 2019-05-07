@@ -7,7 +7,7 @@ package com.excilys.cdb.service.view;
  *
  */
 public enum IndexPagination {
-  IDX_10(10), IDX_50(50), IDX_100(100);
+  IDX_10(10), IDX_25(25), IDX_50(50),IDX_75(75), IDX_100(100), IDX_200(200);
 
   private int index;
 

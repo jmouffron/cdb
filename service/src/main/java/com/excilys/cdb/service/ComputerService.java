@@ -6,7 +6,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,12 +16,10 @@ import com.excilys.cdb.binding.exception.ServiceException;
 import com.excilys.cdb.core.model.Computer;
 import com.excilys.cdb.persistence.DaoComputer;
 import com.excilys.cdb.persistence.mapper.ComputerMapper;
-import com.excilys.cdb.binding.validator.ServiceValidator;
 
 @Service
 @Transactional
 public class ComputerService {
-	@Autowired
 	private DaoComputer dao;
 	private ComputerMapper pcMapper;
 	private CompanyService corpService;
@@ -104,5 +101,13 @@ public class ComputerService {
 
 	public void setDao(DaoComputer dao) {
 		this.dao = dao;
+	}
+
+	public Optional<List<ComputerDTO>> getPage(Long page) throws DaoException {
+		List<ComputerDTO> list = null;
+		list = this.dao.getAll().get().stream().map(ComputerMapper::mapToDTO).map(Optional::get)
+				.collect(Collectors.toList());
+
+		return Optional.ofNullable(list);
 	}
 }

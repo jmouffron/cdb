@@ -65,14 +65,14 @@ public class CompanyService {
 
 	public boolean create(CompanyDTO newEntity) throws ServiceException, DaoException {
 		ServiceValidator.companyDTOValidator(newEntity);
-		Company company = corpMapper.mapToCompany(newEntity, this.getDao());
-		return this.dao.create(company);
+		Optional<Company> company = corpMapper.mapToCompany(newEntity, this.getDao());
+		return this.dao.create(company.orElseThrow(ServiceException::new));
 	}
 
 	public boolean updateById(CompanyDTO newEntity) throws ServiceException, DaoException {
 		ServiceValidator.companyDTOValidator(newEntity);
-		Company company = corpMapper.mapToCompany(newEntity, this.getDao());
-		return this.dao.updateById(company);
+		Optional<Company> company = corpMapper.mapToCompany(newEntity, this.getDao());
+		return this.dao.updateById(company.orElseThrow(ServiceException::new));
 	}
 
 	public boolean deleteById(Long id) throws ServiceException {

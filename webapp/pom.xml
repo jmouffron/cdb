@@ -68,26 +68,18 @@
 		<dependency>
 			<groupId>com.excilys.cdb</groupId>
 			<artifactId>core</artifactId>
-			<version>${application.version}</version>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.excilys.cdb</groupId>
 			<artifactId>binding</artifactId>
-			<version>${application.version}</version>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.excilys.cdb</groupId>
 			<artifactId>persistence</artifactId>
-			<version>${application.version}</version>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.excilys.cdb</groupId>
 			<artifactId>service</artifactId>
-			<version>${application.version}</version>
-			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>

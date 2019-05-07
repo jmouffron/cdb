@@ -1,6 +1,8 @@
 package com.excilys.cdb.console.cli;
 
 import javax.sql.DataSource;
+import javax.ws.rs.ApplicationPath;
+import javax.ws.rs.core.Application;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +24,10 @@ import com.excilys.cdb.binding.exception.DaoException;
  * @author excilys
  * 
  */
+@ApplicationPath("/")
 @ComponentScan({ "com.excilys.cdb.service", "com.excilys.cdb.persistence", "com.excilys.cdb.cli" })
 @PropertySource("classpath:datasource.properties")
-public class App {
+public class App extends Application {
 	@Value("${driverClassName}")
 	String driver;
 	@Value("${jdbcUrl}")

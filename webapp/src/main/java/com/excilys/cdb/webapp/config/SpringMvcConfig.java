@@ -2,21 +2,11 @@ package com.excilys.cdb.webapp.config;
 
 import java.util.Locale;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
@@ -29,6 +19,10 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
+
+import com.excilys.cdb.service.AuthService;
+import com.excilys.cdb.webapp.auth.JwtAuthenticationEntryPoint;
+import com.excilys.cdb.webapp.auth.JwtAuthenticationFilter;
 
 @EnableWebMvc
 @Configuration
@@ -43,6 +37,20 @@ public class SpringMvcConfig implements WebMvcConfigurer {
 		bean.setSuffix(".jsp");
 
 		return bean;
+	}
+	
+	@Bean
+	public BCryptPasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+	
+	@Bean
+	public JwtAuthenticationEntryPoint jwtAutehenticationEntyPoint() {
+		return new JwtAuthenticationEntryPoint();
+	}
+	@Bean
+	public JwtAuthenticationFilter jwtAuthenticationFilter(AuthService service) {
+		return new JwtAuthenticationFilter(service);
 	}
 
 	@Bean

@@ -2,6 +2,7 @@ package com.excilys.cdb.persistence.mapper;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Optional;
 
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
@@ -29,12 +30,12 @@ public class CompanyMapper implements RowMapper<Company> {
 		return new CompanyDTO(company.getId(), company.getName());
 	}
 
-	public Company mapToCompany(CompanyDTO dto, DaoCompany dao) throws BadInputException {
-		return new Company(dto.getId(), dao.getOneByName(dto.getName()).get().getName());
+	public Optional<Company> mapToCompany(CompanyDTO dto, DaoCompany dao) throws BadInputException {
+		return Optional.ofNullable(new Company(dto.getId(), dao.getOneByName(dto.getName()).get().getName()));
 	}
 
-	public Company mapToCompany(ComputerDTO dto, DaoCompany dao) throws BadInputException {
-		return new Company(dto.getCompanyId(), dao.getOneById(dto.getCompanyId()).get().getName());
+	public Optional<Company> mapToCompany(ComputerDTO dto, DaoCompany dao) throws BadInputException {
+		return Optional.ofNullable(new Company(dto.getCompanyId(), dao.getOneById(dto.getCompanyId()).get().getName()));
 	}
 
 	@Override

@@ -1,17 +1,16 @@
 package com.excilys.cdb.console.cli;
 
 import java.sql.Timestamp;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import com.excilys.cdb.binding.dto.CompanyDTO;
 import com.excilys.cdb.binding.dto.ComputerDTO;
-import com.excilys.cdb.binding.exception.BadInputException;
 import com.excilys.cdb.binding.exception.DaoException;
 import com.excilys.cdb.binding.exception.ServiceException;
+import com.excilys.cdb.console.resource.CompanyResource;
+import com.excilys.cdb.console.resource.ComputerResource;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.ComputerService;
 import com.excilys.cdb.persistence.mapper.ComputerMapper;
@@ -55,10 +54,10 @@ public class Controller {
 
 			switch (this.request) {
 				case FETCH_ALL_COMPANY:
-					listAllEntity(CompanyService.class);
+					listAllCompanies();
 					break;
 				case FETCH_ALL_COMPUTER:
-					listAllEntity(ComputerService.class);
+					listAllComputers();
 					break;
 				case FETCH_COMPUTER:
 					showComputer();
@@ -86,58 +85,18 @@ public class Controller {
 	}
 
 	/**
-	 * Returns the total number of pages for a view
-	 * 
-	 * @param totalSize
-	 * @return
-	 */
-	private long getTotalPages(long totalSize) {
-		long parts = 0, partsSize = totalSize;
-		while (partsSize > 0) {
-			partsSize /= 2;
-			parts++;
-		}
-		return parts;
-	}
-
-	/**
-	 * Returns the number of page to be displayed by page for a view
-	 * 
-	 * @param totalSize
-	 * @param totalPages
-	 * @return
-	 */
-	private long getDataPerPage(long totalSize, long totalPages) {
-		return totalSize / totalPages;
-	}
-
-	/**
 	 * List all instances of an entity in the database
 	 * 
 	 * @param serviceType
 	 * @throws DaoException 
 	 * @throws ServiceException
 	 */
-	private void listAllEntity(Class clazz) throws DaoException {
-
-		List entities = null;
-		try {
-			entities = this.getAllEntities(clazz);
-		} catch (ServiceException e) {
-			logger.error(e.getMessage());
-		}
-		Data payload = new Data(entities);
-
-		long totalDataSize = entities.size();
-
-		long totalPages = getTotalPages(totalDataSize);
-		long dataPerPage = getDataPerPage(totalDataSize, totalPages);
-
-		try {
-			this.setPage(new EntityListPage(payload, totalPages, dataPerPage));
-		} catch (ServiceException e) {
-			logger.error(e.getMessage());
-		}
+	private void listAllComputers() throws DaoException {
+		ComputerResource.getAllComputers().ifPresent(System.out::println);
+	}
+	
+	private void listAllCompanies() throws DaoException {
+		CompanyResource.getAllCompanies().ifPresent(System.out::println);
 	}
 
 	/**
@@ -151,11 +110,7 @@ public class Controller {
 				ControllerUtils.isStrictlyPositive);
 
 		ComputerDTO entity = null;
-		try {
-			entity = this.getEntityById(id);
-		} catch (ServiceException e) {
-			logger.error(e.getMessage());
-		}
+		entity = ComputerResource.getComputer(id).get();
 		Data payload = new Data(entity);
 
 		try {
@@ -189,22 +144,17 @@ public class Controller {
 		} while (introduced.after(discontinued));
 
 		CompanyDTO company = null;
-		company = getCompanyById(companyId);
+		company = CompanyResource.getCompany(companyId).get();
 
-		ComputerDTO newEntity = new ComputerDTO.ComputerDTOBuilder().setName(name).setIntroduced(introduced.toString())
+		ComputerDTO dto = new ComputerDTO.ComputerDTOBuilder().setName(name).setIntroduced(introduced.toString())
 				.setDiscontinued(discontinued.toString()).setCompanyId(company.getId())
 				.setCompanyName(company.getName()).build();
 
-		Data payload = new Data(newEntity);
-		this.addEntity(newEntity);
+		Data payload = new Data(dto);
+		ComputerResource.postComputer(dto);
 
 		this.setPage(new EntityAddPage(payload));
 
-	}
-
-	private CompanyDTO getCompanyById(Long companyId) {
-		// TODO Auto-generated method stub
-		return null;
 	}
 
 	/**
@@ -243,56 +193,6 @@ public class Controller {
 			this.setPage(new EntityDeletePage());
 		} catch (ServiceException e) {
 			logger.error("Bad Page instantiation in controller");
-		}
-	}
-
-	/**
-	 * Fetches all instance of a certain type of entity from the database
-	 * 
-	 * @return List<Entity>
-	 * @throws ServiceException
-	 * @throws DaoException 
-	 */
-	private List getAllEntities(Class clazz) throws ServiceException, DaoException {
-		List dto = null;
-		switch (clazz.getSimpleName()) {
-			case "ComputerService":
-				dto = this.computerService.getAll().get();
-				break;
-			case "CompanyService":
-				dto = this.companyService.getAll().get();
-				break;
-		}
-		return dto;
-	}
-
-	/**
-	 * Fetches an Entity based on a given Id.
-	 * 
-	 * @param id
-	 * @return An entity mapped from the database
-	 * @throws ServiceException
-	 */
-	private ComputerDTO getEntityById(Long id) throws ServiceException {
-		try {
-			return this.computerService.getOneById(id).get();
-		} catch (BadInputException e) {
-			logger.error("Couldn't get entity by id!");
-		}
-		return null;
-	}
-
-	/**
-	 * Fetches an Entity based on a given Id.
-	 * 
-	 * @param newEntity
-	 * @return true if the call changed the database, else false
-	 */
-	private void addEntity(ComputerDTO newEntity) {
-		try {
-			this.computerService.create(pcMapper.mapToComputer(newEntity, companyService.getDao()).get());
-		} catch (ServiceException | DaoException e) {
-			logger.error("Couldn't add entity" + newEntity.getName() + "!");
 		}
 	}
 

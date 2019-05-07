@@ -38,7 +38,46 @@
 		<hibernate.version>5.2.4.Final</hibernate.version>
 		<hibernate.jpa.version>1.0.0.Final</hibernate.jpa.version>
 		<hibernate.validation.version>5.2.4.Final</hibernate.validation.version>
+		<hibernate.annotation.version>5.1.0.Final</hibernate.annotation.version>
+		<jackson.version>2.9.8</jackson.version>
+		<jersey.version>2.25.1</jersey.version>
+		<jax.version>2.1.1</jax.version>
+		<jax.databind.version>2.9.8</jax.databind.version>
 	</properties>
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.excilys.cdb</groupId>
+				<artifactId>core</artifactId>
+				<version>${application.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.excilys.cdb</groupId>
+				<artifactId>binding</artifactId>
+				<version>${application.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.excilys.cdb</groupId>
+				<artifactId>persistence</artifactId>
+				<version>${application.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.excilys.cdb</groupId>
+				<artifactId>service</artifactId>
+				<version>${application.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.excilys.cdb</groupId>
+				<artifactId>console</artifactId>
+				<version>${application.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>com.excilys.cdb</groupId>
+				<artifactId>webapp</artifactId>
+				<version>${application.version}</version>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 	<dependencies>
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>

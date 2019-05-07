@@ -26,7 +26,7 @@ import com.excilys.cdb.service.view.Pagination;
 
 @Configuration
 @PropertySource("classpath:datasource.properties")
-@EnableTransactionManagement
+@EnableTransactionManagement(proxyTargetClass = true)
 @ComponentScan(basePackages = "com.excilys.cdb")
 public class AppConfig implements TransactionManagementConfigurer{
 
