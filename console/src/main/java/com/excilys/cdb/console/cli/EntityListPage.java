@@ -3,16 +3,17 @@ package com.excilys.cdb.console.cli;
 import org.slf4j.LoggerFactory;
 
 import com.excilys.cdb.binding.exception.PageException;
-import com.excilys.cdb.binding.exception.ServiceException;
 
 public class EntityListPage extends Page {
+	
+	private static final String DELIMITER = "==============================";
 	private long dataPerPage;
 	private long totalPageNumber;
 
 	private long startIndex;
 	private long pageIndex;
 
-	public EntityListPage(Data payload, long totalPages, long dataPerPage) throws ServiceException {
+	public EntityListPage(Data payload, long totalPages, long dataPerPage) {
 		this.data = payload;
 		this.pageIndex = 0;
 		this.logger = LoggerFactory.getLogger(EntityListPage.class);
@@ -27,11 +28,11 @@ public class EntityListPage extends Page {
 		while (pageIndex >= 0 && pageIndex < totalPageNumber) {
 			data.list(startIndex, dataPerPage);
 
-			System.out.println("P " + (pageIndex + 1) + "/" + totalPageNumber + " N ");
+			logger.info("P {} / {} N ", (pageIndex + 1), totalPageNumber  );
 
 			input = ControllerUtils.getStringInput("P pour page précédente, N pour la suivante, E pour le menu:", ControllerUtils.isPorAorE );
 			
-			logger.error("Input value:" + input);
+			logger.error("Input value: {}", input);
 			
 			if (input.equals("P")) {
 				pageIndex--;
@@ -47,15 +48,15 @@ public class EntityListPage extends Page {
 
 	@Override
 	public MenuChoiceEnum show() {
-		System.out.println("==============================");
-		System.out.println(" |          Liste           | ");
-		System.out.println("==============================");
+		logger.info(DELIMITER);
+		logger.info(" |          Liste           | ");
+		logger.info(DELIMITER);
 		try {
 			paginate();
 		} catch (PageException e) {
 			logger.error(e.getMessage());
 		}
-		System.out.println("==============================");
+		logger.info(DELIMITER);
 		return MenuChoiceEnum.DEFAULT;
 	}
 

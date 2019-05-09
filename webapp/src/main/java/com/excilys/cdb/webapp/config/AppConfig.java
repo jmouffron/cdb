@@ -5,6 +5,8 @@ import java.util.Properties;
 
 import javax.sql.DataSource;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -30,6 +32,7 @@ import com.excilys.cdb.service.view.Pagination;
 @ComponentScan(basePackages = "com.excilys.cdb")
 public class AppConfig implements TransactionManagementConfigurer{
 
+	private static final Logger logger = LoggerFactory.getLogger(AppConfig.class);
 	Environment env;
 
 	public AppConfig(Environment env) {
@@ -71,7 +74,7 @@ public class AppConfig implements TransactionManagementConfigurer{
     	try {
 			hbmProps.load(getClass().getClassLoader().getResourceAsStream("datasource.properties"));
 		} catch (IOException e) {
-			e.printStackTrace();
+			logger.error(e.getMessage());
 		}
     	return hbmProps;
 	}

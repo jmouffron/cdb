@@ -3,12 +3,21 @@ package com.excilys.cdb.binding.dto;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(as = ComputerDTO.class)
 public class ComputerDTO extends EntityDTO {
 
 	private static final long serialVersionUID = -73180210575560484L;
+	@JsonProperty("introduced")
 	private String introduced;
+	@JsonProperty("discontinued")
 	private String discontinued;
+	@JsonProperty("companyName")
 	private String companyName;
+	@JsonProperty("companyId")
 	private long companyId;
 
 	public String getIntroduced() {
@@ -51,8 +60,10 @@ public class ComputerDTO extends EntityDTO {
 	 * @param discontinued
 	 * @param company
 	 */
-	public ComputerDTO(long id, String name, String introduced, String discontinued, String companyName,
-			long companyId) {
+	@JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+	public ComputerDTO(@JsonProperty("id") long id, @JsonProperty("companyName") String name,
+			@JsonProperty("introduced") String introduced, @JsonProperty("discontinued") String discontinued,
+			@JsonProperty("companyName") String companyName, @JsonProperty("companyId") long companyId) {
 		this.id = id;
 		this.name = name;
 		this.introduced = introduced;
@@ -61,7 +72,8 @@ public class ComputerDTO extends EntityDTO {
 		this.companyId = companyId;
 	}
 
-	public ComputerDTO() {}
+	public ComputerDTO() {
+	}
 
 	@Override
 	public String toString() {
@@ -75,7 +87,7 @@ public class ComputerDTO extends EntityDTO {
 	 *         An inner Builder class for computer entities
 	 *
 	 */
-	static public class ComputerDTOBuilder {
+	public static class ComputerDTOBuilder {
 		private long id;
 		private String name;
 		private String introduced = Timestamp.valueOf(LocalDateTime.now()).toString();
@@ -84,6 +96,7 @@ public class ComputerDTO extends EntityDTO {
 		private long companyId;
 
 		public ComputerDTOBuilder() {
+			super();
 		}
 
 		public ComputerDTOBuilder setId(long id) {
@@ -143,19 +156,19 @@ public class ComputerDTO extends EntityDTO {
 		if (companyName == null) {
 			if (other.companyName != null)
 				return false;
-		} else if (!companyName.equals(other.companyName))
+		} else if (!companyName.equals(other.companyName)) {
 			return false;
+		}
 		if (discontinued == null) {
 			if (other.discontinued != null)
 				return false;
-		} else if (!discontinued.equals(other.discontinued))
+		} else if (!discontinued.equals(other.discontinued)) {
 			return false;
-		if (introduced == null) {
-			if (other.introduced != null)
+		}
+		if (introduced == null || other.introduced != null) {
 				return false;
-		} else if (!introduced.equals(other.introduced))
-			return false;
-		return true;
+		}
+		return !introduced.equals(other.introduced);
 	}
 
 }

@@ -26,7 +26,7 @@ import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.view.Pagination;
 
 @RestController
-@RequestMapping("/api/companies/")
+@RequestMapping("/api/companies")
 public class RestfulCompanyController {
 	
 	private CompanyService companyService;
@@ -46,50 +46,72 @@ public class RestfulCompanyController {
 			@RequestParam(name = "isDesc", required = false, defaultValue = "true") boolean isDesc,
 			@RequestParam(name = "toOrder", required = false, defaultValue= "name") String toOrder
 	){
-		Optional<List<CompanyDTO>> companies = Optional.empty();
+		Optional<List<CompanyDTO>> companies;
 		if(toOrder != null ) {
-			
+			try {
+				companies = Optional.ofNullable(companyService.orderBy(toOrder, isDesc).orElseThrow(ServiceException::new));
+			} catch (DaoException | ServiceException e) {
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+			}
 		}else {
 			try {
-				companies = Optional.ofNullable(companyService.orderBy(toOrder, isDesc).orElseThrow(() -> new ServiceException()));
-			} catch (DaoException | ServiceException e) {
-				return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+				companies = Optional.ofNullable(companyService.getAll().orElseThrow(ServiceException::new));
+			} catch (ServiceException e) {
+				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
 		
 		if(!companies.isPresent()) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
 		return new ResponseEntity<>(companies.get(), HttpStatus.OK);
 	}
 	
+	@GetMapping("{id}")
+	public ResponseEntity<CompanyDTO> getCompany(@Valid @PathVariable long id) {
+		if(id<1) {
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+		}
+		Optional<CompanyDTO> dto = Optional.empty();
+		try {
+			dto = companyService.getOneById(id);
+		} catch (ServiceException e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+		if(dto.isPresent()) {
+			return new ResponseEntity<>(dto.get(), HttpStatus.OK);
+		} else {
+			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+	}
+	
 	@PostMapping("/add")
 	public ResponseEntity<CompanyDTO> addCompany(@Valid @RequestBody CompanyDTO dto, BindingResult res) {
 		if(res.hasErrors()) {
-			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		try {
 			companyService.create(dto);
 		} catch (DaoException | ServiceException e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		return new ResponseEntity<>(null, HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@PutMapping("/edit/{id}")
 	public ResponseEntity<CompanyDTO> putCompany(@Valid @RequestBody CompanyDTO dto, BindingResult res, @PathVariable long id) {
 		if(res.hasErrors()) {
-			return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 		}
 		try {
 			companyService.updateById(dto);
 		} catch (DaoException | ServiceException e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		return new ResponseEntity<>(null, HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 	@PatchMapping("/edit/{id}")
@@ -102,10 +124,10 @@ public class RestfulCompanyController {
 		try {
 			companyService.deleteById(id);
 		} catch (ServiceException e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		return new ResponseEntity<>(null, HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 }
 

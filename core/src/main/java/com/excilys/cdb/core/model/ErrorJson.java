@@ -64,10 +64,9 @@ public class ErrorJson implements Serializable{
 		if (message == null) {
 			if (other.message != null)
 				return false;
-		} else if (!message.equals(other.message))
+		} else if (!message.equals(other.message)) {
 			return false;
-		if (status != other.status)
-			return false;
-		return true;
+		}
+		return status != other.status;
 	}
 }

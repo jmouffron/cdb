@@ -23,10 +23,10 @@ import com.excilys.cdb.service.CompanyService;
 @Controller
 public class CompanyController {
 	private static final Logger logger = LoggerFactory.getLogger(CompanyController.class);
-	private final String DASHBOARD = "dashboard";
-	private final String EDIT_COMPANY = "editCompany";
-	private final String DELETE_COMPANY = "deleteCompany";
-	private final String ERROR = "500";
+	private static final String DASHBOARD = "dashboard";
+	private static final String EDIT_COMPANY = "editCompany";
+	private static final String DELETE_COMPANY = "deleteCompany";
+	private static final String ERROR = "500";
 
 	private CompanyService companyService;
 	

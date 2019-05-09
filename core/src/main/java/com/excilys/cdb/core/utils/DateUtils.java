@@ -1,21 +1,22 @@
 package com.excilys.cdb.core.utils;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAmount;
 import java.util.Date;
+import java.util.Optional;
 
 public class DateUtils {
 	private static DateTimeFormatter timestampFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 	private static DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-	private DateUtils() {
-	}
+	private DateUtils() {}
 
 	public static Timestamp stringToTimestamp(String toBeParsed) {
 		if (toBeParsed == null || toBeParsed.isEmpty() ) {
-			return null;
+			throw new RuntimeException("Null String !");
 		}
 		return Timestamp.valueOf(toBeParsed);
 	}
@@ -55,6 +56,14 @@ public class DateUtils {
 	}
 
 	public static Date timestampToDate(String timeString) {
-		return Date.from(stringToTimestamp(timeString).toInstant());
+		if( "".equals(timeString)) {
+			throw new RuntimeException("Null input string for timestamp to date");
+		}
+		Optional<Instant> instant = Optional.ofNullable(stringToTimestamp(timeString).toInstant());
+		if (instant.isPresent()) {
+			return Date.from(instant.get());
+		} else {
+			throw new RuntimeException("Bad Input for timestamp to date");
+		}
 	}
 }

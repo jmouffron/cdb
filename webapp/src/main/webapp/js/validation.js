@@ -18,11 +18,11 @@ $(function() {
 		let intro = new Date($(this).val())
 		let disco = new Date($("#discontinued").val())
 
-		if ( !$(this).val() === '' || intro == "Invalid Date" ){
+		if ( !$(this).val() == '' || intro == "Invalid Date" ){
 			invalidate($(this))
 			$("#discontinued").attr('readonly', true)
 			console.log("invalid date")
-		} else if ( !$(this).val() === '' || !$(this).val().match(regexDate) ) {
+		} else if ( !$(this).val() == '' || !$(this).val().match(regexDate) ) {
 			invalidate( $(this) )
 			console.log("invalid regexp")
 		} else if ( !$(this).val() == '' || (  $("#discontinued").val() != "" && intro >= disco ) ){
@@ -45,7 +45,7 @@ $(function() {
 			invalidate( $(this) )
 		} else if ( $(this).val() == '' || $(this).val() <= $('#introduced').val() ){
 			invalidate($(this))
-		} else if ( $(this).val() == '' || !$("#discontinued").val() instanceof Date){
+		} else if ( $(this).val() == '' || !($("#discontinued").val() instanceof Date) ){
 			invalidate($(this))
 		} else {
 			validate($(this))
@@ -62,7 +62,7 @@ $(function() {
 	})
 	
 	$('form[action="/cdb/addComputer"]').first().on("submit", function(){
-		ctx = $(this)
+		let ctx = $(this)
 		$(this).find("fieldset div").forEach( _ => {
 			if ( $(this).hasClass('has-error') || !$(this).hasClass('has-success') ){
 				ctx.preventDefault()

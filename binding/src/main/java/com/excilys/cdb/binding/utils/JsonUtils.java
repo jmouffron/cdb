@@ -4,13 +4,16 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class JsonUtils {
+	private JsonUtils() {
+
+	}
 
 	public static <T> String returnJsonFrom(T entity) throws JsonProcessingException {
 		ObjectMapper mapper = new ObjectMapper();
 		return mapper.writeValueAsString(entity);
 	}
 
-	public static <T> T returnObjectFrom(String json, Class<T> clazz) throws JsonProcessingException {
+	public static <T> T returnObjectFrom(String json, Class<T> clazz){
 		ObjectMapper mapper = new ObjectMapper();
 		return mapper.convertValue(json, clazz);
 	}

@@ -19,31 +19,33 @@ import javax.validation.constraints.Size;
 import com.excilys.cdb.core.utils.DateUtils;
 
 @Entity
-@Table(name="computer")
+@Table(name = "computer")
 public class Computer implements Serializable {
 
 	private static final long serialVersionUID = 2256380163459893961L;
+
 	public Computer() {
-		
+
 	}
+
 	@Id
 	@Min(0)
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	private long id;
-	
-	@Size(min=2,max=255,message="Should be between 2 and 255 character!")
+
+	@Size(min = 2, max = 255, message = "Should be between 2 and 255 character!")
 	@NotNull
-	@Basic(optional=false)
-	@Column(name="name")
+	@Basic(optional = false)
+	@Column(name = "name")
 	private String name;
-	
+
 	private Timestamp introduced;
-	
+
 	private Timestamp discontinued;
 
 	@ManyToOne
-    @JoinColumn(name = "company_id")
+	@JoinColumn(name = "company_id")
 	private Company company;
 
 	public long getId() {
@@ -124,24 +126,32 @@ public class Computer implements Serializable {
 			return true;
 		if (!super.equals(obj))
 			return false;
-		if (getClass() != obj.getClass())
+		if (getClass() != obj.getClass()) {
 			return false;
+		}
 		Computer other = (Computer) obj;
 		if (company == null) {
-			if (other.company != null)
+			if (other.company != null) {
 				return false;
-		} else if (!company.equals(other.company))
+			}
+		} else if (!company.equals(other.company)) {
 			return false;
+		}
+			
 		if (discontinued == null) {
-			if (other.discontinued != null)
+			if (other.discontinued != null) {
 				return false;
-		} else if (!discontinued.equals(other.discontinued))
+			}
+		} else if (!discontinued.equals(other.discontinued)) {
 			return false;
+		}
 		if (introduced == null) {
-			if (other.introduced != null)
+			if (other.introduced != null) {
 				return false;
-		} else if (!introduced.equals(other.introduced))
+			}
+		} else if (!introduced.equals(other.introduced)) {
 			return false;
+		}
 		return true;
 	}
 
@@ -151,7 +161,7 @@ public class Computer implements Serializable {
 	 *         An inner Builder class for computer entities
 	 *
 	 */
-	static public class ComputerBuilder {
+	public static class ComputerBuilder {
 		private long id;
 		private String name;
 		private Timestamp introduced = DateUtils.getNowTimestamp();
@@ -159,6 +169,7 @@ public class Computer implements Serializable {
 		private Company company;
 
 		public ComputerBuilder() {
+			super();
 		}
 
 		public ComputerBuilder setId(long id) {

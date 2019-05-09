@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
@@ -15,17 +17,18 @@ import com.excilys.cdb.binding.exception.BadInputException;
 import com.excilys.cdb.core.model.Company;
 import com.excilys.cdb.core.model.Computer;
 import com.excilys.cdb.persistence.DaoCompany;
-import com.excilys.cdb.binding.utils.DateUtils;
+import com.excilys.cdb.core.utils.DateUtils;
 
 @Component
 public class ComputerMapper implements RowMapper<Computer>{
   private CompanyMapper corpMapper;
+  private static final Logger logger = LoggerFactory.getLogger(ComputerMapper.class);
   
   public ComputerMapper(CompanyMapper mapper) {
 	  this.corpMapper = mapper;
   }
   
-  static public Computer map(ResultSet rs) throws SQLException {
+  public static Computer map(ResultSet rs) throws SQLException {
 
     Long id = rs.getLong("id");
     String name = rs.getString("pc_name");
@@ -37,13 +40,11 @@ public class ComputerMapper implements RowMapper<Computer>{
 
     Company company = new Company(companyId, companyName);
 
-    Computer computer = new Computer.ComputerBuilder().setId(id).setName(name).setIntroduced(introduced)
+    return new Computer.ComputerBuilder().setId(id).setName(name).setIntroduced(introduced)
         .setDiscontinued(discontinued).setCompany(company).build();
-
-    return computer;
   }
 
-  static public Optional<ComputerDTO> mapToDTO(Computer computer) {
+  public static Optional<ComputerDTO> mapToDTO(Computer computer) {
 	boolean isCompanyNull = computer.getCompany() == null;
     ComputerDTO computerDTO = new ComputerDTO.ComputerDTOBuilder().setId(computer.getId()).setName(computer.getName())
         .setIntroduced(computer.getIntroduced() == null ? null : DateUtils.stringToDateString( computer.getIntroduced() ) )
@@ -56,7 +57,7 @@ public class ComputerMapper implements RowMapper<Computer>{
 
   public Optional<Computer> mapToComputer(ComputerDTO dto, DaoCompany dao) throws BadInputException {
     Optional<Company> company = corpMapper.mapToCompany(dto, dao);
-    System.out.println("Introduced: " + dto.getIntroduced());
+    logger.info("Introduced: {}", dto.getIntroduced());
     Computer computer = new Computer.ComputerBuilder()
         .setId( dto.getId())
         .setName( dto.getName())
@@ -68,14 +69,12 @@ public class ComputerMapper implements RowMapper<Computer>{
     return Optional.ofNullable(computer);
   }
 
-  static public Optional<List<ComputerDTO>> mapToDTOList(List<Computer> computers) {
-    return Optional.ofNullable(computers.stream().map(computer -> {
-      ComputerDTO computerDTO = new ComputerDTO.ComputerDTOBuilder().setId(computer.getId()).setName(computer.getName())
+  public static Optional<List<ComputerDTO>> mapToDTOList(List<Computer> computers) {
+    return Optional.ofNullable(computers.stream().map(computer -> new ComputerDTO.ComputerDTOBuilder().setId(computer.getId()).setName(computer.getName())
           .setIntroduced(computer.getIntroduced() == null ? null : computer.getIntroduced().toString())
           .setDiscontinued(computer.getDiscontinued() == null ? null : computer.getDiscontinued().toString())
-          .setCompanyName(computer.getCompany().getName()).build();
-      return computerDTO;
-    }).collect(Collectors.toList()));
+          .setCompanyName(computer.getCompany().getName()).build()
+    ).collect(Collectors.toList()));
   }
 
   @Override

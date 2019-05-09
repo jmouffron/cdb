@@ -6,7 +6,7 @@ import java.util.Scanner;
 import java.util.function.Function;
 
 public class InputUtils {
-	public static Scanner scan = new Scanner(System.in);
+	public static final Scanner scan = new Scanner(System.in);
 
 	private InputUtils() {
 	}

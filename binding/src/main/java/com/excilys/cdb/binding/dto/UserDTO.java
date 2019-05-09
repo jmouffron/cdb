@@ -1,31 +1,32 @@
 package com.excilys.cdb.binding.dto;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotEmpty;
-
 public class UserDTO {
 	
 	public UserDTO() {
-		
+		super();
 	}
-	
-	@NotEmpty
+	private long id;
+
 	private String username;
 
-	@NotEmpty
 	private String password;
 
-	@Email
-	@NotEmpty
 	private String email;
 
+	public long getId() {
+		return id;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
+	}
 
 	public String getUsername() {
 		return username;
-	}
-
-	public void setLastName(String username) {
-		this.username = username;
 	}
 
 	public String getPassword() {

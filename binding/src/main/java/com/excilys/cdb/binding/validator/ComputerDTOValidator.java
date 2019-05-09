@@ -9,18 +9,21 @@ import org.springframework.validation.ValidationUtils;
 import org.springframework.validation.Validator;
 
 import com.excilys.cdb.binding.dto.ComputerDTO;
-import com.excilys.cdb.binding.utils.DateUtils;
+import com.excilys.cdb.core.utils.DateUtils;
 
 @Component
 public class ComputerDTOValidator implements Validator {
-
+	
+	private static final String INTRODUCED = "introduced";
+	private static final String INTRO_INVALID = "dto.introduced.invalid";
+	
 	@Override
 	public boolean supports(Class<?> clazz) {
 		return ComputerDTO.class.isAssignableFrom(clazz) ;
 	}
 
 	@Override
-	public void validate(Object obj, Errors errors) {
+	public void validate(final Object obj, Errors errors) {
 		if (obj == null) {
 			errors.reject("500", "Computer is null!");
 		}
@@ -36,35 +39,33 @@ public class ComputerDTOValidator implements Validator {
 	
 	private void verif(Object obj, Errors errors) {
 		ComputerDTO dto = (ComputerDTO) obj;
-		System.out.println();
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "dtopc.name.empty");
 
 		if (!"".equals(dto.getDiscontinued())) {
-			ValidationUtils.rejectIfEmptyOrWhitespace(errors, "introduced", "dtopc.introduced.empty");
+			ValidationUtils.rejectIfEmptyOrWhitespace(errors, INTRODUCED, "dtopc.introduced.empty");
 		}
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "companyId", "dtopc.companyId.empty");
 
 		Pattern pattern = Pattern.compile("^[0-9]{4}-[0-9]{2}-[0-9]{2}$", Pattern.CASE_INSENSITIVE);
-
-		if (dto.getName().length() > 255 || dto.getName().length() == 0) {
+		
+		if ( "".equals(dto.getName()) || dto.getName().length() == 0 || dto.getName().length() > 255 ) {
 			errors.rejectValue("name", "dtopc.name.invalid");
 		}
 
 		if (!"".equals(dto.getIntroduced()) && "".equals(dto.getDiscontinued())) {
 			if (!(pattern.matcher(dto.getIntroduced()).matches())) {
-				errors.rejectValue("introduced", "dtopc.introduced.invalid");
+				errors.rejectValue(INTRODUCED, INTRO_INVALID);
 			}
 		} else if (!"".equals(dto.getIntroduced()) && !"".equals(dto.getDiscontinued())) {
 			if (!(pattern.matcher(dto.getIntroduced()).matches())) {
-				errors.rejectValue("introduced", "dtopc.introduced.invalid");
+				errors.rejectValue(INTRODUCED, INTRO_INVALID);
 			}
 			if (!(pattern.matcher(dto.getDiscontinued()).matches())) {
-				errors.rejectValue("discontinued", "dtopc.introduced.invalid");
+				errors.rejectValue("discontinued", INTRO_INVALID);
 			}
 			if (DateUtils.stringToTimestamp(dto.getIntroduced() + " 00:00:00")
 					.compareTo(DateUtils.stringToTimestamp(dto.getDiscontinued() + " 00:00:00")) > 0) {
-				errors.rejectValue("introduced", "dtopc.introduced.invalid");
-				errors.rejectValue("discontinued", "dtopc.introduced.invalid");
+				errors.rejectValue("discontinued", "dtopc.discontinued.invalid");
 			}
 		}
 	}

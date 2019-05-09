@@ -1,6 +1,8 @@
 package com.excilys.cdb.console.cli;
 
 import java.sql.Timestamp;
+import java.util.Optional;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -11,9 +13,6 @@ import com.excilys.cdb.binding.exception.DaoException;
 import com.excilys.cdb.binding.exception.ServiceException;
 import com.excilys.cdb.console.resource.CompanyResource;
 import com.excilys.cdb.console.resource.ComputerResource;
-import com.excilys.cdb.service.CompanyService;
-import com.excilys.cdb.service.ComputerService;
-import com.excilys.cdb.persistence.mapper.ComputerMapper;
 
 /**
  * A Front Controller class to handle user interaction and view data injection.
@@ -28,15 +27,12 @@ public class Controller {
 	private Page page;
 	private MenuChoiceEnum request;
 	
-	private ComputerService computerService;
-	private CompanyService companyService;
-	private ComputerMapper pcMapper;
+	public static Controller of() {
+		return new Controller();
+	}
 
-	private Controller(ComputerService pcService, CompanyService corpService, ComputerMapper pcMapper) {
+	private Controller() {
 		this.page = new MenuPage();
-		this.computerService = pcService;
-		this.companyService = corpService;
-		this.pcMapper = pcMapper;
 	}
 
 	/**
@@ -46,7 +42,7 @@ public class Controller {
 	 * 
 	 * @throws ServiceException
 	 */
-	public void start() throws DaoException {
+	public void start() throws ServiceException {
 		boolean looper = true;
 
 		while (looper) {
@@ -91,12 +87,12 @@ public class Controller {
 	 * @throws DaoException 
 	 * @throws ServiceException
 	 */
-	private void listAllComputers() throws DaoException {
-		ComputerResource.getAllComputers().ifPresent(System.out::println);
+	private void listAllComputers() {
+		ComputerResource.getAllComputers().ifPresent(computer -> logger.info("{}", computer));
 	}
 	
-	private void listAllCompanies() throws DaoException {
-		CompanyResource.getAllCompanies().ifPresent(System.out::println);
+	private void listAllCompanies() {
+		CompanyResource.getAllCompanies().ifPresent(company-> logger.info("{}", company));
 	}
 
 	/**
@@ -104,14 +100,12 @@ public class Controller {
 	 * 
 	 * @throws ServiceException
 	 */
-	private void showComputer() {
-		long id = 0L;
-		id = ControllerUtils.getLongInput("Choisissez un id d'entité supérieur à 0:",
+	private void showComputer() throws ServiceException {
+		long id = ControllerUtils.getLongInput("Choisissez un id d'entité supérieur à 0:",
 				ControllerUtils.isStrictlyPositive);
 
-		ComputerDTO entity = null;
-		entity = ComputerResource.getComputer(id).get();
-		Data payload = new Data(entity);
+		Optional<ComputerDTO> entity = ComputerResource.getComputer(id);
+		Data payload = new Data(entity.orElseThrow(ServiceException::new));
 
 		try {
 			this.setPage(new EntityPage(payload));
@@ -125,10 +119,11 @@ public class Controller {
 	 * 
 	 * @throws ServiceException
 	 */
-	private void createComputer() {
+	private void createComputer() throws ServiceException {
 
 		String name;
-		Timestamp introduced, discontinued;
+		Timestamp introduced;
+		Timestamp discontinued;
 		Long companyId;
 
 		name = ControllerUtils.getStringInput("Veuillez entrer un nom pour l'ordinateur:",
@@ -143,12 +138,11 @@ public class Controller {
 					.getTimestampInput("Veuillez entrer la date de fin de fonction de l'ordinateur");
 		} while (introduced.after(discontinued));
 
-		CompanyDTO company = null;
-		company = CompanyResource.getCompany(companyId).get();
-
+		Optional<CompanyDTO> company = CompanyResource.getCompany(companyId);
+		
 		ComputerDTO dto = new ComputerDTO.ComputerDTOBuilder().setName(name).setIntroduced(introduced.toString())
-				.setDiscontinued(discontinued.toString()).setCompanyId(company.getId())
-				.setCompanyName(company.getName()).build();
+				.setDiscontinued(discontinued.toString()).setCompanyId(company.orElseThrow(ServiceException::new).getId())
+				.setCompanyName(company.orElseThrow(ServiceException::new).getName()).build();
 
 		Data payload = new Data(dto);
 		ComputerResource.postComputer(dto);
@@ -203,14 +197,6 @@ public class Controller {
 	 */
 	private void setPage(Page page) {
 		this.page = page;
-	}
-
-	public CompanyService getCompanyService() {
-		return this.companyService;
-	}
-
-	public ComputerService getComputerService() {
-		return this.computerService;
 	}
 
 }

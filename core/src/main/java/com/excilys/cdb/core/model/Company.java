@@ -23,22 +23,19 @@ import org.hibernate.annotations.OnDeleteAction;
 public class Company implements Serializable {
 
 	private static final long serialVersionUID = 3942228965283035652L;
-	
+
 	@Id
 	@Min(0)
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
-	@Column(name="id")
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id")
 	protected long id;
-	
-	@Size(min=2,max=255,message="Should be between 2 and 255 character!")
+
+	@Size(min = 2, max = 255, message = "Should be between 2 and 255 character!")
 	@NotNull
-	@Basic(optional=false)
-	@Column(name="name")
+	@Basic(optional = false)
+	@Column(name = "name")
 	protected String name;
-	
-	public Company() {
-		
-	}
+
 	public Company(long id, String name) {
 		this.id = id;
 		this.name = name;
@@ -46,7 +43,7 @@ public class Company implements Serializable {
 
 	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
 	@OnDelete(action = OnDeleteAction.CASCADE)
-	Set<Computer> computers;
+	private Set<Computer> computers;
 
 	@Override
 	public String toString() {
@@ -76,12 +73,12 @@ public class Company implements Serializable {
 	public void setComputers(Set<Computer> computers) {
 		this.computers = computers;
 	}
-	
+
 	public void addComputer(Computer computer) {
 		computers.add(computer);
 		computer.setCompany(this);
 	}
-	
+
 	public void removeComputer(Computer computer) {
 		computers.remove(computer);
 		computer.setCompany(null);
@@ -107,17 +104,22 @@ public class Company implements Serializable {
 			return false;
 		Company other = (Company) obj;
 		if (computers == null) {
-			if (other.computers != null)
+			if (other.computers != null) {
 				return false;
-		} else if (!computers.equals(other.computers))
+			}
+		} else if (!computers.equals(other.computers)) {
 			return false;
-		if (id != other.id)
+		}
+		if (id != other.id) {
 			return false;
+		}
 		if (name == null) {
-			if (other.name != null)
+			if (other.name != null) {
 				return false;
-		} else if (!name.equals(other.name))
+			}
+		} else if (!name.equals(other.name)) {
 			return false;
+		}
 		return true;
-	}	
+	}
 }

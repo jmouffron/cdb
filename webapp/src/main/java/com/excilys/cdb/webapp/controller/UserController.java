@@ -13,7 +13,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.excilys.cdb.binding.dto.UserDTO;
 import com.excilys.cdb.core.model.User;
@@ -22,9 +21,9 @@ import com.excilys.cdb.service.UserService;
 @Controller
 public class UserController {
 
-	private final String SIGNUP = "signup";
-	private final String REDIRECT_OP = "redirect:/computer/";
-	private final String LOGIN = "login";
+	private static final String SIGNUP = "signup";
+	private static final String REDIRECT_OP = "redirect:/computer/";
+	private static final String LOGIN = "login";
 
 	private final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private UserService userService;
@@ -49,8 +48,9 @@ public class UserController {
 		model.addAttribute("user", auth);
 		return REDIRECT_OP;
 	}
-
-	@RequestMapping("/logout")
+	
+	@GetMapping("/logout")
+	@PostMapping("/logout")
 	public String postlogoutPage(HttpServletRequest request, HttpServletResponse response) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 
@@ -74,7 +74,7 @@ public class UserController {
 			model.addAttribute("user", new User());
 			return SIGNUP;
 		}
-		logger.error("" + auth.getPrincipal());
+		logger.error("{}", auth.getPrincipal());
 		userService.create(auth.getPrincipal());
 		model.addAttribute("user", auth);
 		return REDIRECT_OP;

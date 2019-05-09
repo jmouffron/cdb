@@ -3,7 +3,7 @@ package com.excilys.cdb.binding.exception;
 public class ResourceFileException extends Exception {
 
 	private static final long serialVersionUID = 1L;
-
+	private static final String MSG = "Resource File for jdbc Connection Not Found";
 	/**
 	 * @param message
 	 * @param cause
@@ -12,7 +12,7 @@ public class ResourceFileException extends Exception {
 	 */
 	public ResourceFileException(String message, Throwable cause, boolean enableSuppression,
 			boolean writableStackTrace) {
-		super(message + "Resource File for jdbc Connection Not Found", cause, enableSuppression, writableStackTrace);
+		super(message + MSG, cause, enableSuppression, writableStackTrace);
 	}
 
 	/**
@@ -20,14 +20,14 @@ public class ResourceFileException extends Exception {
 	 * @param cause
 	 */
 	public ResourceFileException(String message, Throwable cause) {
-		super(message + "Resource File for jdbc Connection Not Found", cause);
+		super(message + MSG, cause);
 	}
 
 	/**
 	 * @param message
 	 */
 	public ResourceFileException(String message) {
-		super(message + "Resource File for jdbc Connection Not Found");
+		super(message + MSG);
 	}
 
 	/**

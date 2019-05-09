@@ -3,56 +3,56 @@ package com.excilys.cdb.console.cli;
 import java.sql.Timestamp;
 import java.util.InputMismatchException;
 import java.util.Scanner;
-import java.util.function.Function;
+import java.util.function.LongPredicate;
+import java.util.function.Predicate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ControllerUtils {
-	public static Scanner scan = new Scanner(System.in);
-	private static Logger logger = LoggerFactory.getLogger(ControllerUtils.class);
-	private ControllerUtils() {}
+	public static final Scanner scan = new Scanner(System.in);
+	private static final Logger logger = LoggerFactory.getLogger(ControllerUtils.class);
 
-	static Function<Long, Boolean> isStrictlyPositive = inputVal -> inputVal == null || inputVal < 0 ;
-	static Function<Long, Boolean> isNotNullLong = inputVal -> inputVal != null;
-	static Function<String, Boolean> isNotNullString = inputVal -> "".equals(inputVal);
-	static Function<Long, Boolean> isPositive = inputVal -> inputVal == null || inputVal <= 0;
-	static Function<String, Boolean> isPorAorE = inputVal -> "".equals(inputVal) || !inputVal.equals("P") || !inputVal.equals("N")
-			|| !inputVal.equals("E");
+	private ControllerUtils() {
+	}
 
+	static LongPredicate isStrictlyPositive = inputVal -> inputVal < 0 ;
+	static Predicate<String> isNotNullString = inputVal -> inputVal.equals("") || inputVal == null;
+	static LongPredicate isPositive = inputVal -> inputVal <= 0;
+	static Predicate<String> isPorAorE = inputVal -> !inputVal.equals("P") || !inputVal.equals("A")
+			|| !inputVal.equals("E") || !inputVal.equals("") || inputVal == null;
 
-	public static long getLongInput(String message, Function<Long, Boolean> boolFunc) {
+	public static long getLongInput(String message, LongPredicate boolFunc) {
 		Long value = null;
 		boolean error;
 
 		do {
 			error = false;
-			System.out.println(message);
+			logger.info(message);
 			try {
 				value = scan.nextLong();
 			} catch (InputMismatchException e) {
 				error = true;
 			}
-		} while (error || boolFunc.apply(value));
+		} while (error || boolFunc.test(value));
 
 		return value;
 	}
 
-	public static String getStringInput(String message, Function<String, Boolean> boolFunc) {
+	public static String getStringInput(String message, Predicate<String> boolFunc) {
 		String value = "";
 		boolean error;
 
 		do {
 			error = false;
-			System.out.println(message);
+			logger.info(message);
 			try {
 				value = scan.next();
-				logger.error("StringScan: " + value);
 			} catch (InputMismatchException e) {
 				error = true;
 			}
-		} while (error || boolFunc.apply(value));
-		logger.error("Passed value: " + value);
+		} while (error || boolFunc.test(value));
+
 		return value;
 	}
 
@@ -62,7 +62,7 @@ public class ControllerUtils {
 
 		do {
 			error = false;
-			System.out.println(message);
+			logger.info(message);
 			try {
 				value = Timestamp.valueOf(scan.nextLine());
 			} catch (InputMismatchException e) {

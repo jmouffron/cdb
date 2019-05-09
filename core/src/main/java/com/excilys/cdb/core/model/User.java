@@ -121,22 +121,27 @@ public class User implements Serializable, UserDetails {
 	private boolean tokenExpired;
 
 	private List<Role> roles;
+	
+	public User() {
+		
+	}
 
 	public User(@Size(min = 2, max = 255, message = "Should be between 2 and 255 character!") @NotNull String username,
 			@Size(min = 8, max = 255, message = "Should be between 8 and 255 character!") @NotNull String password,
-			String email, Timestamp createdAt, Timestamp updatedAt, boolean enabled, boolean tokenExpired, List<Role> roles) {
+			String email, boolean enabled, boolean tokenExpired, List<Role> roles) {
 		super();
 		this.username = username;
 		this.password = password;
 		this.email = email;
-		this.createdAt = createdAt;
-		this.updatedAt = updatedAt;
+		this.createdAt = Timestamp.from(Instant.now());
+		this.updatedAt = Timestamp.from(Instant.now());
 		this.enabled = enabled;
 		this.tokenExpired = tokenExpired;
 		this.roles = roles;
 	}
 	
 	public User(Long id, String username, String password,String email,List<Role> roles) {
+		super();
 		this.id = id;
         this.username = username;
         this.email = email;
@@ -144,13 +149,9 @@ public class User implements Serializable, UserDetails {
         this.roles = roles;
 	}
 
-	public User() {
-		super();
-	}
-
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		List<SimpleGrantedAuthority> authorities = new ArrayList<SimpleGrantedAuthority>();
+		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 		authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
 		Optional<Role> admin = roles.stream()
 			.filter(role -> role.getName().equals("ADMIN"))
@@ -329,16 +330,7 @@ public class User implements Serializable, UserDetails {
 		}
 
 		public User build() {
-			Timestamp now = Timestamp.from(Instant.now());
-			if( createdAt == null && updatedAt != null) {
-				return new User(username, password, email, createdAt, now, true, false, roles);
-			} else if ( updatedAt == null && createdAt != null) {
-				return new User(username, password, email, now, updatedAt, true, false, roles);
-			} else if (createdAt == null && updatedAt == null ) {
-				return new User(username, password, email, now, now, true, false, roles);
-			} else {
-				return new User(username, password, email, now, now, true, false, roles);
-			}
+			return new User(username, password, email, true, false, roles);
 		}
 	}
 }
