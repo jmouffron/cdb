@@ -3,6 +3,7 @@ package com.excilys.cdb.binding.validator;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ValidationUtils;
@@ -26,6 +27,7 @@ public class ComputerDTOValidator implements Validator {
 	public void validate(final Object obj, Errors errors) {
 		if (obj == null) {
 			errors.reject("500", "Computer is null!");
+			return;
 		}
 		
 		if(obj instanceof List) {
@@ -37,7 +39,7 @@ public class ComputerDTOValidator implements Validator {
 		
 	}
 	
-	private void verif(Object obj, Errors errors) {
+	private void verif(@NonNull Object obj, Errors errors) {
 		ComputerDTO dto = (ComputerDTO) obj;
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "dtopc.name.empty");
 

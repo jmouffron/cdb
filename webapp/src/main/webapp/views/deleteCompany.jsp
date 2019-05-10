@@ -15,9 +15,9 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-xs-8 col-xs-offset-2 box">
-					<h1>Delete Company</h1>
 					<form action="/computer/delete" method="POST">
 						<fieldset>
+						<legend><spring:message code="deleteCompany.heading "/></legend>
 							<div class="form-group">
 								<p>${computer}</p>
 							</div>

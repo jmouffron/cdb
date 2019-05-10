@@ -2,6 +2,7 @@ package com.excilys.cdb.core.model;
 
 import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Objects;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -112,47 +113,23 @@ public class Computer implements Serializable {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = super.hashCode();
-		result = prime * result + ((company == null) ? 0 : company.hashCode());
-		result = prime * result + ((discontinued == null) ? 0 : discontinued.hashCode());
-		result = prime * result + ((introduced == null) ? 0 : introduced.hashCode());
-		return result;
+		return Objects.hash(company, discontinued, id, introduced, name);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (!super.equals(obj))
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass()) {
+		}
+		if (!(obj instanceof Computer)) {
 			return false;
 		}
 		Computer other = (Computer) obj;
-		if (company == null) {
-			if (other.company != null) {
-				return false;
-			}
-		} else if (!company.equals(other.company)) {
-			return false;
-		}
-			
-		if (discontinued == null) {
-			if (other.discontinued != null) {
-				return false;
-			}
-		} else if (!discontinued.equals(other.discontinued)) {
-			return false;
-		}
-		if (introduced == null) {
-			if (other.introduced != null) {
-				return false;
-			}
-		} else if (!introduced.equals(other.introduced)) {
-			return false;
-		}
-		return true;
+		return Objects.equals(company, other.company) && Objects.equals(discontinued, other.discontinued)
+				&& id == other.id && Objects.equals(introduced, other.introduced) && Objects.equals(name, other.name);
 	}
 
 	/**

@@ -2,22 +2,19 @@ package com.excilys.cdb.console.cli;
 
 import org.slf4j.LoggerFactory;
 
-import com.excilys.cdb.binding.exception.ServiceException;
-
 public class EntityPage extends Page {
-
-	public EntityPage(Data payload) throws ServiceException {
+	public EntityPage(Data payload) {
 		this.data = payload;
 		this.logger = LoggerFactory.getLogger(EntityPage.class);
 	}
 
 	@Override
 	public MenuChoiceEnum show() {
-		System.out.println("==============================");
-		System.out.println(" |          Entity           | ");
-		System.out.println("==============================");
+		logger.info(DELIMITER);
+		logger.info(" |          Entity           | ");
+		logger.info(DELIMITER);
 		data.show();
-		System.out.println("==============================");
+		logger.info(DELIMITER);
 		return MenuChoiceEnum.DEFAULT;
 	}
 }

@@ -2,6 +2,9 @@ package com.excilys.cdb.console.cli;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.excilys.cdb.binding.dto.EntityDTO;
 
 /**
@@ -12,8 +15,10 @@ import com.excilys.cdb.binding.dto.EntityDTO;
  *
  */
 public class Data {
+	private static final Logger logger = LoggerFactory.getLogger(Data.class);
 	protected List<EntityDTO> dataList;
-	protected EntityDTO data;
+	protected EntityDTO content;
+	protected long id;
 
 	/**
 	 * 
@@ -23,7 +28,11 @@ public class Data {
 	}
 
 	public Data(EntityDTO data) {
-		this.data = data;
+		this.content = data;
+	}
+
+	public Data(long computerId) {
+		this.id = computerId;
 	}
 
 	public List<EntityDTO> getDataList() {
@@ -31,7 +40,7 @@ public class Data {
 	}
 
 	public EntityDTO getData() {
-		return data;
+		return content;
 	}
 
 	public void setData(List<EntityDTO> data) {
@@ -39,25 +48,29 @@ public class Data {
 	}
 
 	public void setData(EntityDTO data) {
-		this.data = data;
+		this.content = data;
 	}
 
 	/**
 	 * Displays a single Entity
 	 */
 	public void show() {
-		System.out.println(this.data);
+		logger.info("{}", this.content);
+	}
+	
+	public void showId() {
+		logger.info("{}", this.id);
 	}
 
 	/**
 	 * Displays a definite number of items from the list of entities in the Data
-	 * object strating from a start index
+	 * object starting from a start index
 	 * 
 	 * @param startIndex
 	 * @param numberToShow
 	 */
 	public void list(long startIndex, long numberToShow) {
 		this.dataList.stream().skip(startIndex).limit(numberToShow)
-				.forEach(entity -> System.out.println("\t" + entity));
+				.forEach(entity -> logger.info("\t {}", entity));
 	}
 }

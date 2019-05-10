@@ -15,7 +15,10 @@
 	<section id="main">
 		<div class="container-fluid">
 			<div class="alert alert-danger">
-				Error 404: Page not found ! <br /> ${ stackTrace }
+				Error 404: Page not found !
+			</div>
+			<div class="alert alert-danger">
+				${stackTrace}
 			</div>
 		</div>
 	</section>

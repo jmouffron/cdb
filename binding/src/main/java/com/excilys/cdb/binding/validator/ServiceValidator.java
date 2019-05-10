@@ -58,22 +58,7 @@ public class ServiceValidator {
 	}
 
 	public static boolean computerValidator(Computer newEntity, String entity) throws BadInputException {
-		if (newEntity == null) {
-			log.error(NEW_NULL_ENTITY, entity);
-			throw new BadInputException();
-		}
-		if (newEntity.getId() <= 0L) {
-			log.error("Bad Id on NewEntity for {}", entity);
-			throw new BadInputException();
-		}
-		if (newEntity.getName() == null || newEntity.getName().equals("")) {
-			log.error(NULL_NAME_ENTITY, entity);
-			throw new BadInputException();
-		}
-		if (newEntity.getIntroduced() == null && newEntity.getDiscontinued() != null) {
-			log.error("Discontinued Date on NewEntity without Introduced Date for {}", entity);
-			throw new BadInputException();
-		}
+		
 		if (newEntity.getIntroduced() != null && newEntity.getDiscontinued() != null
 				&& newEntity.getIntroduced().compareTo(newEntity.getDiscontinued()) > 0) {
 			log.error("Discontinued Date on NewEntity before Introduced Date for {}", entity);
@@ -141,6 +126,25 @@ public class ServiceValidator {
 		}
 
 		return true;
+	}
+	
+	public static void nullChecks(ComputerDTO newEntity, String entity) throws BadInputException {
+		if (newEntity == null) {
+			log.error(NEW_NULL_ENTITY, entity);
+			throw new BadInputException();
+		}
+		if (newEntity.getId() <= 0L) {
+			log.error("Bad Id on NewEntity for {}", entity);
+			throw new BadInputException();
+		}
+		if (newEntity.getName() == null || newEntity.getName().equals("")) {
+			log.error(NULL_NAME_ENTITY, entity);
+			throw new BadInputException();
+		}
+		if (newEntity.getIntroduced() == null && newEntity.getDiscontinued() != null) {
+			log.error("Discontinued Date on NewEntity without Introduced Date for {}", entity);
+			throw new BadInputException();
+		}
 	}
 
 }

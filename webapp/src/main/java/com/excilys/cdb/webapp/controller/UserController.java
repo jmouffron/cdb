@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import com.excilys.cdb.binding.dto.UserDTO;
+import com.excilys.cdb.binding.exception.DaoException;
+import com.excilys.cdb.binding.exception.EmailExistException;
 import com.excilys.cdb.core.model.User;
 import com.excilys.cdb.service.UserService;
 
@@ -75,7 +77,12 @@ public class UserController {
 			return SIGNUP;
 		}
 		logger.error("{}", auth.getPrincipal());
-		userService.create(auth.getPrincipal());
+		try {
+			userService.create((UserDTO) auth.getPrincipal());
+		} catch (DaoException | EmailExistException e) {
+			model.addAttribute("stackTrace",e.getMessage());
+			return SIGNUP;
+		}
 		model.addAttribute("user", auth);
 		return REDIRECT_OP;
 	}

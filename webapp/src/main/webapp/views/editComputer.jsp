@@ -19,7 +19,6 @@
 			<div class="row">
 				<div class="col-xs-8 col-xs-offset-2 box">
 					<div class="label label-default pull-right">id: ${computer.id}</div>
-					<h1><spring:message code="editComputer.heading" /></h1>
 
 					<form:form action="${ctx}/computer/edit/${computer.id}" method="POST"
 						modelAttribute="dto">
@@ -27,6 +26,7 @@
 							id="${computer.id}" />
 
 						<fieldset>
+						<legend><spring:message code="editComputer.heading" /></legend>
 							<form:errors path="*" cssClass="errorblock" element="div" />
 							<div class="form-group">
 								<form:label path="name" for="computerName">

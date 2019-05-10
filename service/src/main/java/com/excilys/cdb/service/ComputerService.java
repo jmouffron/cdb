@@ -21,20 +21,16 @@ import com.excilys.cdb.persistence.mapper.ComputerMapper;
 @Transactional
 public class ComputerService {
 	private DaoComputer dao;
-	private ComputerMapper pcMapper;
-	private CompanyService corpService;
-	private static Logger log = LoggerFactory.getLogger(ComputerService.class);
+	private static Logger logger = LoggerFactory.getLogger(ComputerService.class);
 
-	public ComputerService(DaoComputer dao, CompanyService service, ComputerMapper mapper) {
+	public ComputerService(DaoComputer dao) {
 		this.dao = dao;
-		this.corpService = service;
-		this.pcMapper = mapper;
 	}
 
 	@Transactional(readOnly = true)
 	public Optional<List<ComputerDTO>> getAll() throws DaoException {
 		List<ComputerDTO> list = null;
-		list = this.dao.getAll().get().stream().map(ComputerMapper::mapToDTO).map(Optional::get)
+		list = this.dao.getAll().orElseThrow(DaoException::new).stream().map(ComputerMapper::mapToDTO).map(Optional::get)
 				.collect(Collectors.toList());
 
 		return Optional.ofNullable(list);
@@ -43,7 +39,7 @@ public class ComputerService {
 	@Transactional(readOnly = true)
 	public Optional<List<ComputerDTO>> orderBy(String name, boolean isDesc) throws ServiceException, DaoException {
 		List<ComputerDTO> list = null;
-		list = this.dao.getAllOrderedBy(name, isDesc).get().stream().map(ComputerMapper::mapToDTO).map(Optional::get)
+		list = this.dao.getAllOrderedBy(name, isDesc).orElseThrow(ServiceException::new).stream().map(ComputerMapper::mapToDTO).map(Optional::get)
 				.collect(Collectors.toList());
 		return Optional.ofNullable(list);
 	}
@@ -52,7 +48,7 @@ public class ComputerService {
 	public Optional<List<ComputerDTO>> searchByName(String name) throws DaoException {
 		String regex = "(?i)(.*)" + name + "(.*)";
 		List<ComputerDTO> filteredComputers = null;
-		filteredComputers = this.dao.getAll().get().stream()
+		filteredComputers = this.dao.getAll().orElseThrow(DaoException::new).stream()
 				.filter(computer -> computer.getName().matches(regex) || computer.getCompany().getName().matches(regex))
 				.map(ComputerMapper::mapToDTO).map(Optional::get).collect(Collectors.toList());
 
@@ -61,9 +57,9 @@ public class ComputerService {
 	
 	@Transactional(readOnly = true)
 	public Optional<List<ComputerDTO>> searchByNameOrdered(String name, String order, boolean isDesc)
-			throws ServiceException, DaoException {
+			throws ServiceException {
 		List<ComputerDTO> filteredComputers = null;
-		filteredComputers = this.dao.searchBy(name).get().stream().map(ComputerMapper::mapToDTO).map(Optional::get)
+		filteredComputers = this.dao.searchBy(name).orElseThrow(ServiceException::new).stream().map(ComputerMapper::mapToDTO).map(Optional::get)
 				.collect(Collectors.toList());
 
 		return Optional.ofNullable(filteredComputers);
@@ -71,27 +67,27 @@ public class ComputerService {
 
 	@Transactional(readOnly = true)
 	public Optional<ComputerDTO> getOneById(Long id) throws BadInputException {
-		return ComputerMapper.mapToDTO(this.dao.getOneById(id).get());
+		return ComputerMapper.mapToDTO(this.dao.getOneById(id).orElseThrow(BadInputException::new));
 	}
 	
 	@Transactional(readOnly = true)
 	public Optional<ComputerDTO> getOneByName(String name) throws BadInputException {
-		return ComputerMapper.mapToDTO(this.dao.getOneByName(name).get());
+		return ComputerMapper.mapToDTO(this.dao.getOneByName(name).orElseThrow(BadInputException::new));
 	}
 	
-	public void create(Computer newEntity) throws ServiceException, DaoException {
+	public void create(Computer newEntity) throws DaoException {
 		this.dao.create(newEntity);
 	}
 
-	public void updateById(Computer newEntity) throws BadInputException, DaoException {
+	public void updateById(Computer newEntity) throws DaoException {
 		this.dao.updateById(newEntity);
 	}
 
-	public void deleteById(Long id) throws BadInputException, DaoException {
+	public void deleteById(Long id) throws DaoException {
 		this.dao.deleteById(id);
 	}
 
-	public void deleteByName(String name) throws ServiceException, DaoException {
+	public void deleteByName(String name) throws DaoException {
 		this.dao.deleteByName(name);
 	}
 
@@ -105,7 +101,7 @@ public class ComputerService {
 
 	public Optional<List<ComputerDTO>> getPage(Long page) throws DaoException {
 		List<ComputerDTO> list = null;
-		list = this.dao.getAll().get().stream().map(ComputerMapper::mapToDTO).map(Optional::get)
+		list = this.dao.getAll().orElseThrow(DaoException::new).stream().map(ComputerMapper::mapToDTO).map(Optional::get)
 				.collect(Collectors.toList());
 
 		return Optional.ofNullable(list);

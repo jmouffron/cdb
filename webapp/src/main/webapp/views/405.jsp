@@ -15,7 +15,7 @@
 	<section id="main">
 		<div class="container-fluid">
 			<div class="alert alert-danger">
-				Error 403: Access denied!
+				Error 405: Method Not Allowed!
 			</div>
 			<div class="alert alert-danger">
 				${stackTrace}

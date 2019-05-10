@@ -11,11 +11,11 @@ public class EntityAddPage extends Page{
 
   @Override
 	public MenuChoiceEnum show() {
-		System.out.println("==============================");
-		System.out.print("Entity ");
+		logger.info(DELIMITER);
+		logger.info("Entity ");
 		data.show();
-		System.out.println("created .");
-		System.out.println("==============================");
+		logger.info("created .");
+		logger.info(DELIMITER);
 		return MenuChoiceEnum.DEFAULT;
 	}
 

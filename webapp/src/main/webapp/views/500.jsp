@@ -15,7 +15,8 @@
 		<div class="container-fluid">
 			<div class="alert alert-danger">
 				Error 500: An error has occured! <br />
-				<!-- stacktrace -->
+			</div>
+			<div class="alert alert-danger">
 				${stackTrace}
 			</div>
 		</div>

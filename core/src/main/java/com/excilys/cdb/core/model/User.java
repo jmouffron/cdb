@@ -6,6 +6,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.persistence.Basic;
@@ -19,6 +20,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.NaturalId;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -37,6 +39,7 @@ public class User implements Serializable, UserDetails {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
+	@NaturalId
 	@Size(min = 2, max = 255, message = "Should be between 2 and 255 character!")
 	@NotNull
 	@Basic(optional = false)
@@ -123,7 +126,7 @@ public class User implements Serializable, UserDetails {
 	private List<Role> roles;
 	
 	public User() {
-		
+		super();
 	}
 
 	public User(@Size(min = 2, max = 255, message = "Should be between 2 and 255 character!") @NotNull String username,
@@ -199,6 +202,30 @@ public class User implements Serializable, UserDetails {
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return true;
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(createdAt, email, enabled, id, password, roles, token, tokenExpired, updatedAt, username);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof User)) {
+			return false;
+		}
+		User other = (User) obj;
+		return Objects.equals(createdAt, other.createdAt) && Objects.equals(email, other.email)
+				&& enabled == other.enabled && Objects.equals(id, other.id) && Objects.equals(password, other.password)
+				&& Objects.equals(roles, other.roles) && Objects.equals(token, other.token)
+				&& tokenExpired == other.tokenExpired && Objects.equals(updatedAt, other.updatedAt)
+				&& Objects.equals(username, other.username);
 	}
 
 	public static class UserBuilder {

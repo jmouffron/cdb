@@ -28,69 +28,69 @@ public class CompanyService {
 		this.corpMapper = mapper;
 	}
 
-	public Optional<List<CompanyDTO>> getAll() throws ServiceException {
+	public Optional<List<CompanyDTO>> getAll() throws ServiceException, DaoException {
 		List<CompanyDTO> list = null;
-		list = this.dao.getAll().get().stream().map(CompanyMapper::mapToDTO).collect(Collectors.toList());
+		list = this.dao.getAll().orElseThrow(ServiceException::new).stream().map(CompanyMapper::mapToDTO).collect(Collectors.toList());
 
 		return Optional.ofNullable(list);
 	}
 
 	public Optional<List<CompanyDTO>> orderBy(String name, boolean isDesc) throws ServiceException, DaoException {
 		List<CompanyDTO> list;
-		list = this.dao.getAllOrderedBy(name, isDesc).get().stream().map(CompanyMapper::mapToDTO)
+		list = this.dao.getAllOrderedBy(name, isDesc).orElseThrow(ServiceException::new).stream().map(CompanyMapper::mapToDTO)
 				.collect(Collectors.toList());
 
 		return Optional.ofNullable(list);
 	}
 
-	public Optional<List<CompanyDTO>> searchByName(String name) throws ServiceException {
+	public Optional<List<CompanyDTO>> searchByName(String name) throws ServiceException, DaoException {
 		List<CompanyDTO> filteredCompanies = null;
-		filteredCompanies = this.dao.getAll().get().stream().filter(company -> company.getName().matches(name))
+		filteredCompanies = this.dao.getAll().orElseThrow(ServiceException::new).stream().filter(company -> company.getName().matches(name))
 				.map(CompanyMapper::mapToDTO).collect(Collectors.toList());
 
 		return Optional.ofNullable(filteredCompanies);
 	}
 
-	public Optional<CompanyDTO> getOneById(Long id) throws BadInputException {
+	public Optional<CompanyDTO> getOneById(Long id) throws BadInputException, DaoException {
 		ServiceValidator.idValidator(id, "company");
 
-		return Optional.ofNullable(CompanyMapper.mapToDTO(dao.getOneById(id).get()));
+		return Optional.ofNullable(CompanyMapper.mapToDTO(dao.getOneById(id).orElseThrow(BadInputException::new)));
 	}
 
-	public Optional<CompanyDTO> getOneByName(String name) throws BadInputException {
+	public Optional<CompanyDTO> getOneByName(String name) throws BadInputException, DaoException {
 		ServiceValidator.nameValidator(name, "company");
 
-		return Optional.ofNullable(CompanyMapper.mapToDTO(dao.getOneByName(name).get()));
+		return Optional.ofNullable(CompanyMapper.mapToDTO(dao.getOneByName(name).orElseThrow(BadInputException::new)));
 	}
 
-	public boolean create(CompanyDTO newEntity) throws ServiceException, DaoException {
+	public void create(CompanyDTO newEntity) throws ServiceException, DaoException {
 		ServiceValidator.companyDTOValidator(newEntity);
 		Optional<Company> company = corpMapper.mapToCompany(newEntity, this.getDao());
-		return this.dao.create(company.orElseThrow(ServiceException::new));
+		this.dao.create(company.orElseThrow(ServiceException::new));
 	}
 
-	public boolean updateById(CompanyDTO newEntity) throws ServiceException, DaoException {
+	public void updateById(CompanyDTO newEntity) throws ServiceException, DaoException {
 		ServiceValidator.companyDTOValidator(newEntity);
 		Optional<Company> company = corpMapper.mapToCompany(newEntity, this.getDao());
-		return this.dao.updateById(company.orElseThrow(ServiceException::new));
+		this.dao.updateById(company.orElseThrow(ServiceException::new));
 	}
 
-	public boolean deleteById(Long id) throws ServiceException {
+	public void deleteById(Long id) throws ServiceException {
 		ServiceValidator.idValidator(id, "Company");
 
 		try {
-			return this.dao.deleteById(id);
+			this.dao.deleteById(id);
 		} catch (DaoException e) {
 			log.error(e.getMessage());
 			throw new ServiceException("Couldn't delete by id!");
 		}
 	}
 
-	public boolean deleteByName(String name, ComputerService service) throws ServiceException {
+	public void deleteByName(String name) throws ServiceException {
 		ServiceValidator.nameValidator(name, "Company");
 
 		try {
-			return this.dao.deleteByName(name);
+			this.dao.deleteByName(name);
 		} catch (DaoException e) {
 			log.error(e.getMessage());
 			throw new ServiceException("Couldn't delete by name!");

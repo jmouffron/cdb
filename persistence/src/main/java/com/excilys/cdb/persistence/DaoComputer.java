@@ -40,18 +40,17 @@ public class DaoComputer {
 		return criteriaBuild(Computer.class);
 	}
 
-	public Optional<List<Computer>> getAllOrderedBy(String orderBy, boolean desc) throws DaoException {
+	public Optional<List<Computer>> getAllOrderedBy(String orderBy, boolean desc){
 		return criteriaOrder(orderBy, desc);
 	}
 
 	public Optional<Computer> getOneById(Long id) {
-		Computer criteriaComputer = criteriaGet(id).get();
-		return Optional.ofNullable(criteriaComputer);
+		return criteriaGet(id);
+
 	}
 
 	public Optional<Computer> getOneByName(String name) {
-		Computer criteriaComputer = criteriaGet(name).get();
-		return Optional.ofNullable(criteriaComputer);
+		return criteriaGet(name);
 	}
 
 	public void create(Computer newEntity) throws DaoException {
@@ -145,7 +144,7 @@ public class DaoComputer {
 		return computerFetched;
 	}
 
-	private Optional<List<Computer>> criteriaOrder(String orderBy, boolean desc) throws DaoException {
+	private Optional<List<Computer>> criteriaOrder(String orderBy, boolean desc) {
 		Optional<List<Computer>> criteriaComputers;
 		try (Session session = getSession();) {
 			CriteriaBuilder builder = session.getCriteriaBuilder();
@@ -178,7 +177,7 @@ public class DaoComputer {
 			query.where(builder.equal(root.get("id"), id));
 
 			TypedQuery<Computer> typedQuery = session.createQuery(query);
-			log.error("Computer : " + typedQuery.getSingleResult());
+			log.error("Computer : {}", typedQuery.getSingleResult());
 			computer = Optional.ofNullable(typedQuery.getSingleResult());
 		}
 
@@ -196,7 +195,7 @@ public class DaoComputer {
 			query.select(root).where(builder.equal(root.get("name"), name));
 
 			TypedQuery<Computer> typedQuery = session.createQuery(query);
-			log.error("Computer : " + typedQuery.getSingleResult());
+			log.error("Computer : {}", typedQuery.getSingleResult());
 			computer = Optional.ofNullable(typedQuery.getSingleResult());
 		}
 

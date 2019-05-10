@@ -1,19 +1,26 @@
 package com.excilys.cdb.persistence;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaDelete;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.CriteriaUpdate;
+import javax.persistence.criteria.Root;
+
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.excilys.cdb.binding.exception.DaoException;
-import com.excilys.cdb.persistence.mapper.CompanyMapper;
 import com.excilys.cdb.core.model.Company;
 
 /**
@@ -26,146 +33,175 @@ import com.excilys.cdb.core.model.Company;
 @Repository
 public class DaoCompany {
 
-	private final String DELETE_ID = "DELETE FROM company WHERE id=? ";
-	private final String COMPUTER_CASCADE_DELETE_ID = "DELETE FROM computers WHERE company_id=? ";
-	private final String DELETE_NAME = "DELETE FROM company WHERE name=? ";
-	private final String COMPUTER_CASCADE_DELETE_NAME = "DELETE FROM computers LEFT JOIN company ON computer.company_id = company.id WHERE company.name = ? ";
-	private final String DESC = " DESC;";
-	private final String INSERT = "INSERT INTO company VALUES(?,?)";
-	private final String SELECT_ALL = "SELECT id, name FROM company ";
-	private final String SELECT_ID = "SELECT id, name FROM company where id=?";
-	private final String SELECT_NAME = "SELECT id, name FROM company where name=?";
-	private final String UPDATE = "UPDATE company SET name=? WHERE id=?";
-	private final String ORDER_BY = SELECT_ALL + "ORDER BY ";
-
 	private final Logger log = LoggerFactory.getLogger(DaoCompany.class);
-	private Datasource datasource;
 
-	JdbcTemplate jdbcTemplate;
-	private CompanyMapper corpMapper;
+	private SessionFactory sessionFactory;
 
-	public DaoCompany(JdbcTemplate jdbc, CompanyMapper mapper) {
-		this.jdbcTemplate = jdbc;
-		this.corpMapper = mapper;
+	public DaoCompany(SessionFactory sessionFactory) {
+		this.sessionFactory = sessionFactory;
 	}
 
-	private Connection getConnection() throws DaoException {
-		return this.datasource.getConnection().get();
-	}
-	
-	@Transactional(readOnly=true)
-	public Optional<List<Company>> getAll() {
-		List<Company> companyFetched = jdbcTemplate.query(SELECT_ALL, corpMapper);
-		return Optional.ofNullable(companyFetched);
-	}
-	
-	@Transactional(readOnly=true)
-	public Optional<List<Company>> getAllOrderedBy(String orderBy, boolean desc) {
-		String QUERY = desc ? ORDER_BY + orderBy + DESC : ORDER_BY + orderBy;
-		List<Company> companyFetched = jdbcTemplate.query(QUERY, corpMapper);
-		return Optional.ofNullable(companyFetched);
-	}
-	
-	@Transactional(readOnly=true)
-	public Optional<Company> getOneById(Long id) {
-		Company companyFetched = jdbcTemplate.queryForObject(SELECT_ID, new Object[] { id }, corpMapper);
-		return Optional.ofNullable(companyFetched);
-	}
-	
-	@Transactional(readOnly=true)
-	public Optional<Company> getOneByName(String name) {
-		log.error(name);
-		Company companyFetched = jdbcTemplate.queryForObject(SELECT_NAME, new Object[] { name }, corpMapper);
-		return Optional.ofNullable(companyFetched);
+	private Session getSession() {
+		return this.sessionFactory.openSession();
 	}
 
-	@Transactional
-	public boolean create(Company newEntity) throws DaoException {
-		int affected = jdbcTemplate.update(INSERT, new Object[] { newEntity });
-		if (affected > 0) {
-			throw new DaoException("Couldn't insert " + newEntity.getName());
+	@Transactional(readOnly = true)
+	public Optional<List<Company>> getAll() throws DaoException {
+		Optional<List<Company>> companies;
+		try (Session session = getSession();) {
+			Transaction tx = session.beginTransaction();
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaQuery<Company> query = builder.createQuery(Company.class);
+			Root<Company> root = query.from(Company.class);
+			query.select(root);
+			TypedQuery<Company> typedQuery = session.createQuery(query);
+			companies = Optional.ofNullable(typedQuery.getResultList());
+			tx.commit();
+
+		} catch (HibernateException e) {
+			log.error(e.getMessage());
+			throw new DaoException(e.getMessage());
 		}
-		return affected > 0 ? true : false;
+
+		return companies;
 	}
-	
-	@Transactional
-	public boolean updateById(Company newEntity) throws DaoException {
-		int affected = jdbcTemplate.update(UPDATE, new Object[] { newEntity });
-		if (affected > 0) {
-			throw new DaoException("Couldn't update " + newEntity.getName());
-		}
-		return affected > 0 ? true : false;
-	}
-	
-	@Transactional
-	public boolean deleteById(Long id) throws DaoException {
-		int lineAffected = 0;
 
-		try (Connection conn = getConnection();
-				PreparedStatement stmt = conn.prepareStatement(DELETE_ID);
-				PreparedStatement computerStmt = conn.prepareStatement(COMPUTER_CASCADE_DELETE_ID);) {
-			conn.setAutoCommit(false);
-
-			stmt.setLong(1, id);
-
-			lineAffected = stmt.executeUpdate();
-
-			if (lineAffected > 0) {
-				computerStmt.setLong(1, id);
-				lineAffected = computerStmt.executeUpdate();
+	@Transactional(readOnly = true)
+	public Optional<List<Company>> getAllOrderedBy(String orderBy, boolean desc) throws DaoException {
+		Optional<List<Company>> companies;
+		try (Session session = getSession();) {
+			Transaction tx = session.beginTransaction();
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaQuery<Company> query = builder.createQuery(Company.class);
+			Root<Company> root = query.from(Company.class);
+			if (desc) {
+				query.select(root).where().orderBy(builder.desc(root.<Set<String>>get(orderBy)));
 			} else {
-				throw new DaoException("Couldn't rollback from delete transaction !");
+				query.select(root).where().orderBy(builder.asc(root.<Set<String>>get(orderBy)));
 			}
+			TypedQuery<Company> typedQuery = session.createQuery(query);
+			companies = Optional.ofNullable(typedQuery.getResultList());
+			tx.commit();
 
-			conn.commit();
-		} catch (SQLException sqlex) {
-			log.error(sqlex.getMessage());
-			throw new DaoException("Couldn't rollback from delete transaction !");
+		} catch (HibernateException e) {
+			log.error(e.getMessage());
+			throw new DaoException(e.getMessage());
 		}
 
-		return lineAffected > 0 ? true : false;
+		return companies;
 	}
-	
-	@Transactional
-	public boolean deleteByName(String name) throws DaoException {
-		int lineAffected = 0;
-		Connection conn = getConnection();
 
-		try (PreparedStatement stmt = conn.prepareStatement(DELETE_NAME);
-				PreparedStatement computerStmt = conn.prepareStatement(COMPUTER_CASCADE_DELETE_NAME);) {
-			conn.setAutoCommit(false);
-			stmt.setString(1, name);
+	@Transactional(readOnly = true)
+	public Optional<Company> getOneById(Long id) throws DaoException {
+		Optional<Company> company;
+		try (Session session = getSession();) {
+			Transaction tx = session.beginTransaction();
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaQuery<Company> query = builder.createQuery(Company.class);
+			Root<Company> root = query.from(Company.class);
 
-			lineAffected = stmt.executeUpdate();
+			query.select(root).where(builder.equal(root.get("id"), id));
 
-			if (lineAffected > 0) {
-				computerStmt.setString(1, name);
-				lineAffected = computerStmt.executeUpdate();
-			} else {
-				conn.rollback();
-				throw new DaoException("Couldn't rollback from delete transaction !");
-			}
-			conn.commit();
-		} catch (SQLException sqlex) {
-			log.error(sqlex.getMessage());
-			try {
-				conn.rollback();
-				conn.close();
-			} catch (SQLException e) {
-				log.error(e.getMessage());
-				throw new DaoException(e.getMessage());
-			}
-			throw new DaoException("Couldn't rollback from delete transaction !");
-		} finally {
-			try {
-				conn.setAutoCommit(true);
-			} catch (SQLException e) {
-				log.error(e.getMessage());
-				throw new DaoException(e.getMessage());
-			}
+			TypedQuery<Company> typedQuery = session.createQuery(query);
+			company = Optional.ofNullable(typedQuery.getSingleResult());
+			tx.commit();
+
+		} catch (HibernateException e) {
+			log.error(e.getMessage());
+			throw new DaoException(e.getMessage());
 		}
 
-		return lineAffected > 0 ? true : false;
+		return company;
+	}
+
+	@Transactional(readOnly = true)
+	public Optional<Company> getOneByName(String name) throws DaoException {
+		Optional<Company> company;
+		try (Session session = getSession();) {
+			Transaction tx = session.beginTransaction();
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaQuery<Company> query = builder.createQuery(Company.class);
+			Root<Company> root = query.from(Company.class);
+
+			query.select(root).where(builder.equal(root.get("name"), name));
+
+			TypedQuery<Company> typedQuery = session.createQuery(query);
+			company = Optional.ofNullable(typedQuery.getSingleResult());
+			tx.commit();
+
+		} catch (HibernateException e) {
+			log.error(e.getMessage());
+			throw new DaoException(e.getMessage());
+		}
+
+		return company;
+	}
+
+	@Transactional
+	public void create(Company newEntity) throws DaoException {
+		try (Session session = getSession();) {
+			session.save(newEntity);
+		} catch (HibernateException e) {
+			log.error(e.getMessage());
+			throw new DaoException(e.getMessage());
+		}
+	}
+
+	@Transactional
+	public void updateById(Company newEntity) throws DaoException {
+		try (Session session = getSession();) {
+			Transaction tx = session.beginTransaction();
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaUpdate<Company> updater = builder.createCriteriaUpdate(Company.class);
+			Root<Company> root = updater.from(Company.class);
+
+			updater.set("name", newEntity.getName());
+
+			updater.where(builder.equal(root.get("id"), newEntity.getId()));
+
+			session.createQuery(updater).executeUpdate();
+			tx.commit();
+
+		} catch (HibernateException e) {
+			log.error(e.getMessage());
+			throw new DaoException(e.getMessage());
+		}
+	}
+
+	@Transactional
+	public void deleteById(Long id) throws DaoException {
+		try (Session session = getSession();) {
+			Transaction tx = session.beginTransaction();
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaDelete<Company> deleter = builder.createCriteriaDelete(Company.class);
+			Root<Company> root = deleter.from(Company.class);
+
+			deleter.where(builder.equal(root.get("id"), id));
+
+			session.createQuery(deleter).executeUpdate();
+			tx.commit();
+		} catch (HibernateException e) {
+			log.error(e.getMessage());
+			throw new DaoException(e.getMessage());
+		}
+	}
+
+	@Transactional
+	public void deleteByName(String name) throws DaoException {
+		try (Session session = getSession();) {
+			Transaction tx = session.beginTransaction();
+			CriteriaBuilder builder = session.getCriteriaBuilder();
+			CriteriaDelete<Company> deleter = builder.createCriteriaDelete(Company.class);
+			Root<Company> root = deleter.from(Company.class);
+
+			deleter.where(builder.equal(root.get("name"), name));
+
+			session.createQuery(deleter).executeUpdate();
+			tx.commit();
+		} catch (HibernateException e) {
+			log.error(e.getMessage());
+			throw new DaoException(e.getMessage());
+		}
 	}
 
 }

@@ -18,6 +18,7 @@ public abstract class Page {
 	 * Data encapsulator object for the view
 	 */
 	protected Data data;
+	protected static final String DELIMITER = "==============================";
 
 	/**
 	 * Returns a MenuChoiceEnum that defines a user choice for the controller

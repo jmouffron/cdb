@@ -6,7 +6,6 @@ import com.excilys.cdb.binding.exception.PageException;
 
 public class EntityListPage extends Page {
 	
-	private static final String DELIMITER = "==============================";
 	private long dataPerPage;
 	private long totalPageNumber;
 

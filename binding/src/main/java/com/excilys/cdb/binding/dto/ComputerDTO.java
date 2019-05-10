@@ -61,7 +61,7 @@ public class ComputerDTO extends EntityDTO {
 	 * @param company
 	 */
 	@JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
-	public ComputerDTO(@JsonProperty("id") long id, @JsonProperty("companyName") String name,
+	public ComputerDTO(@JsonProperty("id") long id, @JsonProperty("name") String name,
 			@JsonProperty("introduced") String introduced, @JsonProperty("discontinued") String discontinued,
 			@JsonProperty("companyName") String companyName, @JsonProperty("companyId") long companyId) {
 		this.id = id;

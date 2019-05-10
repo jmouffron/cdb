@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.excilys.cdb.binding.dto.CompanyDTO;
 import com.excilys.cdb.binding.exception.DaoException;
 import com.excilys.cdb.binding.exception.ServiceException;
-import com.excilys.cdb.persistence.mapper.CompanyMapper;
 import com.excilys.cdb.service.CompanyService;
 import com.excilys.cdb.service.view.Pagination;
 
@@ -33,9 +32,7 @@ public class RestfulCompanyController {
 
 	private Pagination pagination;
 
-
-	public RestfulCompanyController(CompanyService companyService, Pagination pagination,
-			CompanyMapper mapper) {
+	public RestfulCompanyController(CompanyService companyService, Pagination pagination) {
 		this.companyService = companyService;
 		this.pagination = pagination;
 	}
@@ -45,7 +42,7 @@ public class RestfulCompanyController {
 			@RequestParam(name = "search", required = false) String search,
 			@RequestParam(name = "isDesc", required = false, defaultValue = "true") boolean isDesc,
 			@RequestParam(name = "toOrder", required = false, defaultValue= "name") String toOrder
-	){
+	) {
 		Optional<List<CompanyDTO>> companies;
 		if(toOrder != null ) {
 			try {
@@ -56,7 +53,7 @@ public class RestfulCompanyController {
 		}else {
 			try {
 				companies = Optional.ofNullable(companyService.getAll().orElseThrow(ServiceException::new));
-			} catch (ServiceException e) {
+			} catch (ServiceException | DaoException e) {
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		}
@@ -76,7 +73,7 @@ public class RestfulCompanyController {
 		Optional<CompanyDTO> dto = Optional.empty();
 		try {
 			dto = companyService.getOneById(id);
-		} catch (ServiceException e) {
+		} catch (ServiceException | DaoException e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		if(dto.isPresent()) {

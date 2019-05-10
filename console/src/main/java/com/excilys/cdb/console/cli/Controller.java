@@ -107,11 +107,7 @@ public class Controller {
 		Optional<ComputerDTO> entity = ComputerResource.getComputer(id);
 		Data payload = new Data(entity.orElseThrow(ServiceException::new));
 
-		try {
-			this.setPage(new EntityPage(payload));
-		} catch (ServiceException e) {
-			logger.error(e.getMessage());
-		}
+		this.setPage(new EntityPage(payload));
 	}
 
 	/**
@@ -144,9 +140,27 @@ public class Controller {
 				.setDiscontinued(discontinued.toString()).setCompanyId(company.orElseThrow(ServiceException::new).getId())
 				.setCompanyName(company.orElseThrow(ServiceException::new).getName()).build();
 
-		Data payload = new Data(dto);
-		ComputerResource.postComputer(dto);
+		
+		dto = ComputerResource.postComputer(dto);
 
+		Data payload = new Data(dto);
+		this.setPage(new EntityAddPage(payload));
+
+	}
+	
+	private void createCompany() throws ServiceException {
+
+		String name;
+
+		name = ControllerUtils.getStringInput("Veuillez entrer un nom pour le manufactureur:",
+				ControllerUtils.isNotNullString);
+		
+		CompanyDTO dto = new CompanyDTO(0, name);
+
+		
+		dto = CompanyResource.postCompany(dto);
+
+		Data payload = new Data(dto);
 		this.setPage(new EntityAddPage(payload));
 
 	}
@@ -156,12 +170,67 @@ public class Controller {
 	 * 
 	 * @throws ServiceException
 	 */
-	private void updateComputer() {
-		try {
-			this.setPage(new EntityUpdatePage());
-		} catch (ServiceException e) {
-			logger.error("Bad service instantiation in controller");
-		}
+	private void updateComputer() throws ServiceException {
+		Long computerId;
+		String name;
+		Timestamp introduced;
+		Timestamp discontinued;
+		Long companyId;
+		
+		computerId = ControllerUtils.getLongInput("Veuillez entrer l'id de l'ordinateur:",
+				ControllerUtils.isStrictlyPositive);
+		
+		
+		ComputerDTO computer = ComputerResource.getComputer(computerId).orElseThrow(ServiceException::new);
+		logger.info("L'ordinateur s'appellait : {}", computer.getName());
+		name = ControllerUtils.getStringInput("Veuillez entrer un nouveau nom pour l'ordinateur:",
+				ControllerUtils.isNotNullString);
+		logger.info("L'ancien manufactureur de la compagnie s'appelle : {}", computer.getCompanyName());
+		companyId = ControllerUtils.getLongInput("Veuillez entrer le nouvel id de la companie ayant crée l'ordinateur:",
+				ControllerUtils.isStrictlyPositive);
+
+		do {
+			logger.info("L'ancienne date de mise en fonction de l'ordinateur est : {}", computer.getIntroduced());
+			introduced = ControllerUtils
+					.getTimestampInput("Veuillez entrer la nouvelle date de mise en fonction de l'ordinateur");
+			logger.info("L'ancienne date de fin en fonction de l'ordinateur est : {}", computer.getCompanyName());
+			discontinued = ControllerUtils
+					.getTimestampInput("Veuillez entrer la date de fin de fonction de l'ordinateur");
+		} while (introduced.after(discontinued));
+
+		Optional<CompanyDTO> company = CompanyResource.getCompany(companyId);
+		
+		ComputerDTO dto = new ComputerDTO.ComputerDTOBuilder().setName(name).setIntroduced(introduced.toString())
+				.setDiscontinued(discontinued.toString()).setCompanyId(company.orElseThrow(ServiceException::new).getId())
+				.setCompanyName(company.orElseThrow(ServiceException::new).getName()).build();
+
+		
+		dto = ComputerResource.postComputer(dto);
+		Data payload = new Data(dto);
+		
+		this.setPage(new EntityUpdatePage(payload));
+	}
+	
+	private void updateCompany() throws ServiceException {
+
+		long companyId;
+		String newName;
+
+		companyId = ControllerUtils.getLongInput("Veuillez entrer le nouvel id de la companie ayant crée l'ordinateur:",
+				ControllerUtils.isStrictlyPositive);
+		CompanyDTO company = CompanyResource.getCompany(companyId).orElseThrow(ServiceException::new);
+		logger.info("L'ancienmanufactureur s'appelait : {}", company.getName());
+		newName = ControllerUtils.getStringInput("Veuillez entrer un nom pour le manufactureur:",
+				ControllerUtils.isNotNullString);
+		
+		CompanyDTO dto = new CompanyDTO(company.getId(), newName);
+
+		
+		dto = CompanyResource.putCompany(dto);
+
+		Data payload = new Data(dto);
+		this.setPage(new EntityAddPage(payload));
+
 	}
 
 	/**
@@ -170,11 +239,11 @@ public class Controller {
 	 * @throws ServiceException
 	 */
 	private void deleteComputer() {
-		try {
-			this.setPage(new EntityDeletePage());
-		} catch (ServiceException e) {
-			logger.error("Bad Page instantiation in controller");
-		}
+		long computerId = ControllerUtils.getLongInput("Veuillez entrer l'id de l'ordinateur:",
+				ControllerUtils.isStrictlyPositive);
+		ComputerResource.deleteComputer(computerId);
+		Data payload = new Data(computerId);
+		this.setPage(new EntityDeletePage(payload));
 	}
 
 	/**
@@ -183,11 +252,11 @@ public class Controller {
 	 * @throws ServiceException
 	 */
 	private void deleteCompany() {
-		try {
-			this.setPage(new EntityDeletePage());
-		} catch (ServiceException e) {
-			logger.error("Bad Page instantiation in controller");
-		}
+		long companyId = ControllerUtils.getLongInput("Veuillez entrer l'id de la compagnie:",
+				ControllerUtils.isStrictlyPositive);
+		ComputerResource.deleteComputer(companyId);
+		Data payload = new Data(companyId);
+		this.setPage(new EntityDeletePage(payload));
 	}
 
 	/**

@@ -17,12 +17,10 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-xs-8 col-xs-offset-2 box">
-					<h1>
-						<spring:message code="addComputer.heading" />
-					</h1>
 					<form:form method="POST" action="${ctx}/computer/add"
 						modelAttribute="computer">
 						<fieldset>
+						<legend><spring:message code="addComputer.heading" /></legend>
 							<div class="form-group">
 								<form:errors path="*" cssClass="danger" element="div" />
 								<form:label path="name">

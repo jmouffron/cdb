@@ -7,6 +7,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
@@ -25,39 +26,37 @@ public class ComputerResource {
 	private ComputerResource() {}
 
 	public static Optional<ComputerDTO> getComputer(Long id) {
-		Optional<ComputerDTO> computer = Optional.empty();
 		httpBuilder = client.target(BASE_URI).path("/"+id).request(MediaType.APPLICATION_JSON);
-		computer = Optional.ofNullable(httpBuilder.get(ComputerDTO.class));
-		return computer;
+		return Optional.ofNullable(httpBuilder.get(ComputerDTO.class));
 	}
 
 	public static Optional<List<ComputerDTO>> getAllComputers() {
-		Optional<List<ComputerDTO>> computers = Optional.empty();
 		httpBuilder = client.target(BASE_URI).request(MediaType.APPLICATION_JSON);
-		computers = Optional.ofNullable(httpBuilder.get(List.class));
-		return computers;
+		return Optional.ofNullable(httpBuilder.get(List.class));
 	}
 	
 	public static Optional<List<ComputerDTO>> getSortedComputers(String order) {
-		Optional<List<ComputerDTO>> computers = Optional.empty();
 		httpBuilder = client.target(BASE_URI).queryParam("order", order).request(MediaType.APPLICATION_JSON);
-		computers = Optional.ofNullable(httpBuilder.get(List.class));
-		return computers;
+		return Optional.ofNullable(httpBuilder.get(List.class));
 	}
 	
-	public static void postComputer(ComputerDTO dto) {
+	public static ComputerDTO postComputer(ComputerDTO dto) {
 		httpBuilder = client.target(BASE_URI).path("add").request(MediaType.APPLICATION_JSON);
-		httpBuilder.post(Entity.entity(dto, MediaType.APPLICATION_JSON), ComputerDTO.class);
+		return httpBuilder.post(Entity.entity(dto, MediaType.APPLICATION_JSON), ComputerDTO.class);
 	}
 	
-	public static void putComputer(ComputerDTO dto) {
-		httpBuilder = client.target(BASE_URI).path("edit/"+ dto.getId()).request(MediaType.APPLICATION_JSON);
-		httpBuilder.put(Entity.entity(dto, MediaType.APPLICATION_JSON), ComputerDTO.class);
+	public static ComputerDTO putComputer(ComputerDTO dto) {
+		httpBuilder = client.target(BASE_URI).path("edit/{id}").resolveTemplate("id", dto.getId()).request(MediaType.APPLICATION_JSON);
+		return httpBuilder.put(Entity.entity(dto, MediaType.APPLICATION_JSON), ComputerDTO.class);
 	}
 	
 	public static void deleteComputer(long id) {
-		httpBuilder = client.target(BASE_URI).path("delete/"+ id).request(MediaType.APPLICATION_JSON);
-		httpBuilder.delete();
+		httpBuilder = client.target(BASE_URI).path("delete/{id}").resolveTemplate("id",id).request(MediaType.APPLICATION_JSON);
+		try {
+			httpBuilder.delete();
+		} catch (ResponseProcessingException e) {
+			logger.error(e.getMessage());
+		}
 	}
 
 }

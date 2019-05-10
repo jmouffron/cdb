@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import com.excilys.cdb.binding.dto.ComputerDTO;
 import com.excilys.cdb.binding.exception.BadInputException;
+import com.excilys.cdb.binding.exception.DaoException;
 import com.excilys.cdb.core.model.Company;
 import com.excilys.cdb.core.model.Computer;
 import com.excilys.cdb.persistence.DaoCompany;
@@ -55,14 +56,13 @@ public class ComputerMapper implements RowMapper<Computer>{
     return Optional.ofNullable(computerDTO);
   }
 
-  public Optional<Computer> mapToComputer(ComputerDTO dto, DaoCompany dao) throws BadInputException {
+  public Optional<Computer> mapToComputer(ComputerDTO dto, DaoCompany dao) throws BadInputException, DaoException {
     Optional<Company> company = corpMapper.mapToCompany(dto, dao);
-    logger.info("Introduced: {}", dto.getIntroduced());
     Computer computer = new Computer.ComputerBuilder()
         .setId( dto.getId())
         .setName( dto.getName())
-        .setIntroduced( dto.getIntroduced().isEmpty() ? null : DateUtils.stringToTimestamp( dto.getIntroduced() + " 00:00:00" ) )
-        .setDiscontinued( dto.getDiscontinued().isEmpty() ? null :DateUtils.stringToTimestamp( dto.getDiscontinued() + " 00:00:00")  )
+        .setIntroduced( dto.getIntroduced().isEmpty() ? null : DateUtils.stringToTimestamp( dto.getIntroduced() ) )
+        .setDiscontinued( dto.getDiscontinued().isEmpty() ? null :DateUtils.stringToTimestamp( dto.getDiscontinued())  )
         .setCompany(company.orElseThrow(BadInputException::new))
         .build();
 

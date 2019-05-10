@@ -17,6 +17,7 @@ public class CompanyDTOValidator implements Validator {
 	public void validate(Object target, Errors errors) {
 		if(target == null) {
 			errors.reject("500", "Company is null!");
+			return;
 		}
 		
 		ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "dtocompany.name.empty");

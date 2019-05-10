@@ -7,7 +7,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation;
-import javax.ws.rs.core.GenericType;
+import javax.ws.rs.client.ResponseProcessingException;
 import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
@@ -25,38 +25,37 @@ public class CompanyResource {
 	private CompanyResource() {}
 
 	public static Optional<CompanyDTO> getCompany(Long id) {
-		Optional<CompanyDTO> company = Optional.empty();
 		httpBuilder = client.target(BASE_URI).path("/"+ id).request(MediaType.APPLICATION_JSON);
-		company = Optional.ofNullable(httpBuilder.get(CompanyDTO.class));
-		return company;
+		return Optional.ofNullable(httpBuilder.get(CompanyDTO.class));
+
 	}
 
 	public static Optional<List<CompanyDTO>> getAllCompanies() {
-		Optional<List<CompanyDTO>> companies = Optional.empty();
 		httpBuilder = client.target(BASE_URI).request(MediaType.APPLICATION_JSON);
-		companies = Optional.ofNullable(httpBuilder.get(new GenericType<List<CompanyDTO>>() {}));
-		return companies;
+		return Optional.ofNullable(httpBuilder.get(List.class));
 	}
 
 	public static Optional<List<CompanyDTO>> getSortedCompanys(String order) {
-		Optional<List<CompanyDTO>> companies = Optional.empty();
 		httpBuilder = client.target(BASE_URI).queryParam("order", order ).request(MediaType.APPLICATION_JSON);
-		companies = Optional.ofNullable(httpBuilder.get(new GenericType<List<CompanyDTO>>() {}));
-		return companies;
+		return Optional.ofNullable(httpBuilder.get(List.class));
 	}
 
-	public static void postCompany(CompanyDTO dto) {
+	public static CompanyDTO postCompany(CompanyDTO dto) {
 		httpBuilder = client.target(BASE_URI).path("add").request(MediaType.APPLICATION_JSON);
-		httpBuilder.post(Entity.entity(dto, MediaType.APPLICATION_JSON));
+		return httpBuilder.post(Entity.entity(dto, MediaType.APPLICATION_JSON), CompanyDTO.class);
 	}
 
-	public static void putCompany(CompanyDTO dto) {
-		httpBuilder = client.target(BASE_URI).path("edit/"+ dto.getId()).request(MediaType.APPLICATION_JSON);
-		httpBuilder.put(Entity.entity(dto, MediaType.APPLICATION_JSON));
+	public static CompanyDTO putCompany(CompanyDTO dto) {
+		httpBuilder = client.target(BASE_URI).path("edit/{id}").resolveTemplate("id", dto.getId()).request(MediaType.APPLICATION_JSON);
+		return httpBuilder.put(Entity.entity(dto, MediaType.APPLICATION_JSON), CompanyDTO.class);
 	}
 
 	public static void deleteCompany(long id) {
-		httpBuilder = client.target(BASE_URI).path("delete/"+ id).request(MediaType.APPLICATION_JSON);
-		httpBuilder.delete();
+		httpBuilder = client.target(BASE_URI).path("delete/{id}").resolveTemplate("id", id).request(MediaType.APPLICATION_JSON);
+		try {
+			httpBuilder.delete();
+		} catch (ResponseProcessingException e) {
+			logger.error(e.getMessage());
+		}
 	}
 }

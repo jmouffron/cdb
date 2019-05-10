@@ -40,8 +40,8 @@ public class DaoUser {
 	}
 	
 	public UserDetails getOneByUsername(String username) throws DaoException {
-		Optional<User> user = Optional.empty();
-		try(Session session = getSession();){
+		Optional<User> user ;
+		try (Session session = getSession();) {
 			CriteriaBuilder builder = session.getCriteriaBuilder();
 			CriteriaQuery<User> query = builder.createQuery(User.class);
 			Root<User> root = query.from(User.class);
@@ -51,12 +51,12 @@ public class DaoUser {
 			
 			TypedQuery<User> typedQuery = session.createQuery(query);
 			user = Optional.ofNullable(typedQuery.getSingleResult());
-		} catch( HibernateException e) {
+		} catch (HibernateException e) {
 			log.error(e.getMessage());
 			throw new DaoException(e.getMessage());
 		}
 		
-		UserBuilder builder = null;
+		UserBuilder builder;
 	    if (user.isPresent()) {
 	      String [] role = (String[]) user.get().getRoles().stream().map(Role::getName).toArray();
 	      builder = org.springframework.security.core.userdetails.User.withUsername(username);
@@ -70,16 +70,14 @@ public class DaoUser {
 	}
 	
 	public User create(User user) throws DaoException {
-		User newUser;
 		try(Session session = getSession();){
 			String result = encoder.encode(user.getPassword());
 			user.setPassword(result);
-			newUser = (User) session.save(user);			
+			return (User) session.save(user);			
 		} catch( HibernateException e) {
 			log.error(e.getMessage());
 			throw new DaoException(e.getMessage());
 		}
-		return newUser;
 	}
 	
 }

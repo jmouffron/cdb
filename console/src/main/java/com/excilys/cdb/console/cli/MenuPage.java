@@ -12,16 +12,16 @@ public class MenuPage extends Page {
 	public MenuChoiceEnum show() {
 		String value;
 
-		System.out.println("Choisissez une option parmi les choix possibles suivants depuis la BDD:");
-		System.out.println("1. Afficher une liste de tous les manufactureurs.");
-		System.out.println("2. Afficher une liste de tous les ordinateurs.");
-		System.out.println("3. Afficher les détails d'un ordinateur.");
-		System.out.println("4. Créer un ordinateur.");
-		System.out.println("5. Mettre à jour un ordinateur.");
-		System.out.println("6. Supprimer un ordinateur.");
-		System.out.println("7. Supprimer un manufactureur.");
-		System.out.println("8. Sortir du programme.");
-		System.out.println("Rentrer le numéro de l'option voulue.");
+		logger.info("Choisissez une option parmi les choix possibles suivants depuis la BDD:");
+		logger.info("1. Afficher une liste de tous les manufactureurs.");
+		logger.info("2. Afficher une liste de tous les ordinateurs.");
+		logger.info("3. Afficher les détails d'un ordinateur.");
+		logger.info("4. Créer un ordinateur.");
+		logger.info("5. Mettre à jour un ordinateur.");
+		logger.info("6. Supprimer un ordinateur.");
+		logger.info("7. Supprimer un manufactureur.");
+		logger.info("8. Sortir du programme.");
+		logger.info("Rentrer le numéro de l'option voulue.");
 
 		value = ControllerUtils.scan.next();
 

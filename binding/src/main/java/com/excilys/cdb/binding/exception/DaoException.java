@@ -40,10 +40,10 @@ public class DaoException extends SQLException {
 
 	/**
 	 * @param reason
-	 * @param SQLState
+	 * @param sqlState
 	 */
-	public DaoException(String reason, String SQLState) {
-		super(reason, SQLState);
+	public DaoException(String reason, String sqlState) {
+		super(reason, sqlState);
 
 	}
 
@@ -58,11 +58,11 @@ public class DaoException extends SQLException {
 
 	/**
 	 * @param reason
-	 * @param SQLState
+	 * @param sqlState
 	 * @param vendorCode
 	 */
-	public DaoException(String reason, String SQLState, int vendorCode) {
-		super(reason, SQLState, vendorCode);
+	public DaoException(String reason, String sqlState, int vendorCode) {
+		super(reason, sqlState, vendorCode);
 
 	}
 

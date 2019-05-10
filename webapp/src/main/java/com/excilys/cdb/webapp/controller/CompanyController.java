@@ -27,7 +27,12 @@ public class CompanyController {
 	private static final String EDIT_COMPANY = "editCompany";
 	private static final String DELETE_COMPANY = "deleteCompany";
 	private static final String ERROR = "500";
-
+	private static final String COMPANY_NAME = "companyName";
+	private static final String EMPTY_OR_NULL = "Empty or null name for company to be searched.";
+	private static final String STACKTRACE = "stackTrace";
+	private static final String SUCCESS = "success";
+	private static final String DANGER = "danger";
+	
 	private CompanyService companyService;
 	
 	public CompanyController(CompanyService service) {
@@ -36,20 +41,20 @@ public class CompanyController {
 
 	@GetMapping({ "/editCompany", "/editCompany" })
 	public String getEditCompany(@RequestParam(required = false) Map<String, String> paths, Model model) {
-		String companyName = paths.get("companyName");
+		String companyName = paths.get(COMPANY_NAME);
 
 		if ("".equals(companyName)) {
-			logger.error("Empty or null name for company to be searched.");
-			model.addAttribute("stackTrace", "Empty or null name for company to be searched.");
+			logger.error(EMPTY_OR_NULL);
+			model.addAttribute(STACKTRACE, EMPTY_OR_NULL);
 			return DASHBOARD;
 		}
 
 		CompanyDTO company = null;
 		try {
-			company = this.companyService.getOneByName(companyName).get();
-		} catch (BadInputException e) {
+			company = this.companyService.getOneByName(companyName).orElseThrow(DaoException::new);
+		} catch (BadInputException | DaoException e) {
 			logger.error(e.getMessage());
-			model.addAttribute("stackTrace", e.getMessage());
+			model.addAttribute(STACKTRACE, e.getMessage());
 			return DASHBOARD;
 		}
 
@@ -61,7 +66,7 @@ public class CompanyController {
 	@PostMapping({ "/editCompany", "/editCompany" })
 	public String postEditCompany(@Validated @RequestParam(required = false) Map<String, String> paths,
 			BindingResult res, Model model) {
-		String companyName = paths.get("companyName");
+		String companyName = paths.get(COMPANY_NAME);
 
 		boolean hasError = setStackTraceBindingError(model, res);
 		if (hasError) {
@@ -69,41 +74,37 @@ public class CompanyController {
 		}
 
 		if (companyName == null) {
-			logger.error("Empty or null name for company to be searched.");
-			model.addAttribute("stackTrace", "Empty or null name for company to be searched.");
+			logger.error(EMPTY_OR_NULL);
+			model.addAttribute(STACKTRACE, EMPTY_OR_NULL);
 			return DASHBOARD;
 		}
 
 		CompanyDTO company = null;
 		try {
-			company = this.companyService.getOneByName(companyName).get();
-		} catch (BadInputException e) {
+			company = this.companyService.getOneByName(companyName).orElseThrow(DaoException::new);
+		} catch (BadInputException | DaoException e) {
 			logger.error(e.getMessage());
-			model.addAttribute("stackTrace", e.getMessage());
+			model.addAttribute(STACKTRACE, e.getMessage());
 			return DASHBOARD;
 		}
 
-		boolean isUpdated = false;
+		
 		try {
-			isUpdated = this.companyService.updateById(company);
+			this.companyService.updateById(company);
 		} catch (DaoException | ServiceException e) {
 			logger.error(e.getMessage());
-			model.addAttribute("stackTrace", e.getMessage());
+			model.addAttribute(STACKTRACE, e.getMessage());
+			model.addAttribute(DANGER, "Company " + company.getName() + " not updated!");
 			return DASHBOARD;
 		}
-
-		if (isUpdated) {
-			model.addAttribute("success", "Company " + company.getName() + " successfully updated!");
-		} else {
-			model.addAttribute("danger", "Company " + company.getName() + " not updated!");
-		}
+		model.addAttribute(SUCCESS, "Company " + company.getName() + " successfully updated!");
 
 		return getEditCompany(paths, model);
 	}
 
 	@GetMapping({ "/deleteCompany", "/deletecompany" })
 	public String getRoot(@RequestParam(required = false) Map<String, String> paths, Model model) {
-		String companyName = paths.get("companyName");
+		String companyName = paths.get(COMPANY_NAME);
 
 		if (companyName == null) {
 			companyName = "";
@@ -111,16 +112,16 @@ public class CompanyController {
 
 		CompanyDTO company = null;
 		try {
-			company = this.companyService.getOneByName(companyName).get();
-		} catch (BadInputException e) {
+			company = this.companyService.getOneByName(companyName).orElseThrow(DaoException::new);
+		} catch (BadInputException | DaoException e) {
 			logger.error(e.getMessage());
-			model.addAttribute("stackTrace", e.getMessage());
+			model.addAttribute(STACKTRACE, e.getMessage());
 			return DASHBOARD;
 		}
 
 		if (company == null) {
-			logger.error("Null company found!");
-			model.addAttribute("stackTrace", "Null Company found!");
+			logger.error(EMPTY_OR_NULL);
+			model.addAttribute(STACKTRACE, EMPTY_OR_NULL);
 			return DASHBOARD;
 		} else {
 			model.addAttribute("company", company);
@@ -137,48 +138,43 @@ public class CompanyController {
 			return ERROR;
 		}
 
-		String success = paths.get("success");
-		String danger = paths.get("danger");
-		String companyName = paths.get("companyName");
+		String success = paths.get(SUCCESS);
+		String danger = paths.get(DANGER);
+		String companyName = paths.get(COMPANY_NAME);
 
 		if (companyName == null) {
 			logger.error("No correct company name found!");
-			model.addAttribute("stackTrace", "No correct company name found!");
+			model.addAttribute(STACKTRACE, "No correct company name found!");
 			return DASHBOARD;
 		}
 
 		CompanyDTO company = null;
 		try {
-			company = this.companyService.getOneByName(companyName).get();
-		} catch (BadInputException e) {
+			company = this.companyService.getOneByName(companyName).orElseThrow(DaoException::new);
+		} catch (BadInputException | DaoException e) {
 			logger.error(e.getMessage());
-			model.addAttribute("stackTrace", e.getMessage());
+			model.addAttribute(STACKTRACE, e.getMessage());
 			return DASHBOARD;
 		}
 
 		if (company == null) {
-			logger.error("Null company found!");
-			model.addAttribute("stackTrace", "Null company found!");
+			logger.error(EMPTY_OR_NULL);
+			model.addAttribute(STACKTRACE, EMPTY_OR_NULL);
 			return DASHBOARD;
 		}
-
-		boolean isDeleted = false;
 
 		try {
-			isDeleted = this.companyService.deleteById(company.getId());
+			this.companyService.deleteById(company.getId());
 		} catch (ServiceException e) {
 			logger.error(e.getMessage());
-			model.addAttribute("stackTrace", e.getMessage());
+			model.addAttribute(STACKTRACE, e.getMessage());
+			model.addAttribute(SUCCESS, success);
+			model.addAttribute(DANGER, "The company" + company.getName() + "couldn't be deleted!");
 			return DASHBOARD;
 		}
-
-		if (isDeleted) {
-			model.addAttribute("success", "The company " + company.getName() + " has been correctly deleted!");
-			model.addAttribute("danger", danger);
-		} else {
-			model.addAttribute("success", success);
-			model.addAttribute("danger", "The company" + company.getName() + "couldn't be deleted!");
-		}
+		
+		model.addAttribute(SUCCESS, "The company " + company.getName() + " has been correctly deleted!");
+		model.addAttribute(DANGER, danger);
 
 		return getRoot(paths, model);
 	}
@@ -188,9 +184,10 @@ public class CompanyController {
 			StringBuilder stackTrace = new StringBuilder();
 			List<ObjectError> errors = res.getAllErrors();
 			errors.forEach(stackTrace::append);
-			model.addAttribute("stackTrace", stackTrace);
+			model.addAttribute(STACKTRACE, stackTrace);
 			return true;
 		}
+		
 		return false;
 	}
 

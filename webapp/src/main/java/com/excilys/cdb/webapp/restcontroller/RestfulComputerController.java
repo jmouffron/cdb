@@ -71,23 +71,21 @@ public class RestfulComputerController {
 			@RequestParam(value="perPage", required = false) IndexPagination perPage,
 			@RequestParam(value="isDesc", required = false) boolean isDesc,
 			@RequestParam(value="order", required = false) String order
-	){
-		Optional<List<ComputerDTO>> computers = Optional.empty();
-		if(order != null && perPage == null && page == null) {
-			
-		} else if(perPage != null && page != null) {
+	) throws DaoException{
+		Optional<List<ComputerDTO>> computers;
+		if(perPage != null && page != null) {
 			try {
 				pagination.setPerPage(perPage);
-				pagination.setElements(computerService.getAll().get());
+				pagination.setElements(computerService.getAll().orElseThrow(DaoException::new));
 				pagination.navigate(page);
 				computers = pagination.list();
 			} catch (PageException | DaoException e) {
 				return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 			}
-		} else if(perPage != null && page != null && order != null) {
+		} else if(perPage != null && order != null) {
 			try {
 				pagination.setPerPage(perPage);
-				pagination.setElements(computerService.orderBy(order, true).get());
+				pagination.setElements(computerService.orderBy(order, true).orElseThrow(DaoException::new));
 				pagination.navigate(page);
 				computers = pagination.list();
 			} catch (PageException | DaoException | ServiceException e) {
@@ -96,7 +94,7 @@ public class RestfulComputerController {
 		} else if(page != null) {
 			try {
 				pagination.setPerPage(IndexPagination.IDX_10);
-				pagination.setElements(computerService.getAll().get());
+				pagination.setElements(computerService.getAll().orElseThrow(DaoException::new));
 				pagination.navigate(page);
 				computers = pagination.list();
 			} catch (PageException | DaoException e) {
@@ -110,11 +108,7 @@ public class RestfulComputerController {
 			}
 		}
 		
-		if(!computers.isPresent()) {
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		
-		return new ResponseEntity<>(computers.get(), HttpStatus.OK);
+		return new ResponseEntity<>(computers.orElseThrow(DaoException::new), HttpStatus.OK);
 	}
 	
 	@GetMapping("/{id}")
@@ -124,14 +118,14 @@ public class RestfulComputerController {
 			computer = computerService.getOneById(id);
 		} catch (BadInputException e) {
 			ErrorJson error = ErrorJson.of(HttpStatus.BAD_REQUEST);
-			return new ResponseEntity<ErrorJson>(error, HttpStatus.BAD_REQUEST);
+			return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
 		}
 
 		if(!computer.isPresent()) {
 			ErrorJson error = ErrorJson.of(HttpStatus.INTERNAL_SERVER_ERROR);
-			return new ResponseEntity<ErrorJson>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+			return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
-		return new ResponseEntity<ComputerDTO>(computer.get(), HttpStatus.OK);
+		return new ResponseEntity<>(computer.get(), HttpStatus.OK);
 	}
 	
 	@PostMapping("/add")
@@ -142,7 +136,7 @@ public class RestfulComputerController {
 		Optional<Computer> computer;
 		try {
 			computer = pcMapper.mapToComputer(dto, companyService.getDao());
-		} catch (BadInputException e1) {
+		} catch (BadInputException | DaoException e1) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		if(!computer.isPresent()) {
@@ -150,7 +144,7 @@ public class RestfulComputerController {
 		}
 		try {
 			computerService.create(computer.get());
-		} catch (DaoException | ServiceException e) {
+		} catch (DaoException e) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
@@ -165,7 +159,7 @@ public class RestfulComputerController {
 		Optional<Computer> computer;
 		try {
 			computer = pcMapper.mapToComputer(dto, companyService.getDao());
-		} catch (BadInputException e1) {
+		} catch (BadInputException | DaoException e1) {
 			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		if(!computer.isPresent()) {
@@ -173,7 +167,7 @@ public class RestfulComputerController {
 		}
 		try {
 			computerService.updateById(computer.get());
-		} catch (DaoException | ServiceException e) {
+		} catch (DaoException e) {
 			return new ResponseEntity<>(HttpStatus.NOT_MODIFIED);
 		}
 		
@@ -189,11 +183,11 @@ public class RestfulComputerController {
 	public ResponseEntity<ComputerDTO> deleteComputer (@PathVariable long id){
 		try {
 			computerService.deleteById(id);
-		} catch (DaoException | ServiceException e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+		} catch (DaoException e) {
+			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 		
-		return new ResponseEntity<>(null, HttpStatus.OK);
+		return new ResponseEntity<>(HttpStatus.OK);
 	}
 	
 }

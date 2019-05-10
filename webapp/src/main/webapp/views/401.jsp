@@ -15,8 +15,10 @@
 	<section id="main">
 		<div class="container-fluid">
 			<div class="alert alert-danger">
-				Error 401: Permission denied! <br />
-				${ stackTrace }
+				Error 401: Permission denied!
+			</div>
+			<div class="alert alert-danger">
+				${stackTrace}
 			</div>
 		</div>
 	</section>

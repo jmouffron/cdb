@@ -1,16 +1,24 @@
 package com.excilys.cdb.binding.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+@JsonDeserialize(as = UserDTO.class)
 public class UserDTO {
 	
 	public UserDTO() {
 		super();
 	}
+	@JsonProperty("id")
 	private long id;
 
+	@JsonProperty("username")
 	private String username;
 
+	@JsonProperty("password")
 	private String password;
 
+	@JsonProperty("email")
 	private String email;
 
 	public long getId() {

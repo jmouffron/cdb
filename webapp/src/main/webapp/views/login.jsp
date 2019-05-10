@@ -18,13 +18,10 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-xs-8 col-xs-offset-2 box">
-					<h1>
-						<spring:message code="login.heading" />
-					</h1>
 					<form:form action="${ctx}/login" method="post"
 						modelAttribute="user">
 						<fieldset>
-
+							<legend><spring:message code="login.heading" /></legend>
 							<form:errors path="*" cssClass="alert-danger" element="div" />
 							<div class="form-group">
 								<form:label path="username">

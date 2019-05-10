@@ -31,7 +31,8 @@ public class ControllerUtils {
 			logger.info(message);
 			try {
 				value = scan.nextLong();
-			} catch (InputMismatchException e) {
+			} catch (InputMismatchException|NumberFormatException e) {
+				logger.error(e.getMessage());
 				error = true;
 			}
 		} while (error || boolFunc.test(value));
@@ -44,12 +45,15 @@ public class ControllerUtils {
 		boolean error;
 
 		do {
+			
 			error = false;
 			logger.info(message);
 			try {
 				value = scan.next();
 			} catch (InputMismatchException e) {
+				logger.error(e.getMessage());
 				error = true;
+				scan.reset();
 			}
 		} while (error || boolFunc.test(value));
 
@@ -61,13 +65,17 @@ public class ControllerUtils {
 		boolean error;
 
 		do {
+			
 			error = false;
 			logger.info(message);
 			try {
-				value = Timestamp.valueOf(scan.nextLine());
-			} catch (InputMismatchException e) {
+				value = Timestamp.valueOf(scan.next() + " 00:00:00");
+			} catch (InputMismatchException | IllegalArgumentException e) {
+				logger.error(e.getMessage());
 				error = true;
+				scan.reset();
 			}
+			
 		} while (error);
 
 		return value;

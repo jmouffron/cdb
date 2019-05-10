@@ -1,6 +1,7 @@
 package com.excilys.cdb.core.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.persistence.Basic;
@@ -39,6 +40,9 @@ public class Company implements Serializable {
 	public Company(long id, String name) {
 		this.id = id;
 		this.name = name;
+	}
+	public Company() {
+		
 	}
 
 	@OneToMany(mappedBy = "company", cascade = CascadeType.ALL)
@@ -86,40 +90,22 @@ public class Company implements Serializable {
 
 	@Override
 	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((computers == null) ? 0 : computers.hashCode());
-		result = prime * result + (int) (id ^ (id >>> 32));
-		result = prime * result + ((name == null) ? 0 : name.hashCode());
-		return result;
+		return Objects.hash(computers, id, name);
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if (obj == null) {
 			return false;
-		if (getClass() != obj.getClass())
+		}
+		if (!(obj instanceof Company)) {
 			return false;
+		}
 		Company other = (Company) obj;
-		if (computers == null) {
-			if (other.computers != null) {
-				return false;
-			}
-		} else if (!computers.equals(other.computers)) {
-			return false;
-		}
-		if (id != other.id) {
-			return false;
-		}
-		if (name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!name.equals(other.name)) {
-			return false;
-		}
-		return true;
+		return Objects.equals(computers, other.computers) && id == other.id && Objects.equals(name, other.name);
 	}
+
 }

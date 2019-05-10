@@ -1,21 +1,20 @@
 package com.excilys.cdb.console.cli;
 
-import com.excilys.cdb.binding.exception.ServiceException;
 import org.slf4j.LoggerFactory;
 
 public class EntityUpdatePage extends Page {
-
-	public EntityUpdatePage() throws ServiceException {
+	public EntityUpdatePage(Data data) {
 		this.logger = LoggerFactory.getLogger(EntityUpdatePage.class);
+		this.data = data;
 	}
 
 	@Override
 	public MenuChoiceEnum show() {
-		System.out.println("==============================");
-		System.out.print("Entity ");
+		logger.info(DELIMITER);
+		logger.info("Entity ");
 		data.show();
-		System.out.println("updated .");
-		System.out.println("==============================");
+		logger.info("updated .");
+		logger.info(DELIMITER);
 		return MenuChoiceEnum.DEFAULT;
 	}
 

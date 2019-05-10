@@ -71,31 +71,31 @@
 								<th class="editMode" style="width: 60px; height: 22px;"><input
 									type="checkbox" id="selectall" /> <span
 									style="vertical-align: top;"> - <a href="#"
-										id="deleteSelected" onclick="$.fn.deleteSelected();"> <i
-											class="fa fa-trash-o fa-lg"></i>
+										id="deleteSelected" onclick="$.fn.deleteSelected();"> <em
+											class="fa fa-trash-o fa-lg"></em>
 									</a>
 								</span></th>
 								<th class="text-center"><spring:message code="dashboard.computer_name" /> <a
-									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=0&order=true"><i
-										class="fa fa-caret-down"></i></a><a
-									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=0"><i
-										class="fa fa-caret-up"></i></a></th>
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=0&order=true"><em
+										class="fa fa-caret-down"></em></a><a
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=0"><em
+										class="fa fa-caret-up"></em></a></th>
 								<th class="text-center"><spring:message code="dashboard.introduced_date" /> <a
-									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=1&order=true"><i
-										class="fa fa-caret-down"></i></a><a
-									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=1"><i
-										class="fa fa-caret-up"></i></a></th>
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=1&order=true"><em
+										class="fa fa-caret-down"></em></a><a
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=1"><em
+										class="fa fa-caret-up"></em></a></th>
 								<th class="text-center"><spring:message code="dashboard.discontinued_date" />
 									<a
-									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=2&order=true"><i
-										class="fa fa-caret-down"></i></a><a
-									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=2"><i
-										class="fa fa-caret-up"></i></a></th>
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=2&order=true"><em
+										class="fa fa-caret-down"></em></a><a
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=2"><em
+										class="fa fa-caret-up"></em></a></th>
 								<th class="text-center"><spring:message code="dashboard.company" /> <a
-									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=3&order=true"><i
-										class="fa fa-caret-down"></i></a><a
-									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=3"><i
-										class="fa fa-caret-up"></i></a></th>
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=3&order=true"><em
+										class="fa fa-caret-down"></em></a><a
+									href="${ctx}/computer?page=${currentPage}&search=${search}&toOrder=3"><em
+										class="fa fa-caret-up"></em></a></th>
 
 							</tr>
 						</thead>
